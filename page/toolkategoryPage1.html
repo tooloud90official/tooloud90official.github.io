@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>툴 카데고리 페이지</title>
+  <style>
+    :root{
+      --bg: #f3f3f3;
+      --folder: rgba(255,255,255,.75);
+      --stroke: rgba(0,0,0,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.18);
+      --radius: 22px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background: radial-gradient(1200px 600px at 20% 10%, #ffffff, var(--bg));
+      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+      color:#111;
+    }
+
+    /* ===== Layout ===== */
+    .dock{
+      display:flex;
+      gap: 22px;
+      align-items:flex-start;
+      padding: 30px 18px;
+    }
+
+    .folder-wrap{ position: relative; }
+
+    /* ===== Folder (collapsed) ===== */
+    .folder{
+      width: 132px;
+      height: 132px;
+      border-radius: var(--radius);
+      background: var(--folder);
+      border: 1px solid var(--stroke);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      padding: 14px;
+      cursor: default;
+      position: relative;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      user-select: none;
+      transition: transform .18s ease;
+    }
+    .folder-wrap:hover .folder{ transform: scale(1.02); }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+      align-content: start;
+      justify-items: center;
+      padding-top: 6px;
+    }
+    .mini-icon{
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 6px 12px rgba(0,0,0,.08);
+    }
+
+    .folder-label{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-34px;
+      text-align:center;
+      font-size:14px;
+      opacity:.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 6px;
+    }
+
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      opacity: 0;
+      pointer-events: none; /* 항상 none */
+      transition: opacity .18s ease;
+      z-index: 10;
+    }
+    .overlay.open{
+      opacity: 1;
+      pointer-events: none; /* open이어도 none 유지 */
+    }
+
+    /* ===== Panel ===== */
+    .panel{
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) translateY(10px) scale(.94);
+      width: min(560px, 92vw);
+      height: min(440px, 78vh);
+      border-radius: 28px;
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      transition: transform .22s ease, opacity .22s ease;
+      padding: 18px;
+      z-index: 20;
+      pointer-events: none;
+
+      /* ✅ 스크롤 영역 만들기 위한 flex */
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      /* ✅ 패널 안에 모달 올릴거라 relative */
+      position: fixed;
+    }
+    .panel.open{
+      transform: translate(-50%, -50%) translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .panel-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 6px 6px 6px 6px;
+      flex: 0 0 auto;
+    }
+    .panel-title{
+      font-size:16px;
+      font-weight: 650;
+      letter-spacing: .2px;
+    }
+    .hint{
+      font-size: 12px;
+      opacity: .6;
+      margin-top: 4px;
+    }
+
+    /* ✅ 앱 그리드: 패널 안 스크롤 */
+    .apps{
+      flex: 1 1 auto;           /* 남는 높이 사용 */
+      overflow: auto;           /* ✅ 여기 스크롤 */
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 8px 6px 12px 6px;
+      align-content: start;
+    }
+    @media (max-width: 520px){
+      .apps{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* (선택) 스크롤바 살짝 예쁘게 */
+    .apps::-webkit-scrollbar{ width: 10px; }
+    .apps::-webkit-scrollbar-thumb{
+      background: rgba(0,0,0,.14);
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.6);
+    }
+    .apps::-webkit-scrollbar-track{ background: transparent; }
+
+    .app{
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.75);
+      padding: 14px 12px;
+      cursor: pointer;
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .app:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
+    .app:active{ transform: translateY(0) scale(.99); }
+
+    .app-icon{
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+    }
+    .app-name{ font-size: 14px; opacity: .95; }
+
+    .app-rate{
+      font-size: 12px;
+      opacity: .65;
+      text-align:center;
+      line-height: 1.35;
+    }
+
+    .app-desc{
+      font-size: 12px;
+      opacity: .65;
+      text-align:center;
+      line-height: 1.35;
+    }
+
+    /* ✅ 더보기 버튼 */
+    .more-btn{
+      margin-top: 2px;
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(37, 99, 235, .25);
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .more-btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+    .more-btn:active{
+      transform: translateY(0) scale(.99);
+    }
+
+    /* ✅ 패널 내부 팝업(모달) */
+    .app-modal{
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      background: rgba(0,0,0,.18);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 30;
+    }
+    .app-modal.open{ display: flex; }
+
+    .app-modal-card{
+      width: min(420px, 92%);
+      border-radius: 20px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 16px 16px 14px 16px;
+    }
+    .app-modal-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .app-modal-title{
+      font-size: 15px;
+      font-weight: 750;
+    }
+    .app-modal-msg{
+      font-size: 13px;
+      opacity: .75;
+      line-height: 1.45;
+      margin-top: 6px;
+    }
+    .x-btn{
+      border: 0;
+      background: rgba(0,0,0,.06);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .ghost-btn{
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.8);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    .primary-btn{
+      border: 0;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 750;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .overlay, .panel, .folder, .more-btn, .app { transition: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>카테고리 페이지</h2>
+  <div class="dock" id="dock"></div>
+
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <!-- 패널(공용 하나만) -->
+  <div class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Folder Panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title" id="panelTitle">Folder</div>
+        <div class="hint">이미지 생성에 특화된 AI</div>
+      </div>
+    </div>
+
+    <div class="apps" id="panelApps"></div>
+
+    <!-- ✅ 패널 내부 팝업 -->
+    <div class="app-modal" id="appModal" aria-hidden="true">
+      <div class="app-modal-card">
+        <div class="app-modal-top">
+          <div>
+            <div class="app-modal-title" id="modalTitle">제목</div>
+            <div class="app-modal-msg" id="modalMsg">내용</div>
+          </div>
+          <button class="x-btn" id="modalX" type="button">✕</button>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn" id="modalClose" type="button">닫기</button>
+          <button class="primary-btn" id="modalAction" type="button">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ 폴더 데이터 (원하면 나중에 runUrl/detailUrl 연결)
+    const folders = [
+      {
+        title: "이미지 생성",
+        apps: [
+          { name: "App A", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "이미지 생성에 최적화", grad: "linear-gradient(135deg,#ff6b6b,#ffd93d)" },
+          { name: "App B", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "깔끔한 UI/UX", grad: "linear-gradient(135deg,#5f6cff,#7df9ff)" },
+          { name: "App C", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "고화질 이미지 생성에 최적화된 유틸리티", grad: "linear-gradient(135deg,#7c3aed,#f472b6)" },
+        ],
+      },
+      {
+        title: "영상 생성",
+        apps: [
+          { name: "App D", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#34d399,#a7f3d0)" },
+          { name: "App E", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#fb7185,#fecdd3)" },
+          { name: "App F", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#f59e0b,#fde68a)" },
+          { name: "App G", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#60a5fa,#bfdbfe)" },
+        ],
+      },
+      {
+        title: "오디오 생성",
+        apps: [
+          { name: "App H", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#a78bfa,#ddd6fe)" },
+          { name: "App I", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#22c55e,#bbf7d0)" },
+          { name: "App J", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#f97316,#fed7aa)" },
+          { name: "App K", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#06b6d4,#a5f3fc)" },
+          { name: "App L", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#64748b,#cbd5e1)" },
+        ],
+      },
+    ];
+
+    const dock = document.getElementById('dock');
+    const overlay = document.getElementById('overlay');
+    const panel = document.getElementById('panel');
+    const panelTitle = document.getElementById('panelTitle');
+    const panelApps = document.getElementById('panelApps');
+
+    // 모달
+    const appModal = document.getElementById('appModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMsg = document.getElementById('modalMsg');
+    const modalX = document.getElementById('modalX');
+    const modalClose = document.getElementById('modalClose');
+    const modalAction = document.getElementById('modalAction');
+
+    let closeTimer = null;
+    let modalState = { type: null, appName: null };
+
+    function showModal(type, appName){
+      modalState = { type, appName };
+
+      if(type === 'run'){
+        modalTitle.textContent = "앱 실행";
+        modalMsg.textContent = `"${appName}" 실행 링크로 이동할 예정이에요. (지금은 팝업만)`;
+        modalAction.textContent = "실행";
+      } else {
+        modalTitle.textContent = "상세 보기";
+        modalMsg.textContent = `"${appName}" 상세페이지로 이동할 예정이에요. (지금은 팝업만)`;
+        modalAction.textContent = "상세로";
+      }
+
+      appModal.classList.add('open');
+      appModal.setAttribute('aria-hidden', 'false');
+      clearTimeout(closeTimer); // 모달 열려있으면 닫힘 방지
+    }
+
+    function hideModal(){
+      appModal.classList.remove('open');
+      appModal.setAttribute('aria-hidden', 'true');
+      modalState = { type: null, appName: null };
+    }
+
+    modalX.addEventListener('click', hideModal);
+    modalClose.addEventListener('click', hideModal);
+
+    // 모달 배경 클릭하면 닫기 (카드 클릭 방지)
+    appModal.addEventListener('click', (e) => {
+      if(e.target === appModal) hideModal();
+    });
+
+    // 모달 확인 버튼 (나중에 링크 연결 위치)
+    modalAction.addEventListener('click', () => {
+      const { type, appName } = modalState;
+
+      if(type === 'run'){
+        // ✅ 나중에 연결 예:
+        // location.href = `/run/${encodeURIComponent(appName)}`;
+        alert(`[실행] ${appName} (여기에 실행 링크 연결)`);
+      } else if(type === 'detail'){
+        // ✅ 나중에 연결 예:
+        // location.href = `/detail/${encodeURIComponent(appName)}`;
+        alert(`[상세] ${appName} (여기에 상세 페이지 링크 연결)`);
+      }
+
+      hideModal();
+    });
+
+    function openFolder(folder){
+      clearTimeout(closeTimer);
+
+      panelTitle.textContent = folder.title;
+
+      // ✅ 카드 클릭(실행) + 더보기 버튼(상세) 분리
+      panelApps.innerHTML = folder.apps.map(app => `
+        <div class="app" data-app="${app.name}">
+          <div class="app-icon" style="background:${app.grad}"></div>
+          <div class="app-name">${app.name}</div>
+          <div class="app-rate">${app.rate}</div>
+          <div class="app-desc">${app.desc}</div>
+
+          <button class="more-btn" type="button" data-app="${app.name}">더보기</button>
+        </div>
+      `).join("");
+
+      overlay.classList.add('open');
+      panel.classList.add('open');
+
+      // ✅ 카드(아이콘/타일) 클릭 = 실행 팝업
+      panelApps.querySelectorAll('.app').forEach(card => {
+        card.addEventListener('click', () => {
+          const appName = card.dataset.app;
+          showModal('run', appName);
+        });
+      });
+
+      // ✅ 더보기 클릭 = 상세 팝업 (카드 클릭으로 번지지 않게)
+      panelApps.querySelectorAll('.more-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const appName = btn.dataset.app;
+          showModal('detail', appName);
+        });
+      });
+    }
+
+    function scheduleClose(){
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => {
+        if(appModal.classList.contains('open')) return; // ✅ 모달 열려있으면 안 닫힘
+        overlay.classList.remove('open');
+        panel.classList.remove('open');
+      }, 120);
+    }
+
+    function renderFolders(){
+      dock.innerHTML = folders.map((f, idx) => {
+        const minis = f.apps.slice(0, 9).map(a =>
+          `<div class="mini-icon" style="background:${a.grad}"></div>`
+        ).join("");
+
+        return `
+          <div class="folder-wrap" data-idx="${idx}">
+            <div class="folder" aria-label="${f.title}">
+              <div class="mini-grid" aria-hidden="true">${minis}</div>
+              <div class="folder-label">${f.title}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll('.folder-wrap').forEach(wrap => {
+        const idx = Number(wrap.dataset.idx);
+        wrap.addEventListener('mouseenter', () => openFolder(folders[idx]));
+        wrap.addEventListener('mouseleave', scheduleClose);
+      });
+    }
+
+    // 패널 hover 유지
+    panel.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+    panel.addEventListener('mouseleave', scheduleClose);
+
+    renderFolders();
+
+    function isInside(el, x, y){
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if (!panel.classList.contains('open')) return;
+
+      // ✅ 모달이 열려있으면 닫힘 방지
+      if(appModal.classList.contains('open')){
+        clearTimeout(closeTimer);
+        return;
+      }
+
+      const insidePanel = isInside(panel, e.clientX, e.clientY);
+      const insideFolder = !!e.target.closest('.folder-wrap');
+
+      if (insidePanel || insideFolder) {
+        clearTimeout(closeTimer);
+      } else {
+        scheduleClose();
+      }
+    });
+  </script>
+</body>
+</html>

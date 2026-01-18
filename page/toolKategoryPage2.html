@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>툴 카데고리 페이지</title>
+  <style>
+    :root{
+      --bg: #f3f3f3;
+      --folder: rgba(255,255,255,.75);
+      --stroke: rgba(0,0,0,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.18);
+      --radius: 22px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background: radial-gradient(1200px 600px at 20% 10%, #ffffff, var(--bg));
+      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+      color:#111;
+    }
+
+    .dock{
+      display:flex;
+      gap: 22px;
+      align-items:flex-start;
+      padding: 30px 18px;
+    }
+    .folder-wrap{ position: relative; }
+
+    .folder{
+      width: 132px;
+      height: 132px;
+      border-radius: var(--radius);
+      background: var(--folder);
+      border: 1px solid var(--stroke);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      padding: 14px;
+      cursor: default;
+      position: relative;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      user-select: none;
+      transition: transform .18s ease;
+    }
+    .folder-wrap:hover .folder{ transform: scale(1.02); }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+      align-content: start;
+      justify-items: center;
+      padding-top: 6px;
+    }
+    .mini-icon{
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 6px 12px rgba(0,0,0,.08);
+    }
+    .folder-label{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-34px;
+      text-align:center;
+      font-size:14px;
+      opacity:.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 6px;
+    }
+
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 10;
+    }
+    .overlay.open{ opacity: 1; pointer-events:none; }
+
+    .panel{
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) translateY(10px) scale(.94);
+      width: min(560px, 92vw);
+      height: min(520px, 80vh);
+      border-radius: 28px;
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      transition: transform .22s ease, opacity .22s ease;
+      padding: 18px;
+      z-index: 20;
+      pointer-events: none;
+
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+
+      position: fixed;
+    }
+    .panel.open{
+      transform: translate(-50%, -50%) translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .panel-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 6px 6px 0 6px;
+      flex: 0 0 auto;
+    }
+    .panel-title{
+      font-size:16px;
+      font-weight: 650;
+      letter-spacing: .2px;
+    }
+    .hint{
+      font-size: 12px;
+      opacity: .6;
+      margin-top: 4px;
+    }
+
+    /* ✅ 리스트 영역만 스크롤 */
+    .list{
+      flex: 1 1 auto;
+      overflow: auto;
+      padding: 6px 6px 10px 6px;
+      border-top: 1px solid rgba(0,0,0,.06); /* ✅ 상단 구분선 */
+    }
+
+    .list::-webkit-scrollbar{ width: 10px; }
+    .list::-webkit-scrollbar-thumb{
+      background: rgba(0,0,0,.14);
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.6);
+    }
+    .list::-webkit-scrollbar-track{ background: transparent; }
+
+    /* ✅ 세로 리스트 아이템 */
+    .row{
+      display:flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 6px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,.06); /* ✅ 각 행 구분선 */
+      transition: background .15s ease;
+    }
+    .row:hover{
+      background: rgba(255,255,255,.55);
+      border-radius: 16px;
+    }
+
+    .row-left{
+      flex: 0 0 auto;
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+    }
+
+    .row-mid{
+      flex: 1 1 auto;
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .row-topline{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .row-name{
+      font-size: 14px;
+      font-weight: 700;
+      opacity: .95;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-rate{
+      font-size: 12px;
+      opacity: .75;
+      white-space: nowrap;
+    }
+
+    .row-desc{
+      font-size: 12px;
+      opacity: .65;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;          /* 두 줄까지만 */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .row-right{
+      flex: 0 0 auto;
+      display:flex;
+      align-items:center;
+      gap: 6px;
+    }
+
+    /* ✅ 상세 링크(> 형태) */
+    .detail-link{
+      border: 0;
+      background: transparent;
+      color: rgba(17,17,17,.7);
+      font-weight: 750;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 12px;
+      transition: background .15s ease;
+      white-space: nowrap;
+    }
+    .detail-link:hover{
+      background: rgba(0,0,0,.06);
+    }
+    .chev{
+      font-weight: 900;
+      opacity: .55;
+      padding-right: 4px;
+    }
+
+    /* ✅ 모달(기존 그대로) */
+    .app-modal{
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      background: rgba(0,0,0,.18);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 30;
+    }
+    .app-modal.open{ display: flex; }
+
+    .app-modal-card{
+      width: min(420px, 92%);
+      border-radius: 20px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 16px 16px 14px 16px;
+    }
+    .app-modal-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .app-modal-title{
+      font-size: 15px;
+      font-weight: 750;
+    }
+    .app-modal-msg{
+      font-size: 13px;
+      opacity: .75;
+      line-height: 1.45;
+      margin-top: 6px;
+    }
+    .x-btn{
+      border: 0;
+      background: rgba(0,0,0,.06);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .ghost-btn{
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.8);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    .primary-btn{
+      border: 0;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 750;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .overlay, .panel, .folder { transition: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>카테고리 페이지</h2>
+  <div class="dock" id="dock"></div>
+
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <div class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Folder Panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title" id="panelTitle">Folder</div>
+        <div class="hint" id="panelHint">설명</div>
+      </div>
+    </div>
+
+    <!-- ✅ 리스트(세로) -->
+    <div class="list" id="panelList"></div>
+
+    <!-- ✅ 모달 -->
+    <div class="app-modal" id="appModal" aria-hidden="true">
+      <div class="app-modal-card">
+        <div class="app-modal-top">
+          <div>
+            <div class="app-modal-title" id="modalTitle">제목</div>
+            <div class="app-modal-msg" id="modalMsg">내용</div>
+          </div>
+          <button class="x-btn" id="modalX" type="button">✕</button>
+        </div>
+
+        <div class="modal-actions">
+          <button class="ghost-btn" id="modalClose" type="button">닫기</button>
+          <button class="primary-btn" id="modalAction" type="button">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const folders = [
+      {
+        title: "이미지 생성",
+        hint: "이미지 생성에 특화된 AI",
+        apps: [
+          { name: "App A", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "이미지 생성에 최적화", grad: "linear-gradient(135deg,#ff6b6b,#ffd93d)" },
+          { name: "App B", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "깔끔한 UI/UX", grad: "linear-gradient(135deg,#5f6cff,#7df9ff)" },
+          { name: "App C", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "고화질 이미지 생성에 최적화된 유틸리티", grad: "linear-gradient(135deg,#7c3aed,#f472b6)" },
+          { name: "App M", rate: "⭐️⭐️⭐️⭐️", desc: "스타일 변환에 강점", grad: "linear-gradient(135deg,#10b981,#a7f3d0)" },
+          { name: "App N", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "프롬프트 템플릿 제공", grad: "linear-gradient(135deg,#f97316,#fed7aa)" },
+        ],
+      },
+      {
+        title: "영상 생성",
+        hint: "영상 생성 툴 모음",
+        apps: [
+          { name: "App D", rate: "⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#34d399,#a7f3d0)" },
+          { name: "App E", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#fb7185,#fecdd3)" },
+          { name: "App F", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#f59e0b,#fde68a)" },
+          { name: "App G", rate: "⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#60a5fa,#bfdbfe)" },
+        ],
+      },
+      {
+        title: "오디오 생성",
+        hint: "오디오/음성 생성 툴 모음",
+        apps: [
+          { name: "App H", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#a78bfa,#ddd6fe)" },
+          { name: "App I", rate: "⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#22c55e,#bbf7d0)" },
+          { name: "App J", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#f97316,#fed7aa)" },
+          { name: "App K", rate: "⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#06b6d4,#a5f3fc)" },
+          { name: "App L", rate: "⭐️⭐️⭐️⭐️⭐️", desc: "한줄 소개", grad: "linear-gradient(135deg,#64748b,#cbd5e1)" },
+        ],
+      },
+    ];
+
+    const dock = document.getElementById('dock');
+    const overlay = document.getElementById('overlay');
+    const panel = document.getElementById('panel');
+    const panelTitle = document.getElementById('panelTitle');
+    const panelHint = document.getElementById('panelHint');
+    const panelList = document.getElementById('panelList');
+
+    const appModal = document.getElementById('appModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMsg = document.getElementById('modalMsg');
+    const modalX = document.getElementById('modalX');
+    const modalClose = document.getElementById('modalClose');
+    const modalAction = document.getElementById('modalAction');
+
+    let closeTimer = null;
+    let modalState = { type: null, appName: null };
+
+    function showModal(type, appName){
+      modalState = { type, appName };
+
+      if(type === 'run'){
+        modalTitle.textContent = "앱 실행";
+        modalMsg.textContent = `"${appName}" 실행 링크로 이동할 예정이에요. (지금은 팝업만)`;
+        modalAction.textContent = "실행";
+      } else {
+        modalTitle.textContent = "상세 보기";
+        modalMsg.textContent = `"${appName}" 상세페이지로 이동할 예정이에요. (지금은 팝업만)`;
+        modalAction.textContent = "상세로";
+      }
+
+      appModal.classList.add('open');
+      appModal.setAttribute('aria-hidden', 'false');
+      clearTimeout(closeTimer);
+    }
+
+    function hideModal(){
+      appModal.classList.remove('open');
+      appModal.setAttribute('aria-hidden', 'true');
+      modalState = { type: null, appName: null };
+    }
+
+    modalX.addEventListener('click', hideModal);
+    modalClose.addEventListener('click', hideModal);
+    appModal.addEventListener('click', (e) => { if(e.target === appModal) hideModal(); });
+
+    modalAction.addEventListener('click', () => {
+      const { type, appName } = modalState;
+      if(type === 'run'){
+        alert(`[실행] ${appName} (여기에 실행 링크 연결)`);
+      } else if(type === 'detail'){
+        alert(`[상세] ${appName} (여기에 상세 페이지 링크 연결)`);
+      }
+      hideModal();
+    });
+
+    function openFolder(folder){
+      clearTimeout(closeTimer);
+
+      panelTitle.textContent = folder.title;
+      panelHint.textContent = folder.hint || "마우스를 밖으로 빼면 닫혀요";
+
+      // ✅ 세로 리스트 렌더
+      panelList.innerHTML = folder.apps.map(app => `
+        <div class="row" data-app="${app.name}">
+          <div class="row-left" style="background:${app.grad}"></div>
+
+          <div class="row-mid">
+            <div class="row-topline">
+              <div class="row-name">${app.name}</div>
+              <div class="row-rate">${app.rate}</div>
+            </div>
+            <div class="row-desc">${app.desc}</div>
+          </div>
+
+          <div class="row-right">
+            <button class="detail-link" type="button" data-app="${app.name}">
+              상세 <span class="chev">›</span>
+            </button>
+          </div>
+        </div>
+      `).join("");
+
+      overlay.classList.add('open');
+      panel.classList.add('open');
+
+      // ✅ 행 클릭 = 실행
+      panelList.querySelectorAll('.row').forEach(row => {
+        row.addEventListener('click', () => {
+          showModal('run', row.dataset.app);
+        });
+      });
+
+      // ✅ 상세 클릭 = 상세 (버블링 방지)
+      panelList.querySelectorAll('.detail-link').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showModal('detail', btn.dataset.app);
+        });
+      });
+    }
+
+    function scheduleClose(){
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => {
+        if(appModal.classList.contains('open')) return;
+        overlay.classList.remove('open');
+        panel.classList.remove('open');
+      }, 120);
+    }
+
+    function renderFolders(){
+      dock.innerHTML = folders.map((f, idx) => {
+        const minis = f.apps.slice(0, 9).map(a =>
+          `<div class="mini-icon" style="background:${a.grad}"></div>`
+        ).join("");
+
+        return `
+          <div class="folder-wrap" data-idx="${idx}">
+            <div class="folder" aria-label="${f.title}">
+              <div class="mini-grid" aria-hidden="true">${minis}</div>
+              <div class="folder-label">${f.title}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll('.folder-wrap').forEach(wrap => {
+        const idx = Number(wrap.dataset.idx);
+        wrap.addEventListener('mouseenter', () => openFolder(folders[idx]));
+        wrap.addEventListener('mouseleave', scheduleClose);
+      });
+    }
+
+    panel.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+    panel.addEventListener('mouseleave', scheduleClose);
+
+    renderFolders();
+
+    function isInside(el, x, y){
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if (!panel.classList.contains('open')) return;
+      if(appModal.classList.contains('open')){
+        clearTimeout(closeTimer);
+        return;
+      }
+
+      const insidePanel = isInside(panel, e.clientX, e.clientY);
+      const insideFolder = !!e.target.closest('.folder-wrap');
+
+      if (insidePanel || insideFolder) clearTimeout(closeTimer);
+      else scheduleClose();
+    });
+  </script>
+</body>
+</html>
