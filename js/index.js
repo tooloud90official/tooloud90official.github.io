@@ -1,19 +1,35 @@
-const menuToggle = document.getElementById("menuToggle");
-const navMenu = document.getElementById("navMenu");
-const logo = document.getElementById("logo");
-const authBtn = document.getElementById("authBtn");
-
-/* 모바일 메뉴 토글 */
-menuToggle.addEventListener("click", () => {
-    navMenu.classList.toggle("active");
-});
-
-/* 로고 클릭 */
-logo.addEventListener("click", () => {
-    alert("홈으로 이동합니다");
-});
-
-/* 로그인 클릭 */
-authBtn.addEventListener("click", () => {
-    alert("로그인 페이지로 이동합니다");
-});
+// 배너가 include.js로 나중에 들어오므로, 이벤트는 "위임" 방식으로 처리
+document.addEventListener("click", (e) => {
+    const toggle = e.target.closest("#menuToggle");
+    const authBtn = e.target.closest("#authBtn");
+    const logo = e.target.closest("#logo");
+  
+    if (toggle) {
+      const navMenu = document.getElementById("navMenu");
+      if (navMenu) {
+        navMenu.classList.toggle("open");
+      }
+    }
+  
+    if (authBtn) {
+      alert("로그인 / 회원가입 버튼 클릭");
+    }
+  
+    if (logo) {
+      alert("로고 클릭");
+    }
+  });
+  
+  // 키보드 접근성(엔터/스페이스로 모바일 메뉴)
+  document.addEventListener("keydown", (e) => {
+    const toggle = e.target.closest("#menuToggle");
+    if (!toggle) return;
+  
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const navMenu = document.getElementById("navMenu");
+      if (navMenu) {
+        navMenu.classList.toggle("open");
+      }
+    }
+  });
