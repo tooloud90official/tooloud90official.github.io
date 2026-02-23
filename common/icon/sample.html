@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Icon Component Sample</title>
+  <link rel="stylesheet" href="icon.css" />
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="section-title">앱 아이콘형 컴포넌트 테스트</div>
+
+    <div class="demo-grid">
+      <div id="iconMount1"></div>
+      <div id="iconMount2"></div>
+      <div id="iconMount3"></div>
+      <div id="iconMount4"></div>
+    </div>
+  </div>
+
+  <script src="icon.js"></script>
+  <script>
+    loadToolIconCard("#iconMount1", {
+      toolName: "Midjourney",
+      url: "#",
+      onClick: ({ title }) => alert(`${title} 커스텀 클릭 동작!`)
+    });
+
+    loadToolIconCard("#iconMount2", {
+      toolName: "Runway",
+      url: "#"
+    });
+
+    loadToolIconCard("#iconMount3", {
+      toolName: "Ideogram",
+      url: "#"
+    });
+
+    loadToolIconCard("#iconMount4", {
+      toolName: "Perplexity",
+      url: "#"
+    });
+  </script>
+</body>
+</html>

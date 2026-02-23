@@ -1,0 +1,82 @@
+/* ===== 기본 리셋 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+  }
+  
+  /* sample.html 테스트용 */
+  .page-wrap {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px 20px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: #222;
+  }
+  
+  .demo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  /* ===== 앱 아이콘 카드 ===== */
+  .tool-icon-card {
+    width: 100px;
+    display: inline-flex;
+    flex-direction: column;   /* 아이콘 위, 텍스트 아래 */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+  
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+  }
+  
+  .tool-icon-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .tool-icon-card:active {
+    transform: scale(0.97);
+  }
+  
+  /* ===== 아이콘(검은색 앱 아이콘 placeholder) ===== */
+  .tool-icon-card__icon {
+    width: 64px;
+    height: 64px;
+    background: #000;
+    border-radius: 16px; /* "조금 모서리 둥근 네모" */
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    display: block;
+  }
+  
+  /* ===== 텍스트 ===== */
+  .tool-icon-card__title {
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    text-align: center;
+    line-height: 1.2;
+  
+    /* 이름 길 때 정리 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
