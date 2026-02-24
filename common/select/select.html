@@ -1,0 +1,40 @@
+<!-- select.html -->
+<div class="select" data-select>
+    <button
+      type="button"
+      class="select__trigger"
+      data-select-trigger
+      aria-haspopup="listbox"
+      aria-expanded="false"
+      aria-controls="select-list-1"
+    >
+      <span class="select__value" data-select-value>선택 해주세요</span>
+  
+      <span class="select__icon" aria-hidden="true">
+        <svg class="select__chevron" viewBox="0 0 24 24">
+          <path d="M6 9l6 6 6-6Z" fill="currentColor"></path>
+        </svg>
+      </span>
+    </button>
+  
+    <div class="select__menu-wrap" data-select-menu-wrap>
+      <ul
+        id="select-list-1"
+        class="select__menu"
+        data-select-menu
+        role="listbox"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <li class="select__option is-selected" data-select-option data-value="option1" role="option" aria-selected="true" tabindex="0">
+          옵션 1
+        </li>
+        <li class="select__option" data-select-option data-value="option2" role="option" aria-selected="false" tabindex="-1">
+          옵션 2
+        </li>
+        <li class="select__option" data-select-option data-value="option3" role="option" aria-selected="false" tabindex="-1">
+          옵션 3
+        </li>
+      </ul>
+    </div>
+  </div>

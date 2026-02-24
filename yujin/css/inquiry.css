@@ -1,0 +1,128 @@
+/* inquiry.css */
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+      "Noto Sans KR", "Malgun Gothic", sans-serif;
+    color: #1f1f1f;
+  }
+  
+  .inquiry-page {
+    min-height: 100vh;
+  }
+  
+  /* 상단 배너 래퍼 (top-banner.html이 들어오는 자리) */
+  .inquiry-banner-root {
+    width: 100%;
+    min-height: 56px;
+  }
+  
+  .inquiry-main {
+    width: min(100%, 780px);
+    margin: 0 auto;
+    padding: 18px;
+  }
+  
+  /* ===== Hero ===== */
+  .inquiry-hero {
+    margin-bottom: 18px;
+  }
+  
+  .inquiry-hero__title {
+    margin: 0;
+    font-size: 50px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  
+  .inquiry-hero__desc {
+    margin: 8px 0 0;
+    color: #8a8a8a;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  /* ===== Section ===== */
+  .inquiry-section {
+    margin-top: 20px;
+  }
+  
+  .inquiry-section__title {
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  
+  /* 공용 드롭다운 리스트 자리 */
+  .inquiry-faq-list {
+    display: grid;
+    gap: 10px;
+  }
+  
+  /* 공용 드롭다운이 width:100%로 보이도록 */
+  .inquiry-faq-list > .drop_down {
+    width: 100%;
+  }
+  
+  /* ===== Contact us 입력창 ===== */
+  .inquiry-contact-wrap {
+    border: 1px solid #bdbdbd;
+    background: #efefef;
+    border-radius: 2px;
+    padding: 8px;
+  }
+  
+  .inquiry-contact-textarea {
+    display: block;
+    width: 100%;
+    min-height: 110px;
+    border: none;
+    outline: none;
+    resize: vertical;
+    background: transparent;
+    color: #222;
+    font-size: 12px;
+    line-height: 1.5;
+    font-family: inherit;
+    padding: 2px;
+  }
+  
+  .inquiry-contact-textarea::placeholder {
+    color: #888;
+  }
+  
+  /* ===== 버튼 영역 ===== */
+  .inquiry-submit-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+    margin-bottom: 12px;
+  }
+  
+  #submitBtn {
+    min-width: 140px;
+    min-height: 36px;
+  }
+  
+  /* ===== 반응형 ===== */
+  @media (max-width: 640px) {
+    .inquiry-main {
+      padding: 14px;
+    }
+  
+    .inquiry-hero__title {
+      font-size: 28px;
+    }
+  
+    .inquiry-section__title {
+      font-size: 17px;
+    }
+  }

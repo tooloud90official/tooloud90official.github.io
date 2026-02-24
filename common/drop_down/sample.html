@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>문의사항 드롭다운 샘플</title>
+  <link rel="stylesheet" href="./drop_down.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 18px;
+      background: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+        "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="faq-list">
+      <!-- 1개 -->
+      <div class="drop_down" data-drop_down>
+        <button
+          type="button"
+          class="drop_down__trigger"
+          data-faq-trigger
+          aria-expanded="false"
+          aria-controls="faq-panel-1"
+        >
+          <span class="drop_down__title" data-faq-title>
+            원하시는 내용을 입력하세요.
+          </span>
+
+          <span class="drop_down__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="drop_down__chevron">
+              <path d="M7 14l5-5 5 5" fill="currentColor"></path>
+            </svg>
+          </span>
+        </button>
+
+        <div
+          id="faq-panel-1"
+          class="drop_down__panel"
+          data-faq-panel
+          role="region"
+          aria-hidden="true"
+        >
+          <div class="drop_down__content">
+            <div class="drop_down__meta">
+              <strong class="drop_down__label">질문 내용</strong>
+              <span class="drop_down__dot">•</span>
+              <span class="drop_down__time" data-faq-time>2일 전</span>
+            </div>
+
+            <p class="drop_down__desc" data-faq-desc>
+              원하시는 컨텐츠를 입력하세요.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initFaqItems } from "./drop_down.js";
+
+    const faqInstances = initFaqItems();
+
+    // 필요하면 JS로 내용 바꾸기 예시
+    faqInstances[0]?.setContent({
+      title: "원하는 내용을 입력하세요.",
+      time: "2일 전",
+      desc: "원하는 내용을 입력하세요.."
+    });
+  </script>
+</body>
+</html>

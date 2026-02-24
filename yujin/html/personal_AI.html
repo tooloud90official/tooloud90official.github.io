@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal AI</title>
+
+  <!-- 페이지 스타일 -->
+  <link rel="stylesheet" href="/yujin/css/personal_AI.css" />
+
+  <!-- 탑 배너 스타일 -->
+  <link rel="stylesheet" href="/common/top-banner/css/index.css" />
+
+  <!-- 공용 아이콘 컴포넌트 스타일 -->
+  <link rel="stylesheet" href="/common/icon/icon.css" />
+</head>
+<body>
+  <div class="personal-ai-page">
+    <!-- 상단 배너 자리 -->
+    <div id="top-banner" class="personal-ai-banner-root"></div>
+
+    <main class="personal-ai-main">
+      <section class="personal-ai-hero">
+        <h1 class="personal-ai-hero__title">당신을 위한 AI 툴을 한 눈에</h1>
+      </section>
+
+      <!-- AI 추천 툴 -->
+      <section class="tool-board-section">
+        <h2 class="tool-board-section__title">AI 추천 툴</h2>
+        <div class="tool-board">
+          <div class="tool-board__grid" id="recommendedTools"></div>
+        </div>
+      </section>
+
+      <!-- 최근 사용한 툴 -->
+      <section class="tool-board-section">
+        <h2 class="tool-board-section__title">최근 사용한 툴</h2>
+        <div class="tool-board">
+          <div class="tool-board__grid" id="recentTools"></div>
+        </div>
+      </section>
+
+      <!-- 관심 있는 툴 -->
+      <section class="tool-board-section">
+        <h2 class="tool-board-section__title">관심 있는 툴</h2>
+        <div class="tool-board">
+          <div class="tool-board__grid" id="favoriteTools"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 공용 아이콘 컴포넌트 JS -->
+  <script src="/common/icon/icon.js"></script>
+
+  <!-- 페이지 JS -->
+  <script type="module" src="/yujin/js/personal_AI.js"></script>
+</body>
+</html>

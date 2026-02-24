@@ -18,6 +18,11 @@ body {
     justify-content: space-between;
     padding: 0 40px;
     border-bottom: 1px solid #eee;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: #fff;
 }
 
 /* ===== 로고 ===== */
@@ -97,4 +102,5 @@ body {
     .mobile-toggle {
         display: block;
     }
+
 }

@@ -1,0 +1,36 @@
+<!-- components/confirm/confirm.html -->
+<div class="confirm-modal" data-confirm-modal hidden aria-hidden="true">
+    <div class="confirm-modal__backdrop" data-confirm-close></div>
+  
+    <section
+      class="confirm-modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirmModalTitle"
+      aria-describedby="confirmModalDesc"
+      tabindex="-1"
+    >
+      <div class="confirm-modal__content">
+        <!-- 제목 / 설명: JS에서 교체 가능 -->
+        <header class="confirm-modal__header">
+          <h2 id="confirmModalTitle" class="confirm-modal__title" data-confirm-title>
+            삭제하시겠습니까?
+          </h2>
+          <p id="confirmModalDesc" class="confirm-modal__desc" data-confirm-desc>
+            이 작업은 취소할 수 없습니다.
+          </p>
+        </header>
+  
+        <!-- 버튼 슬롯 (기본 버튼은 placeholder) -->
+        <div class="confirm-modal__actions" data-confirm-actions>
+          <!-- 기본 버튼 (외부 버튼 컴포넌트로 교체 가능) -->
+          <button type="button" class="confirm-btn confirm-btn--ghost" data-confirm-cancel>
+            취소
+          </button>
+          <button type="button" class="confirm-btn confirm-btn--primary" data-confirm-ok>
+            확인
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>

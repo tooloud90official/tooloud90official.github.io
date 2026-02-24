@@ -1,0 +1,194 @@
+/* select.css */
+
+:root {
+    --jsel-trigger-bg: #ffffff;
+    --jsel-menu-bg: #ffffff;
+    --jsel-border: #d4d4d4;
+    --jsel-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    --jsel-radius-trigger: 16px;
+    --jsel-radius-menu: 16px;
+    --jsel-text-main: #222;
+    --jsel-text-muted: #9a9a9a;
+  }
+  
+  .select {
+    position: relative;
+    width: 220px; /* 필요 시 바꿔도 됨 */
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+      "Noto Sans KR", "Malgun Gothic", sans-serif;
+  }
+  
+  /* ===== Trigger ===== */
+  .select__trigger {
+    width: 100%;
+    height: 76px;
+    border: 3px solid var(--jsel-border);
+    border-radius: var(--jsel-radius-trigger);
+    background: var(--jsel-trigger-bg);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 18px 0 20px;
+    cursor: pointer;
+    color: var(--jsel-text-main);
+    text-align: left;
+  }
+  
+  .select__trigger:focus-visible {
+    outline: 3px solid rgba(24, 119, 242, 0.2);
+    outline-offset: 2px;
+  }
+  
+  .select__value {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--jsel-text-main);
+    line-height: 1.2;
+  }
+  
+  /* Placeholder 상태 (선택 전) */
+  .select.is-placeholder .select__value {
+    color: #666;
+    font-weight: 600;
+  }
+  
+  .select__icon {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    color: #111;
+  }
+  
+  .select__chevron {
+    width: 30px;
+    height: 30px;
+    transition: transform 180ms ease;
+  }
+  
+  .select.is-open .select__chevron {
+    transform: rotate(180deg);
+  }
+  
+  /* ===== Menu wrap (위치 잡기) ===== */
+  .select__menu-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 10px);
+    z-index: 30;
+    pointer-events: none;
+  }
+  
+  /* ===== Menu ===== */
+  .select__menu {
+    margin: 0 auto;
+    width: calc(100% - 24px); /* 스샷처럼 살짝 좁게 */
+    list-style: none;
+    padding: 14px 0;
+    background: var(--jsel-menu-bg);
+    border-radius: var(--jsel-radius-menu);
+    box-shadow: var(--jsel-shadow);
+    border: 1px solid rgba(0,0,0,0.03);
+  
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+    transform-origin: top center;
+    transition: opacity 160ms ease, transform 160ms ease;
+    pointer-events: none;
+  }
+  
+  .select.is-open .select__menu-wrap {
+    pointer-events: auto;
+  }
+  
+  .select.is-open .select__menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  
+  /* ===== Option ===== */
+  .select__option {
+    padding: 10px 18px;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: var(--jsel-text-muted);
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: -0.02em;
+  }
+  
+  .select__option + .select__option {
+    margin-top: 2px;
+  }
+  
+  .select__option:hover,
+  .select__option:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.03);
+    color: #666;
+  }
+  
+  .select__option.is-selected {
+    color: #1f1f1f;
+    font-weight: 800;
+  }
+  
+  /* 선택 후에도 메뉴에서 선택된 항목 강하게 표시 안 하고 싶으면 위 유지 */
+  .select__option[aria-selected="true"] {
+    /* 필요시 스타일 추가 */
+  }
+  
+  /* ===== Disabled (optional) ===== */
+  .select.is-disabled .select__trigger {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ===== Sample page helper ===== */
+  body.select-demo {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #ffffff;
+  }
+  
+  /* ===== Mobile ===== */
+  @media (max-width: 640px) {
+    .select {
+      width: 200px;
+    }
+  
+    .select__trigger {
+      height: 68px;
+      padding: 0 14px 0 16px;
+      border-width: 2px;
+    }
+  
+    .select__value {
+      font-size: 16px;
+    }
+  
+    .select__icon {
+      width: 30px;
+      height: 30px;
+    }
+  
+    .select__chevron {
+      width: 20px;
+      height: 20px;
+    }
+  
+    .select__option {
+      font-size: 18px;
+      padding: 8px 14px;
+    }
+  }

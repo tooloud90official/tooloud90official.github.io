@@ -65,7 +65,7 @@ function bindToolIconCard(cardEl, options = {}) {
     }
   
     try {
-      const res = await fetch("icon.html");
+      const res = await fetch("/common/icon/icon.html");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
   
       const html = await res.text();

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>카테고리 툴 페이지</title>
+  <link rel="stylesheet" href="/yujin/css/price_AI.css" />
+  <link rel="stylesheet" href="/common/top-banner/css/index.css" />
+  <link rel="stylesheet" href="/common/icon/icon.css" />
+</head>
+<body>
+  <div class="category-tools-page">
+    <div id="top-banner" class="category-tools-banner-root"></div>
+
+    <main class="category-tools-main">
+      <section class="category-hero">
+        <h1 class="category-hero__title">이미지·오디오·영상</h1>
+        <p class="category-hero__desc">
+          당신의 <span class="category-hero__desc--accent">합리적인 선택</span>을 위해.
+        </p>
+      </section>
+
+      <section class="price-filter" id="priceFilter">
+        <div class="price-filter__labels" id="sliderLabels" aria-hidden="true">
+          <span class="price-filter__step-label">옵션 1</span>
+          <span class="price-filter__step-label">옵션 2</span>
+          <span class="price-filter__step-label">옵션 3</span>
+          <span class="price-filter__step-label">옵션 4</span>
+          <span class="price-filter__step-label">옵션 5</span>
+          <span class="price-filter__step-label">옵션 6</span>
+        </div>
+      
+        <div class="price-filter__slider" id="stepSlider">
+          <div class="price-filter__track"></div>
+          <div class="price-filter__track-fill" id="sliderFill"></div>
+      
+          <div class="price-filter__dots" id="sliderDots">
+            <button type="button" class="price-filter__dot" data-step="0"></button>
+            <button type="button" class="price-filter__dot" data-step="1"></button>
+            <button type="button" class="price-filter__dot" data-step="2"></button>
+            <button type="button" class="price-filter__dot" data-step="3"></button>
+            <button type="button" class="price-filter__dot" data-step="4"></button>
+            <button type="button" class="price-filter__dot" data-step="5"></button>
+          </div>
+      
+          <button type="button" id="sliderThumb" class="price-filter__thumb" role="slider" aria-valuemin="1" aria-valuemax="6"></button>
+        </div>
+        <p class="price-filter__hint" id="sliderHint">현재 선택: 옵션 1</p>
+      </section>
+
+      <section class="tool-card-grid" id="toolCardGrid"></section>
+    </main>
+  </div>
+
+  <script src="/common/icon/icon.js"></script>
+  <script src="/common/top-banner/js/include.js"></script>
+  <script type="module" src="/yujin/js/price_AI.js"></script>
+</body>
+</html>

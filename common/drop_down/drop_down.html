@@ -1,0 +1,40 @@
+<!-- drop_down.html -->
+<div class="drop_down" data-drop_down>
+    <button
+      type="button"
+      class="drop_down__trigger"
+      data-faq-trigger
+      aria-expanded="false"
+      aria-controls="faq-panel-1"
+    >
+      <span class="drop_down__title" data-faq-title>
+        원하시는 내용을 입력하세요.
+      </span>
+  
+      <span class="drop_down__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="drop_down__chevron">
+          <path d="M7 14l5-5 5 5" fill="currentColor"></path>
+        </svg>
+      </span>
+    </button>
+  
+    <div
+      id="faq-panel-1"
+      class="drop_down__panel"
+      data-faq-panel
+      role="region"
+      aria-hidden="true"
+    >
+      <div class="drop_down__content">
+        <div class="drop_down__meta">
+          <strong class="drop_down__label">질문 내용</strong>
+          <span class="drop_down__dot">•</span>
+          <span class="drop_down__time" data-faq-time>2일 전</span>
+        </div>
+  
+        <p class="drop_down__desc" data-faq-desc>
+          원하시는 컨텐츠를 입력하세요.
+        </p>
+      </div>
+    </div>
+  </div>

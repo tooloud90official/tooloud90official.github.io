@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Modal Sample</title>
+
+  <!-- 기존 모달 스타일 -->
+  <link rel="stylesheet" href="./confirm.css" />
+
+  <!-- 친구가 만든 공용 버튼 스타일 -->
+  <link rel="stylesheet" href="/common/button/button.css" />
+</head>
+<body class="confirm-demo-bg">
+  <main>
+    <button id="openConfirm">삭제 모달 열기</button>
+  </main>
+
+  <div id="modal-root"></div>
+
+  <!-- 친구 버튼 시스템 JS (전역 loadButton 제공) -->
+  <script src="/common/button/button.js"></script>
+
+  <script type="module">
+    import { includeHTML } from "./include.js";
+    import { ConfirmModal } from "./confirm.js";
+
+    async function init() {
+      // 1) 모달 HTML 삽입
+      await includeHTML("#modal-root", "./confirm.html");
+
+      // 2) 모달 인스턴스 생성
+      const confirmModal = new ConfirmModal();
+
+      // 3) 기본 버튼 대신 "버튼 들어갈 자리(div)"로 교체
+      confirmModal.setActions(`
+        <div id="confirmCancelSlot"></div>
+        <div id="confirmOkSlot"></div>
+      `);
+
+      // 4) 친구 버튼 시스템으로 모달 버튼 생성
+      //    (onClick에서 confirmModal.close(false/true) 직접 호출)
+      loadButton({
+        target: '#confirmCancelSlot',
+        text: '취소',
+        variant: 'outline',
+        onClick: () => confirmModal.close(false)
+      });
+
+      loadButton({
+        target: '#confirmOkSlot',
+        text: '확인',
+        variant: 'primary',
+        onClick: () => confirmModal.close(true)
+      });
+
+      // 5) 열기 버튼
+      document.querySelector("#openConfirm").addEventListener("click", async () => {
+        const result = await confirmModal.open({
+          title: "삭제하시겠습니까?",
+          description: "이 작업은 취소할 수 없습니다."
+        });
+
+        console.log("결과:", result ? "확인" : "취소");
+      });
+    }
+
+    init().catch((err) => {
+      console.error("모달 초기화 실패:", err);
+      alert("모달 파일 로드 실패! 경로 또는 실행 방식 확인해줘.");
+    });
+  </script>
+</body>
+</html>

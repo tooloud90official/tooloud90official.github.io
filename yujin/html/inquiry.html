@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>문의사항</title>
+
+  <!-- 페이지 스타일 -->
+  <link rel="stylesheet" href="/yujin/css/inquiry.css" />
+  <link rel="stylesheet" href="/common/top-banner/css/index.css" />
+  <!-- 공용 드롭다운 스타일 -->
+  <link rel="stylesheet" href="/common/drop_down/drop_down.css" />
+
+  <!-- 공용 버튼 스타일 -->
+  <link rel="stylesheet" href="/common/button/button.css" />
+</head>
+<body>
+  <div class="inquiry-page">
+    <!-- 상단 배너 자리 -->
+    <div id="top-banner" class="inquiry-banner-root"></div>
+    <br><br>
+    <main class="inquiry-main">
+      <!-- 타이틀 -->
+      <section class="inquiry-hero">
+        <h1 class="inquiry-hero__title">문의사항</h1>
+        <p class="inquiry-hero__desc">궁금하거나 불편한 점을 알려주세요.</p>
+      </section>
+      <br>
+      <!-- FAQ -->
+      <section class="inquiry-section">
+        <h2 class="inquiry-section__title">Frequently Asked Questions</h2>
+        <div id="faqList" class="inquiry-faq-list"></div>
+      </section>
+
+      <!-- 문의한 내용 (공용 드롭다운 그대로) -->
+      <section class="inquiry-section">
+        <h2 class="inquiry-section__title">문의한 내용</h2>
+        <div id="myInquiryList" class="inquiry-faq-list"></div>
+      </section>
+
+      <!-- Contact us (입력창) -->
+      <section class="inquiry-section">
+        <h2 class="inquiry-section__title">Contact us</h2>
+
+        <div class="inquiry-contact-wrap">
+          <textarea
+            id="contactMessage"
+            class="inquiry-contact-textarea"
+            placeholder="문의사항을 입력해주세요. (답변은 영업일 기준 3~5일 정도 소요될 수 있습니다.)"
+          ></textarea>
+        </div>
+      </section>
+
+      <!-- 버튼 컴포넌트 자리 -->
+      <div class="inquiry-submit-wrap">
+        <div id="submitBtn"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 버튼 컴포넌트 JS -->
+  <script src="/common/button/button.js"></script>
+
+  <!-- 페이지 JS -->
+  <script type="module" src="/yujin/js/inquiry.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jeonub Select Sample</title>
+  <link rel="stylesheet" href="./select.css" />
+</head>
+<body class="select-demo">
+
+  <main>
+    <!-- 컴포넌트 자리 -->
+    <div id="select-root"></div>
+  </main>
+
+  <script type="module">
+    import { JeonubSelect } from "./select.js";
+
+    // 셀렉트 HTML 삽입
+    document.querySelector("#select-root").innerHTML = `
+      <div class="select" data-select>
+        <button
+          type="button"
+          class="select__trigger"
+          data-select-trigger
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="select-list-sample"
+        >
+          <span class="select__value" data-select-value>선택 해주세요</span>
+          <span class="select__icon" aria-hidden="true">
+            <svg class="select__chevron" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6Z" fill="currentColor"></path>
+            </svg>
+          </span>
+        </button>
+
+        <div class="select__menu-wrap" data-select-menu-wrap>
+          <ul
+            id="select-list-sample"
+            class="select__menu"
+            data-select-menu
+            role="listbox"
+            tabindex="-1"
+            aria-hidden="true"
+          ></ul>
+        </div>
+      </div>
+    `;
+
+    // 초기화 (옵션은 코드로 언제든 추가/교체 가능)
+    const select = new JeonubSelect("[data-select]", {
+      placeholder: "선택 해주세요",
+      items: [
+        { label: "옵션 1", value: "opt1" },
+        { label: "옵션 2", value: "opt2" },
+        { label: "옵션 3", value: "opt3" },
+      ],
+      onChange: (item) => {
+        console.log("선택됨:", item);
+      }
+    });
+
+    // 필요하면 나중에 코드에서 이렇게 변경 가능 (지금은 주석만)
+    // select.setOptions([
+    //   { label: "옵션 1", value: "opt1" },
+    //   { label: "옵션 2", value: "opt2" },
+    //   { label: "옵션 3", value: "opt3" },
+    //   { label: "옵션 4", value: "opt4" },
+    // ]);
+  </script>
+</body>
+</html>
