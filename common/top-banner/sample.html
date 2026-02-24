@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top Banner 테스트</title>
+
+  <!-- 같은 폴더 CSS -->
+  <link rel="stylesheet" href="top-banner.css" />
+</head>
+
+<body>
+
+  <!-- 배너 들어갈 자리 -->
+  <div id="top-banner"></div>
+
+  <main style="padding:40px;">
+    <h1>Top Banner Include 테스트</h1>
+    <p>top-banner.html이 정상적으로 불러와지면 성공 ✅</p>
+  </main>
+
+  <!-- include + 메뉴 토글 동작 -->
+  <script>
+    async function loadTopBanner() {
+      const target = document.getElementById("top-banner");
+      if (!target) return;
+
+      try {
+        const res = await fetch("top-banner.html"); // 같은 폴더
+        const html = await res.text();
+        target.innerHTML = html;
+
+        // 배너 로드 후 인터랙션 연결
+        initBannerEvents();
+
+      } catch (e) {
+        console.error("배너 로드 실패:", e);
+      }
+    }
+
+    function initBannerEvents() {
+      const toggle = document.getElementById("menuToggle");
+      const menu = document.getElementById("navMenu");
+
+      if (toggle && menu) {
+        toggle.addEventListener("click", () => {
+          menu.classList.toggle("active");
+        });
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadTopBanner);
+  </script>
+
+</body>
+</html>

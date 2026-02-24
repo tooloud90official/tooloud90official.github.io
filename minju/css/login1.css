@@ -29,6 +29,15 @@ body {
   gap: 14px;
 }
 
+.login-error {
+  color: #ff3b30;
+  font-size: 14px;
+  justify-content: center;
+  margin-left: 20px
+  margin-top: 8px;
+  min-height: 18px;
+}
+
 .login-input {
   height: 48px;
   border-radius: 10px;
@@ -78,7 +87,7 @@ body {
   display: flex; 
   align-items: center; 
   justify-content: center;
-  padding: 0;  
+  padding-left: 12px;
 }
 
 .social.apple img {
