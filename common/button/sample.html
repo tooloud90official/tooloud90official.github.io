@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet" href="/common/button/button.css">
+
+  <title>Button System Test</title>
+</head>
+<body>
+
+  <h2>Primary 버튼</h2>
+  <div id="btn1"></div>
+
+  <h2>Outline 버튼</h2>
+  <div id="btn2"></div>
+
+  <script src="/common/button/button.js"></script>
+
+  <script>
+    loadButton({
+      target: '#btn1',
+      text: '버튼 1',
+      variant: 'primary',
+      onClick: () => alert('확인 클릭')
+    });
+
+    loadButton({
+      target: '#btn2',
+      text: '버튼 2',
+      variant: 'outline',
+      onClick: () => alert('취소 클릭')
+    });
+  </script>
+
+</body>
+</html>

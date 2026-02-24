@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="/common/searchBar/searchBar.css">
+<script src="/common/searchBar/searchBar.js"></script>
+
+<div id="search"></div>
+
+<script>
+loadSearchBar({
+  target: '#search',
+  onSearch: (q) => location.href = `/search?q=${q}`
+});
+</script>

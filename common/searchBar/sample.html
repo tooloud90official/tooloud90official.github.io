@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet" href="/common/searchBar/searchBar.css">
+
+  <title>SearchBar Test</title>
+</head>
+<body>
+
+  <h2>검색창 테스트</h2>
+
+  <div id="search-area"></div>
+
+  <script src="/common/searchBar/searchBar.js"></script>
+
+  <script>
+    loadSearchBar({
+      target: '#search-area',
+      placeholder: '검색어를 입력하세요',
+      onSearch: (keyword) => {
+        console.log('검색:', keyword);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* =========================
+   wrapper
+========================= */
+.searchbar-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* =========================
+   search container
+========================= */
+.searchbar {
+  width: 640px;
+  height: 65px;
+
+  background: #ffffff;   /* ✅ 내부 흰색 */
+  border-radius: 300px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 20px;
+  border: 1px solid #e5e5e5;
+}
+
+/* =========================
+   input
+========================= */
+.search-input {
+  flex: 1;
+  height: 100%;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-size: 16px;
+  color: #333;
+}
+
+.search-input::placeholder {
+  color: #9a9a9a;
+}
+
+/* =========================
+   search button
+========================= */
+.search-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   CSS 돋보기 (선으로 제작)
+========================= */
+
+.magnifier {
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid #6b6b6b;
+  border-radius: 50%;
+
+  position: relative;
+}
+
+.magnifier::after {
+  content: "";
+
+  width: 9px;
+  height: 2px;
+
+  background: #6b6b6b;
+
+  position: absolute;
+  right: -6px;
+  bottom: -3px;
+
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+/* =========================
+   hover 효과 (선택)
+========================= */
+
+.searchbar:focus-within {
+  border-color: #1677e6;
+}

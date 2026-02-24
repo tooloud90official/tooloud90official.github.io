@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+
+  <!-- 페이지 스타일 -->
+  <link rel="stylesheet" href="../css/login1.css">
+
+  <!-- 공통 버튼 스타일 -->
+  <link rel="stylesheet" href="../../common/button/button.css">
+</head>
+
+<body>
+
+  <main class="login-page">
+
+    <h1 class="login-title">로그인</h1>
+
+    <!-- 입력 영역 -->
+    <div class="login-form">
+
+      <input
+        type="email"
+        id="email"
+        class="login-input"
+        placeholder="이메일 입력창"
+      />
+
+      <input
+        type="password"
+        id="password"
+        class="login-input"
+        placeholder="비밀번호 입력창"
+      />
+
+      <div class="login-options">
+        <label class="remember">
+          <input type="checkbox" id="remember">
+          로그인 유지
+        </label>
+
+        <button class="text-btn" id="resetPw">
+          비밀번호 재설정하기
+        </button>
+      </div>
+
+      <!-- 로그인 버튼 -->
+      <div id="loginBtn"></div>
+
+      <!-- 소셜 로그인 -->
+      <div class="social-login">
+        <button class="social google" id="googleLogin">G</button>
+        <button class="social apple" id="appleLogin"></button>
+      </div>
+
+      <!-- 회원가입 버튼 -->
+      <div id="signupBtn"></div>
+
+    </div>
+
+  </main>
+
+  <!-- 공통 버튼 -->
+  <script src="../../common/button/button.js"></script>
+
+  <!-- 페이지 JS -->
+  <script src="../js/login1.js"></script>
+
+</body>
+</html>
