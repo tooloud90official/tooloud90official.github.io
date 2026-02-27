@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>작업물 라이브러리</title>
+
+  <!-- 공용 셀렉트 -->
+  <link rel="stylesheet" href="/common/select/select.css" />
+  <link rel="stylesheet" href="/yujin/css/artwork-card.css" />
+
+  <link rel="stylesheet" href="/common/top-banner/top-banner.css" />
+  <link rel="stylesheet" href="/common/searchBar/searchBar.css">
+  <!-- 페이지 전용 -->
+  <link rel="stylesheet" href="/yujin/css/artwork.css" />
+</head>
+
+<body class="artwork-page">
+  <!-- ✅ 왼쪽 떠다니는 메뉴 버튼 (스크롤해도 고정) -->
+  <button class="artwork-fab" id="artworkFab" type="button" aria-label="메뉴 열기" aria-expanded="false">
+    <img class="artwork-fab__img" src="/yujin/media/menu.png" alt="" aria-hidden="true" />
+  </button>
+
+  <!-- ✅ 왼쪽 사이드바 -->
+  <aside class="artwork-sidebar" id="artworkSidebar" aria-hidden="true">
+    <div class="artwork-sidebar__head">
+      <div class="artwork-sidebar__title">메뉴</div>
+    </div>
+
+    <nav class="artwork-sidebar__nav">
+      <a class="artwork-sidebar__item is-active" href="#">내 라이브러리</a>
+
+      <div class="artwork-sidebar__section">카테고리 별 작업물 보기</div>
+      <a class="artwork-sidebar__item" href="#">이미지·오디오·영상</a>
+      <a class="artwork-sidebar__item" href="#">리서치</a>
+      <a class="artwork-sidebar__item" href="#">문서 생성·요약·편집</a>
+      <a class="artwork-sidebar__item" href="#">개발·코드</a>
+      <a class="artwork-sidebar__item" href="#">학습·교육</a>
+
+      <div class="artwork-sidebar__section">작업물</div>
+      <a class="artwork-sidebar__item" href="#">AI 추천 작업물 보기</a>
+      <a class="artwork-sidebar__item" href="#">작업물 올리기</a>
+    </nav>
+  </aside>
+
+  <!-- ✅ 메인 콘텐츠 래퍼 (사이드바 열리면 오른쪽으로 밀림) -->
+  <div class="artwork-shell" id="artworkShell">
+    <div id="top-banner" class="detail_AI-banner-root"></div>
+    <header class="artwork-hero">
+      <h1 class="artwork-hero__title">작업물 라이브러리</h1>
+      <p class="artwork-hero__desc">아티스트가 되어 상상력을 펼쳐 주세요.</p>
+
+      <!-- ✅ 너가 만든 그림 넣을 자리 (artwork_img) -->
+      <div class="artwork_img" id="artworkImg">
+        <img src="/yujin/media/artwork.png" alt="banner" style="width:100%; height:auto; border-radius:18px;">
+      </div>
+
+      <!--검색창-->
+
+      <div id="search-area"></div>
+
+    </header>
+
+    <main class="artwork-main">
+      <section class="artwork-section">
+        <div class="artwork-section__head">
+          <div>
+            <div class="artwork-section__title">💙 좋아요 많은 작업물</div>
+            <div class="artwork-section__desc">지금 인기있는 작업물들을 감상해보세요.</div>
+          </div>
+
+          <!-- ✅ 필터(셀렉트) 컴포넌트 mount 자리 -->
+          <div id="select-root"></div>
+        </div>
+
+        <!-- ✅ 작업물 카드 그리드 -->
+        <div class="artwork-grid" id="artworkGrid">
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 사이드바 열릴 때 배경 클릭 닫기 -->
+  <div class="artwork-dim" id="artworkDim" aria-hidden="true"></div>
+  <script src="/common/searchBar/searchBar.js"></script>
+  <script src="/common/top-banner/include.js"></script>
+  <script type="module" src="/yujin/js/artwork.js"></script>
+</body>
+</html>

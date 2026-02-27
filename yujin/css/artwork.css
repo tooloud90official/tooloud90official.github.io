@@ -1,0 +1,297 @@
+/* ✅ 탑 배너: 스크롤 고정 */
+#top-banner{
+    position: sticky;
+    top: 0;
+    z-index: 20;          /* ⭐ dim/사이드바보다 낮게! */
+  }
+/* 기본 */
+.artwork-page{
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+    color: #111;
+    background: #ffffff;
+  }
+  
+  /* ✅ 왼쪽 떠다니는 메뉴 버튼 */
+  .artwork-fab{
+    position: fixed;
+    left: 16px;
+    top: 120px;
+    z-index: 60;
+    width: 50px;
+    height: 50px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    cursor: pointer;
+  }
+
+  .artwork-fab__img{
+    width: 100%;         /* ✅ 버튼 크기만큼 */
+    height: 100%;
+    display: block;      /* ✅ 아래 여백(인라인 이미지 gap) 제거 */
+    object-fit: contain; /* ✅ 아이콘 전체 보이게 */
+  }
+  /* ✅ 사이드바 열렸을 때 FAB 숨김 */
+.artwork-fab.is-hidden{
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.98);
+  }
+
+  /* ✅ 사이드바 */
+  .artwork-sidebar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.08);
+    transform: translateX(-110%);
+    transition: transform 220ms ease;
+    z-index: 50;
+    padding: 14px 12px;
+    box-sizing: border-box;
+  }
+  .artwork-sidebar.is-open{
+    transform: translateX(0);
+  }
+  .artwork-sidebar__head{
+    padding: 10px 10px 12px;
+  }
+  .artwork-sidebar__title{
+    font-weight: 900;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+  .artwork-sidebar__nav{
+    display: grid;
+    gap: 6px;
+    padding: 6px 6px 12px;
+  }
+  .artwork-sidebar__section{
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 900;
+    color: rgba(0,0,0,0.45);
+  }
+  .artwork-sidebar__item{
+    display: block;
+    padding: 10px 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: rgba(0,0,0,0.78);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .artwork-sidebar__item:hover{
+    background: rgba(0,0,0,0.04);
+  }
+  .artwork-sidebar__item.is-active{
+    background: rgba(11,102,255,0.10);
+    color: #0B66FF;
+  }
+  
+  /* ✅ dim */
+  .artwork-dim{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+    z-index: 40;
+  }
+  .artwork-dim.is-on{
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* ✅ 메인 shell (사이드바 열릴 때 오른쪽으로 밀리기) */
+  .artwork-shell{
+    transition: transform 220ms ease;
+  }
+  .artwork-shell.is-shift{
+    transform: translateX(260px);
+  }
+  
+  /* 상단 헤더 */
+  .artwork-hero{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 46px 20px 18px;
+    text-align: center;
+  }
+  .artwork-hero__title{
+    margin: 0;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+  }
+  .artwork-hero__desc{
+    margin: 8px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(0,0,0,0.45);
+  }
+  
+  /* ✅ artwork_img 자리 */
+/* ✅ 네가 이미지 넣을 자리(비워둠) */
+.artwork_img{
+    margin: 18px auto 10px;
+    width: min(680px, 92vw);
+    min-height: 90px;             /* 자리감만 */
+    /* 필요없으면 min-height도 지워도 됨 */
+  }
+  /* 검색 */
+  .artwork-search{
+    margin: 12px auto 0;
+    width: min(520px, 92vw);
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px 8px 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+  }
+  .artwork-search__input{
+    border: 0;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .artwork-search__btn{
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  /* 메인 */
+  .artwork-main{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 20px 60px;
+  }
+  
+  /* 섹션 헤더 + 필터 */
+  .artwork-section__head{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 18px;
+    margin-bottom: 14px;
+  }
+  .artwork-section__title{
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  .artwork-section__desc{
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(0,0,0,0.45);
+  }
+  
+/* =========================
+   artwork 페이지: select 튜닝(작게 + 선 얇게 + 메뉴 글자 작게 + 세모 정렬)
+========================= */
+
+.artwork-page .select{
+    width: 110px;
+  }
+  
+  /* ✅ 트리거: 높이/글자/정렬/선 굵기 */
+  .artwork-page .select__trigger{
+    height: 32px;
+    padding: 0 10px 0 12px;
+    border-radius: 10px;
+  
+    display: flex;                 /* ⭐ 세모 위치 깨짐 방지 */
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+  
+    border-width: 1px !important;  /* ✅ 선 굵기 줄이기 */
+  }
+  
+  /* ✅ 트리거 안 텍스트(좋아요 순) */
+  .artwork-page .select__value{
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  
+  /* ✅ “세모 아이콘 버튼” 영역(오른쪽) */
+  .artwork-page .select__icon{
+    width: 16px;
+    height: 16px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 16px;
+  }
+  
+  /* ✅ 세모(svg) 크기/정렬 */
+  .artwork-page .select__chevron{
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  
+  /* ✅ 펼쳤을 때 메뉴(좋아요 순/최신 순/조회수 순) 글자 크게 보이는 거 해결 */
+  .artwork-page .select__menu{
+    font-size: 11px !important;
+    line-height: 1.2;
+  }
+  
+  /* 메뉴 아이템 */
+  .artwork-page .select__menu > li,
+  .artwork-page [data-select-item]{
+    font-size: 11px !important;
+    line-height: 1.2;
+    padding: 7px 10px !important;  /* ✅ 줄 높이(=커 보이는 느낌) 줄이기 */
+    white-space: nowrap;           /* ✅ 줄바꿈으로 커보이는 현상 방지 */
+  }
+  
+  /* ✅ 메뉴 박스 테두리도 얇게 */
+  .artwork-page .select__menu-wrap{
+    border-width: 1px !important;
+  }
+
+  /* 그리드 카드 */
+  .artwork-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+  .artwork-card{
+    aspect-ratio: 1 / 0.72; /* 스샷 느낌(가로로 납작한) */
+    border-radius: 18px;
+    background: rgba(0,0,0,0.55);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.10);
+  }
+  
+  /* 반응형 */
+  @media (max-width: 720px){
+    .artwork-shell.is-shift{
+      transform: translateX(0); /* 모바일은 밀기 대신 사이드바만 덮게 */
+    }
+    .artwork-grid{
+      grid-template-columns: 1fr;
+    }
+  }

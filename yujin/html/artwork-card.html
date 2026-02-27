@@ -1,0 +1,49 @@
+<template id="artworkCardTpl">
+  <article class="artwork-card">
+    <!-- ✅ 이미지 영역 -->
+    <div class="artwork-card__media">
+      <img class="artwork-card__img" src="/yujin/media/work.png" alt="작업물 이미지" />
+
+      <!-- ✅ 툴 배지 -->
+      <div class="artwork-card__tool">
+        <span class="artwork-card__tool-ic" aria-hidden="true"></span>
+        <div class="artwork-card__tool-meta">
+          <div class="artwork-card__tool-top">
+            <span class="artwork-card__tool-name" data-tool-name>Adobe Firefly</span>
+            <span class="artwork-card__tool-stars" data-tool-stars aria-label="평점">★★★★☆</span>
+          </div>
+          <div class="artwork-card__tool-brand" data-tool-brand>@Adobe</div>
+        </div>
+      </div>
+
+      <!-- ✅ 좋아요/댓글: 이미지 위 오른쪽 아래 -->
+      <div class="artwork-card__actions">
+        <button class="artwork-card__action artwork-card__action--icon" type="button" aria-label="좋아요">
+          <img class="artwork-card__action-img" src="/yujin/media/heart.png" alt="" />
+          <span class="artwork-card__action-count">21</span>
+        </button>
+      
+        <button class="artwork-card__action artwork-card__action--icon" type="button" aria-label="댓글">
+          <img class="artwork-card__action-img" src="/yujin/media/comment.png" alt="" />
+          <span class="artwork-card__action-count">5</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ✅ 흰 패널 -->
+    <div class="artwork-card__panel">
+      <!-- ✅ 프로필 (원 링 포함) -->
+      <div class="artwork-card__profile">
+        <div class="artwork-card__avatar-ring">
+          <img class="artwork-card__avatar" src="/yujin/media/profil.png" alt="프로필" />
+        </div>
+        <div class="artwork-card__user" data-art-user>user</div>
+      </div>
+
+      <div class="artwork-card__content">
+        <div class="artwork-card__date" data-art-date>YYYY.MM.DD</div>
+        <p class="artwork-card__text" data-art-text></p>
+      </div>
+    </div>
+  </article>
+</template>
