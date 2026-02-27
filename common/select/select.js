@@ -300,3 +300,7 @@ export class JeonubSelect {
       this.root.removeEventListener("keydown", this._onKeyDown);
     }
   }
+
+  export function initSelect(el){
+  console.log("select mounted", el);
+}

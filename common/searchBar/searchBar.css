@@ -11,8 +11,8 @@
    search container
 ========================= */
 .searchbar {
-  width: 640px;
-  height: 65px;
+  width: 480px;
+  height: 52px;
 
   background: #ffffff;   /* ✅ 내부 흰색 */
   border-radius: 300px;

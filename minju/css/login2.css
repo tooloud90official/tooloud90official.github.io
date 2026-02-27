@@ -14,15 +14,7 @@
 /* ============================= */
 body {
   min-height: 100vh;
-
-  /* 중앙 밝은 그라데이션 */
-  background: radial-gradient(
-    circle at center,
-    #eef4ff 0%,
-    #e3ebf7 35%,
-    #d7dfec 65%,
-    #cdd5e3 100%
-  );
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
 }
 
 

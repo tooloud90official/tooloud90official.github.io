@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOOLOUD - AI 소음 속, 나만의 도구</title>
+
+  <link rel="stylesheet" href="../../common/top-banner/top-banner.css">
+  <link rel="stylesheet" href="../../common/searchBar/searchBar.css">
+  <link rel="stylesheet" href="../../common/icon/icon.css">
+  <link rel="stylesheet" href="../../common/alert/alert.css">
+  <link rel="stylesheet" href="./main2.css">
+</head>
+
+<body>
+
+  <!-- 공통 top-banner -->
+  <div id="top-banner"></div>
+
+  <main class="main-container">
+
+    <!-- ===== 히어로 섹션 ===== -->
+    <section class="hero-section">
+      <h1 class="hero-title">AI 소음 속, 나만의 도구</h1>
+      <div class="hero-logo">
+        <img src="../../common/top-banner/media/logo.png" alt="TOOLOUD 로고">
+      </div>
+      <div id="searchbar-container"></div>
+    </section>
+
+    <!-- ===== 작업물 카드 섹션 ===== -->
+    <section class="work-card-section">
+
+      <!-- 카테고리 탭 -->
+      <div class="category-tabs" id="categoryTabs">
+        <button class="category-tab is-active" data-category="image">이미지·오디오·영상</button>
+        <button class="category-tab" data-category="research">리서치</button>
+        <button class="category-tab" data-category="document">문서 생성·요약·편집</button>
+        <button class="category-tab" data-category="dev">개발·코딩</button>
+        <button class="category-tab" data-category="edu">학습·교육</button>
+        <button class="category-tab" data-category="chat">챗봇·어시스턴트</button>
+      </div>
+
+      <!-- 작업물 카드 -->
+      <div class="work-card">
+        <div class="work-card__header">
+          <span class="work-card__badge">
+            <img src="../../minju/media/profile.png" alt="프로필" class="profile">
+            민주강 님의 작업물
+          </span>
+        </div>
+        <div class="work-card__body">
+          <div class="work-card__image">
+            <img id="workCardImg" src="./media/work-sample.png" alt="작업물 이미지"
+              onerror="this.parentElement.style.background='#e8eef5'">
+          </div>
+          <div class="work-card__tool" id="workCardTool"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== AI 추천 툴 섹션 (로그인 후에만 표시) ===== -->
+    <section class="recommend-section">
+      <h2 class="section-title">나에게 꼭 맞는 AI 툴을 사용해보세요.</h2>
+      <div class="tool-grid" id="recommendGrid">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- ===== 대표 AI 툴 섹션 ===== -->
+    <section class="tools-section-wrap">
+      <h2 class="section-title">대표 AI 툴을 빠르게 탐색해보세요.</h2>
+      <div class="tools-section" id="toolsSection">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../../common/top-banner/include.js"></script>
+  <script src="../../common/searchBar/searchBar.js"></script>
+  <script src="../../common/icon/icon.js"></script>
+  <script src="../../common/alert/alert.js"></script>
+  <script type="module" src="./main2.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+// main1.js
+// 경로: minju/main1/main1.js
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== 검색바 초기화 =====
+  loadSearchBar({
+    target: '#searchbar-container',
+    placeholder: '검색어를 입력하세요',
+    onSearch: (value) => {
+      console.log('검색어:', value);
+      // TODO: 검색 결과 페이지로 이동
+    }
+  });
+
+
+  // ===== 카테고리별 작업물 데이터 =====
+  const WORK_DATA = {
+    image: {
+      img: './media/work-image.png',
+      tool: { name: 'Midjourney', img: 'https://logo.clearbit.com/midjourney.com' },
+      stars: '★★★★☆'
+    },
+    research: {
+      img: './media/work-research.png',
+      tool: { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },
+      stars: '★★★★★'
+    },
+    document: {
+      img: './media/work-document.png',
+      tool: { name: 'Notion AI', img: 'https://logo.clearbit.com/notion.so' },
+      stars: '★★★★☆'
+    },
+    dev: {
+      img: './media/work-dev.png',
+      tool: { name: 'Cursor', img: 'https://logo.clearbit.com/cursor.sh' },
+      stars: '★★★★★'
+    },
+    edu: {
+      img: './media/work-edu.png',
+      tool: { name: 'Gamma', img: 'https://logo.clearbit.com/gamma.app' },
+      stars: '★★★★☆'
+    },
+    chat: {
+      img: './media/work-chat.png',
+      tool: { name: 'ChatGPT', img: 'https://logo.clearbit.com/openai.com' },
+      stars: '★★★★★'
+    },
+  };
+
+
+  // ===== 카테고리별 툴 데이터 =====
+  const TOOLS_DATA = {
+    image: [
+      { name: 'Midjourney',    img: 'https://logo.clearbit.com/midjourney.com' },
+      { name: 'Gamma',         img: 'https://logo.clearbit.com/gamma.app' },
+      { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },
+      { name: 'Pitch',         img: 'https://logo.clearbit.com/pitch.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+    research: [
+      { name: 'Chat GPT',  img: 'https://logo.clearbit.com/openai.com' },
+      { name: 'Claude',    img: 'https://logo.clearbit.com/anthropic.com' },
+      { name: 'Gemini',    img: 'https://logo.clearbit.com/gemini.google.com' },
+      { name: 'Canva',     img: 'https://logo.clearbit.com/canva.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+    document: [
+      { name: 'Midjourney',    img: 'https://logo.clearbit.com/midjourney.com' },
+      { name: 'Gamma',         img: 'https://logo.clearbit.com/gamma.app' },
+      { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },
+      { name: 'Pitch',         img: 'https://logo.clearbit.com/pitch.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+    dev: [
+      { name: 'Chat GPT', img: 'https://logo.clearbit.com/openai.com' },
+      { name: 'Claude',   img: 'https://logo.clearbit.com/anthropic.com' },
+      { name: 'Cursor',   img: 'https://logo.clearbit.com/cursor.sh' },
+      { name: 'Canva',    img: 'https://logo.clearbit.com/canva.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+    edu: [
+      { name: 'Midjourney',    img: 'https://logo.clearbit.com/midjourney.com' },
+      { name: 'Gamma',         img: 'https://logo.clearbit.com/gamma.app' },
+      { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },
+      { name: 'Pitch',         img: 'https://logo.clearbit.com/pitch.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+    chat: [
+      { name: 'Chat GPT', img: 'https://logo.clearbit.com/openai.com' },
+      { name: 'Claude',   img: 'https://logo.clearbit.com/anthropic.com' },
+      { name: 'Gemini',   img: 'https://logo.clearbit.com/gemini.google.com' },
+      { name: 'Canva',    img: 'https://logo.clearbit.com/canva.com' },
+      { name: 'Adobe',         img: 'https://logo.clearbit.com/adobe.com' },  // ✅ 추가
+      { name: 'Canva',         img: 'https://logo.clearbit.com/canva.com' },  // ✅ 추가
+    ],
+  };
+
+  const CATEGORY_LABELS = {
+    image:    '이미지·오디오·영상 AI 툴',
+    research: '리서치 AI 툴',
+    document: '문서 생성·요약·편집 AI 툴',
+    dev:      '개발·코딩 AI 툴',
+    edu:      '학습·교육 AI 툴',
+    chat:     '챗봇·어시스턴트 AI 툴',
+  };
+
+
+  // ===== 작업물 카드 렌더링 =====
+  function renderWorkCard(category) {
+    const data       = WORK_DATA[category];
+    const imgEl      = document.getElementById('workCardImg');
+    const toolEl     = document.getElementById('workCardTool');
+
+    if (!data) return;
+
+    // 작업물 이미지 교체
+    if (imgEl) {
+      imgEl.src = data.img;
+      imgEl.onerror = () => {
+        imgEl.parentElement.style.background = '#e8eef5';
+        imgEl.style.display = 'none';
+      };
+      imgEl.style.display = 'block';
+    }
+
+    // 툴 정보 교체
+    if (toolEl) {
+      toolEl.innerHTML = `
+        <div class="tool-icon-card">
+          <span class="tool-icon-card__icon">
+            <img src="${data.tool.img}" alt="${data.tool.name}"
+              onerror="this.style.display='none'">
+          </span>
+          <span class="tool-icon-card__title">${data.tool.name}</span>
+        </div>
+        <div class="work-card__stars">${data.stars}</div>
+        <button type="button" class="btn-more">툴 더 알아보기</button>
+      `;
+    }
+  }
+
+
+  // ===== 툴 그리드 렌더링 =====
+  function renderTools(category) {
+    const toolsSection = document.getElementById('toolsSection');
+    toolsSection.innerHTML = '';
+
+    const categories = category === 'all'
+      ? Object.keys(TOOLS_DATA)
+      : [category];
+
+    categories.forEach(cat => {
+      const tools = TOOLS_DATA[cat];
+      if (!tools) return;
+
+      const group = document.createElement('div');
+      group.className = 'tool-category-group';
+
+      const label = document.createElement('p');
+      label.className = 'tool-category-label';
+      label.textContent = CATEGORY_LABELS[cat];
+
+      const grid = document.createElement('div');
+      grid.className = 'tool-grid';
+
+      tools.forEach(tool => {
+        const card = document.createElement('div');
+        card.className = 'tool-icon-card';
+        card.dataset.toolName = tool.name;
+        card.innerHTML = `
+          <span class="tool-icon-card__icon">
+            <img src="${tool.img}" alt="${tool.name}"
+              onerror="this.style.display='none'">
+          </span>
+          <span class="tool-icon-card__title">${tool.name}</span>
+        `;
+        card.addEventListener('click', () => {
+          console.log('툴 클릭:', tool.name);
+          // TODO: 툴 상세 페이지로 이동
+        });
+        grid.appendChild(card);
+      });
+
+      group.appendChild(label);
+      group.appendChild(grid);
+      toolsSection.appendChild(group);
+    });
+  }
+
+
+  // ===== 카테고리 탭 클릭 =====
+  document.getElementById('categoryTabs').addEventListener('click', (e) => {
+    const tab = e.target.closest('.category-tab');
+    if (!tab) return;
+
+    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('is-active'));
+    tab.classList.add('is-active');
+
+    const category = tab.dataset.category;
+
+    // 작업물 카드 + 툴 그리드 모두 업데이트
+    renderWorkCard(category);
+    renderTools('all');
+  });
+
+
+  // ===== 초기 렌더링 =====
+  renderWorkCard('image');
+  renderTools('all');
+
+});

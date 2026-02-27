@@ -7,19 +7,21 @@ async function loadButton({
   const res = await fetch('/common/button/button.html');
   const html = await res.text();
 
-  const container = document.querySelector(target);
+  const container =
+    typeof target === "string"
+      ? document.querySelector(target)
+      : target;
+
   container.innerHTML = html;
 
   const btn = container.querySelector('.btn');
 
-  /* 텍스트 */
   btn.textContent = text;
-
-  /* variant */
   btn.classList.add(`btn-${variant}`);
 
-  /* 클릭 이벤트 */
-  if (onClick) {
-    btn.addEventListener('click', onClick);
-  }
+  if (onClick) btn.addEventListener('click', onClick);
+}
+
+export function initButton(el){
+  console.log("button mounted", el);
 }

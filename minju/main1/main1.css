@@ -1,0 +1,328 @@
+/* =========================
+   main1.css - 메인 페이지
+========================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: #1a1a2e;
+  display: block !important;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
+}
+
+#top-banner {
+  width: 100% !important;
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  background: transparent !important;
+}
+
+.nav-container {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+/* ===== 메인 컨테이너 ===== */
+.main-container {
+  width: 100%;
+}
+
+/* ===== 히어로 섹션 ===== */
+.hero-section {
+  width: 100%;
+  padding: 60px 20px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 100px;
+  background: none;
+  box-sizing: border-box;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.hero-logo {
+  width: 120px;
+}
+
+.hero-logo img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+#searchbar-container {
+  width: 100%;
+  max-width: 640px;
+}
+
+
+/* ===== 작업물 카드 섹션 ===== */
+.work-card-section {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 48px 20px 60px;
+  box-sizing: border-box;
+}
+
+/* ===== 카테고리 탭 ===== */
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.category-tab {
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.category-tab:hover {
+  border-color: #2a7cff;
+  color: #2a7cff;
+}
+
+.category-tab.is-active {
+  background: #2a7cff;
+  border-color: #2a7cff;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ===== 작업물 카드 ===== */
+.work-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.work-card__header {
+  margin-bottom: 16px;
+}
+
+.work-card__badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.profile {
+  width: 20px;   /* ← 원하는 크기로 조절 */
+  height: 20px;
+  border-radius: 50%;  /* 원형으로 만들고 싶으면 */
+  object-fit: cover;
+}
+
+.badge-logo {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.work-card__body {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.work-card__image {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f0f4fa;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.work-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.work-card__tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* ← 추가 */
+  gap: 12px;
+  min-width: 110px;
+  align-self: center; /* ← 추가 */
+}
+
+.work-card__stars {
+  font-size: 14px;
+  color: #f5a623;
+  letter-spacing: 2px;
+}
+
+.btn-more {
+  background: #2a7cff;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.btn-more:hover {
+  background: #1a6be0;
+}
+
+/* ===== 툴 아이콘 카드 (작업물 카드 내) ===== */
+.work-card__tool .tool-icon-card {
+  pointer-events: none;
+}
+
+.work-card__tool .tool-icon-card__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #f0f4fa;
+  display: block;
+  overflow: hidden;
+}
+
+.work-card__tool .tool-icon-card__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.work-card__tool .tool-icon-card__title {
+  font-size: 13px;
+  color: #444;
+  text-align: center;
+}
+
+
+/* ===== 대표 AI 툴 섹션 ===== */
+.tools-section-wrap {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  box-sizing: border-box;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a2e;
+  text-align: center;
+  margin: 0 0 36px;
+  letter-spacing: -0.5px;
+}
+
+.tools-section {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.tool-category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tool-category-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  padding-left: 40px
+}
+
+.tool-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  /* 스크롤바 숨기기 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 100%;
+  width: 100%;
+}
+.tool-grid::-webkit-scrollbar {
+  display: none;
+}
+.tool-grid .tool-icon-card {
+  flex: 0 0 calc(25% - 15px); /* ✅ 4개가 딱 맞게 보이도록 */
+  min-width: calc(25% - 15px);
+}
+
+
+/* ===== 툴 아이콘 카드 (그리드) ===== */
+.tool-icon-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.tool-icon-card:hover {
+  transform: translateY(-2px);
+}
+
+.tool-icon-card__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #f0f4fa;
+  display: block;
+  overflow: hidden;
+}
+
+.tool-icon-card__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.tool-icon-card__title {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+}
