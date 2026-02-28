@@ -34,12 +34,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== 카테고리별 작업물 데이터 =====
   const WORK_DATA = {
-    image:    { img: '/minju/main1/media/work-image.png',    tool: { name: 'Midjourney',    img: 'https://logo.clearbit.com/midjourney.com' },  stars: '★★★★☆' },
-    research: { img: '/minju/main1/media/work-research.png', tool: { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },  stars: '★★★★★' },
-    document: { img: '/minju/main1/media/work-document.png', tool: { name: 'Notion AI',     img: 'https://logo.clearbit.com/notion.so' },       stars: '★★★★☆' },
-    dev:      { img: '/minju/main1/media/work-dev.png',      tool: { name: 'Cursor',        img: 'https://logo.clearbit.com/cursor.sh' },       stars: '★★★★★' },
-    edu:      { img: '/minju/main1/media/work-edu.png',      tool: { name: 'Gamma',         img: 'https://logo.clearbit.com/gamma.app' },       stars: '★★★★☆' },
-    chat:     { img: '/minju/main1/media/work-chat.png',     tool: { name: 'ChatGPT',       img: 'https://logo.clearbit.com/openai.com' },      stars: '★★★★★' },
+    image:    { img: '/main1/media/work-image.png',    tool: { name: 'Midjourney',    img: 'https://logo.clearbit.com/midjourney.com' },  stars: '★★★★☆' },
+    research: { img: '/main1/media/work-research.png', tool: { name: 'Perplexity AI', img: 'https://logo.clearbit.com/perplexity.ai' },  stars: '★★★★★' },
+    document: { img: '/main1/media/work-document.png', tool: { name: 'Notion AI',     img: 'https://logo.clearbit.com/notion.so' },       stars: '★★★★☆' },
+    dev:      { img: '/main1/media/work-dev.png',      tool: { name: 'Cursor',        img: 'https://logo.clearbit.com/cursor.sh' },       stars: '★★★★★' },
+    edu:      { img: '/main1/media/work-edu.png',      tool: { name: 'Gamma',         img: 'https://logo.clearbit.com/gamma.app' },       stars: '★★★★☆' },
+    chat:     { img: '/main1/media/work-chat.png',     tool: { name: 'ChatGPT',       img: 'https://logo.clearbit.com/openai.com' },      stars: '★★★★★' },
   };
 
 
@@ -109,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderRecommend() {
     const grid = document.getElementById('recommendGrid');
     if (!grid) return;
+    grid.className = 'tool-grid'; // ← 추가
     grid.innerHTML = '';
     RECOMMEND_TOOLS.forEach(tool => {
       const card = document.createElement('div');

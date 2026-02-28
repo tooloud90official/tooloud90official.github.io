@@ -22,7 +22,7 @@ body {
 /* 회원가입 영역 */
 /* ============================= */
 .signup-container {
-  width: 420px;
+  width: 480px;
   margin: 120px auto 80px auto;   /* 상단 상태바 아래 공간 */
   display: flex;
   flex-direction: column;
@@ -44,7 +44,7 @@ body {
 /* 폼 그룹 */
 /* ============================= */
 .form-group {
-  width: 100%;
+  width: 300px;
   margin-bottom: 28px;
 }
 
@@ -53,6 +53,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 10px;
+  margin-left: 0;
   color: #222;
 }
 
@@ -63,7 +64,9 @@ body {
 .email-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  width: 480px;
+  margin: 0 auto
 }
 
 .email-wrap span {
@@ -78,12 +81,15 @@ body {
 input,
 select {
   height: 44px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ddd;
   padding: 0 14px;
   font-size: 14px;
-  background: #f3f3f3;
+  background: #ffffff;
   outline: none;
+  display: block;
+  margin: 0 auto;
+  width: 300px;
 }
 
 input:focus,
@@ -95,24 +101,26 @@ select:focus {
 
 /* 이메일 아이디 */
 #emailId {
-  width: 160px;
+  width: 300px;
+ 
 }
 
 /* 도메인 선택 */
 #emailDomain {
-  width: 150px;
+  flex: 1;
 }
 
 /* 직접 입력 */
 #emailCustom {
-  width: 150px;
+  flex: 1;
 }
 
 
 /* 비밀번호 입력 */
 #password,
 #passwordConfirm {
-  width: 100%;
+  width: 300px;
+  margin: 0 auto;
 }
 
 

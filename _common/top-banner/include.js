@@ -4,8 +4,10 @@
 (async () => {
 
   // ===== 로그인 상태 확인 =====
+  // login 페이지에서는 무조건 default 배너 표시
   const isLoginPage = window.location.pathname.includes('/login');
   const isLoggedIn  = !isLoginPage && localStorage.getItem('isLoggedIn') === 'true';
+
   const bannerFile = isLoggedIn
     ? '/_common/top-banner/top-banner-logged.html'
     : '/_common/top-banner/top-banner.html';

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="/_common/signup_status/signup_status.css">
   <link rel="stylesheet" href="/_common/confirm/confirm.css">
+  <link rel="stylesheet" href="/_common/button/button.css"> <!-- 버튼 스타일 -->
 </head>
 
 <body>
@@ -46,17 +47,40 @@
       <input type="password" id="passwordConfirm">
     </div>
 
-    <button class="signup-btn" id="signupBtn">회원가입</button>
+    <!-- ✅ 공통 버튼 들어갈 자리 -->
+    <div id="signup-button"></div>
 
-    <div class="back-link">
+    <div class="back-link" id="backBtn">
       ← 이전으로 돌아가기
     </div>
 
   </main>
 
-  <!-- ✅ 경로: minju/html/login2.html 기준 -->
+  <!-- 공통 컴포넌트 -->
   <script src="/_common/top-banner/include.js"></script>
   <script src="/_common/signup_status/include.js"></script>
+
+  <!-- 버튼 로더 -->
+  <script src="/_common/button/button.js"></script>
+
+  <!-- 버튼 생성 -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      loadButton({
+        target: "#signup-button",
+        text: "다음",
+        variant: "primary",
+        size: "md",
+        onClick: () => {
+          window.location.href = "/login3/login3.html";
+          console.log("회원가입 버튼 클릭");
+          document.getElementById("signupBtn")?.click();
+        }
+      });
+    });
+  </script>
+
+  <!-- 페이지 로직 -->
   <script type="module" src="/login2/login2.js"></script>
 
 </body>

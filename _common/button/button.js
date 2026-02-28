@@ -1,7 +1,8 @@
-async function loadButton({
+window.loadButton = async function({
   target,
   text = "버튼",
   variant = "primary",
+  size = "md",
   onClick = null
 }) {
   const res = await fetch('/_common/button/button.html');
@@ -15,13 +16,9 @@ async function loadButton({
   container.innerHTML = html;
 
   const btn = container.querySelector('.btn');
-
   btn.textContent = text;
   btn.classList.add(`btn-${variant}`);
+  btn.classList.add('btn-${size}');
 
   if (onClick) btn.addEventListener('click', onClick);
-}
-
-export function initButton(el){
-  console.log("button mounted", el);
-}
+};

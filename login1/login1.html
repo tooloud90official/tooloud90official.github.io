@@ -28,13 +28,10 @@
                 </label>
                 <button class="text-btn" id="resetPw">비밀번호 재설정하기</button>
             </div>
-            
+
             <div id="loginError" class="login-error"></div>
 
-            <div id="loginBtnContainer">
-                <button type="button" class="btn btn-primary full-width" id="loginBtn">로그인</button>
-            </div>
-
+            <!-- 로그인 버튼 (loadButton으로 렌더링) -->
             <div class="social-login">
                 <button class="social google" id="googleLogin">
                     <img src="/media/googleLogo.svg" alt="Google 로그인">
@@ -43,10 +40,12 @@
                     <img src="/media/appleLogo.svg" alt="Apple 로그인">
                 </button>
             </div>
+            <div id="loginBtnContainer"></div>
 
-            <div id="signupBtnContainer">
-                <button type="button" class="btn btn-outline full-width" id="signupBtn">회원가입</button>
-            </div>
+
+
+            <!-- 회원가입 버튼 (loadButton으로 렌더링) -->
+            <div id="signupBtnContainer"></div>
 
         </div>
     </main>

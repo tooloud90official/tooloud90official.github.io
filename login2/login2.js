@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== 가입 버튼 클릭 시 최종 검사 =====
 
-  document.getElementById('signupBtn').addEventListener('click', () => {
+  document.getElementById('signupBtn')?.addEventListener('click', () => {
     let isValid = true;
 
     if (!PW_REGEX.test(password.value)) {
@@ -96,7 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.body.appendChild(root);
     }
 
-    // ✅ 경로: minju/html/login2.html 기준
     await includeHTML('#modal-root', '/_common/confirm/confirm.html');
 
     const modal     = document.querySelector('[data-confirm-modal]');
@@ -121,9 +120,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnCancel.addEventListener('click', closeConfirm);
     backdrop.addEventListener('click', closeConfirm);
 
+    // ✅ 여기 수정됨
     btnOk.addEventListener('click', () => {
       closeConfirm();
-      history.back();
+      window.location.href = '/login1/login1.html';
     });
 
     document.addEventListener('keydown', (e) => {
@@ -142,4 +142,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   const openConfirm = await initConfirm();
   backLink.addEventListener('click', openConfirm);
 
-}); // DOMContentLoaded 끝
+});
