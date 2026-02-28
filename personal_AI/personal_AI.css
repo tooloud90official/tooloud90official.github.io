@@ -1,24 +1,27 @@
-/* personal_AI.css */
-
-* {
-  box-sizing: border-box;
+/* ✅ 배경 강제 적용 (다른 CSS가 body 배경 덮어도 이게 이김) */
+html, body {
+  min-height: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%) !important;
 }
 
+/* ✅ height:100vh 때문에 잘리는 거 방지 */
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
-  min-height: 100vh;       /* ✅ 이걸로 */
+  height: auto !important;
+  min-height: 100vh !important;
 }
 
-.personal-ai-page {
-  min-height: 100vh;
+/* ✅ 탑 배너: 화면 맨 위 고정 */
+.personal-ai-banner-root{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;          /* 가로폭 계산 트릭 없이 그냥 양쪽 0 */
+  z-index: 9999;
 }
 
-/* 탑 배너 자리 (고정은 top-banner.css에서 처리한다고 가정) */
-.personal-ai-banner-root {
-  width: 100%;
-  min-height: 56px; /* ✅ inquiry랑 동일하게 */
+/* ✅ 고정된 배너 높이만큼 본문을 아래로 */
+.personal-ai-page{
+  padding-top: 70px; /* 배너 실제 높이에 맞춰 조절 */
 }
 
 .personal-ai-main {
