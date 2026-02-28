@@ -6,10 +6,10 @@
   }
 /* 기본 */
 .artwork-page{
-    margin: 0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
-    color: #111;
-    background: #ffffff;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
+  height: 100vh;
   }
   
   /* ✅ 왼쪽 떠다니는 메뉴 버튼 */
