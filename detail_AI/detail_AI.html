@@ -57,36 +57,44 @@
           </div>
         </article>
 
-        <!-- RIGHT: 프로필 + 작업물 -->
-        <article class="detail_AI__showcase">
-          <div class="detail_AI__profile">
-            <div class="detail_AI__avatar">
-              <img src="/media/profil.png" alt="프로필" />
-            </div>
+<!-- RIGHT: 프로필 + 작업물 -->
+<article class="detail_AI__showcase">
+  <div class="detail_AI__profile">
+    <div class="detail_AI__avatar">
+      <img src="/media/profil.png" alt="프로필" />
+    </div>
 
-            <div class="detail_AI__profile-meta">
-              <div class="detail_AI__profile-name">민주캉 님의 작업물</div>
-              <div class="detail_AI__likes">
-                <span class="detail_AI__like-icon">♡</span>
-                <span>490</span>
-              </div>
-            </div>
-          </div>
+    <div class="detail_AI__profile-meta">
+      <div class="detail_AI__profile-name">민주캉 님의 작업물</div>
+      <div class="detail_AI__likes">
+        <span class="detail_AI__like-icon">♡</span>
+        <span>490</span>
+      </div>
+    </div>
+  </div>
 
-          <div class="detail_AI__carousel">
-            <div class="detail_AI__carousel-frame">
-              <img src="/media/work.png" alt="작업물" />
-            </div>
+  <div class="detail_AI__carousel">
+    <!-- ✅ 작업물 위 액션 링크 -->
+    <div class="detail_AI__work-actions">
+      <a class="detail_AI__work-link" href="/artwork/artwork.html">작업물 올리기</a>
+    </div>
 
-            <div class="detail_AI__dots" aria-label="캐러셀 페이지">
-              <button class="dot is-active" type="button" aria-label="1"></button>
-              <button class="dot" type="button" aria-label="2"></button>
-              <button class="dot" type="button" aria-label="3"></button>
-              <button class="dot" type="button" aria-label="4"></button>
-              <button class="dot" type="button" aria-label="5"></button>
-            </div>
-          </div>
-        </article>
+    <!-- ✅ 작업물(이미지) 자체를 클릭 가능하게 -->
+    <a class="detail_AI__carousel-frame detail_AI__work-button"
+       href="/artwork/artwork.html"
+       aria-label="작업물 페이지로 이동">
+      <img src="/media/work.png" alt="작업물" />
+    </a>
+
+    <div class="detail_AI__dots" aria-label="캐러셀 페이지">
+      <button class="dot is-active" type="button" aria-label="1"></button>
+      <button class="dot" type="button" aria-label="2"></button>
+      <button class="dot" type="button" aria-label="3"></button>
+      <button class="dot" type="button" aria-label="4"></button>
+      <button class="dot" type="button" aria-label="5"></button>
+    </div>
+  </div>
+</article>
       </section>
 
       <!-- ✅ 여기 아래로 계속 요소 추가하면 됨 -->
@@ -264,7 +272,7 @@
   
             <div class="review-card__user">
               <div class="review-card__avatar">
-                <img src="/yujin/media/profil.png" alt="작성자" />
+                <img src="/media/profil.png" alt="작성자" />
               </div>
               <div class="review-card__name">민주 캉</div>
             </div>

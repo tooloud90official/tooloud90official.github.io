@@ -20,11 +20,11 @@ const SLIDER_LABELS = ["옵션 1", "옵션 2", "옵션 3", "옵션 4", "옵션 5
   
 /** 샘플 카드 데이터 */
 const TOOL_CARDS = [
-  { toolName: "Chat GPT", price: "$35/월", url: "#" },
-  { toolName: "Claude", price: "$40/월", url: "#" },
-  { toolName: "Flexclip", price: "$45/월", url: "#" },
-  { toolName: "Adobe Firefly", price: "$50/월", url: "#" },
-  { toolName: "Descript", price: "$55/월", url: "#" }
+  { toolName: "Chat GPT", price: "$35/월", url: "/detail_AI/detail_AI.html" },
+  { toolName: "Claude", price: "$40/월", url: "/detail_AI/detail_AI.html" },
+  { toolName: "Flexclip", price: "$45/월", url: "/detail_AI/detail_AI.html" },
+  { toolName: "Adobe Firefly", price: "$50/월", url: "/detail_AI/detail_AI.html" },
+  { toolName: "Descript", price: "$55/월", url: "/detail_AI/detail_AI.html" }
 ];
   
 /**

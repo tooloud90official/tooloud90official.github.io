@@ -179,6 +179,34 @@ body {
      RIGHT (쇼케이스) - ✅ 레이아웃 변경 핵심
      작업물(오른쪽) + 프로필 크게(왼쪽)
   ========================= */
+
+  /* 작업물 위 링크(밑줄) */
+.detail_AI__work-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 6px 0 10px;
+}
+
+.detail_AI__work-link{
+  font-size: 12px;
+  color: #2a7cff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* 작업물 이미지 클릭 영역 */
+.detail_AI__work-button{
+  display: block;        /* a가 프레임을 그대로 차지 */
+  cursor: pointer;
+}
+
+/* 호버 시 살짝 강조(원치 않으면 삭제 가능) */
+.detail_AI__work-button:hover{
+  transform: translateY(-1px);
+}
+
   .detail_AI__showcase {
     border-radius: 18px;
     padding: 18px;

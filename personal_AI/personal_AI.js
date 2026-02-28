@@ -47,36 +47,36 @@ async function includeHTML(targetSelector, filePath) {
   
   /* 샘플 데이터 (나중에 바꾸기 쉽게 배열만 분리) */
   const recommendedTools = [
-    { toolName: "Chat GPT", url: "#" },
-    { toolName: "Claude", url: "#" },
-    { toolName: "Gemini", url: "#" },
-    { toolName: "툴 #1", url: "#" },
-    { toolName: "Midjourney", url: "#" },
-    { toolName: "Gamma", url: "#" },
-    { toolName: "Perplexity AI", url: "#" },
-    { toolName: "툴 #1", url: "#" }
+    { toolName: "Chat GPT", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Claude", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gemini", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Midjourney", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gamma", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Perplexity AI", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.html" }
   ];
   
   const recentTools = [
-    { toolName: "Chat GPT", url: "#" },
-    { toolName: "Claude", url: "#" },
-    { toolName: "Gemini", url: "#" },
-    { toolName: "툴 #1", url: "#" },
-    { toolName: "Midjourney", url: "#" },
-    { toolName: "Gamma", url: "#" },
-    { toolName: "Perplexity AI", url: "#" },
-    { toolName: "툴 #1", url: "#" }
+    { toolName: "Chat GPT", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Claude", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gemini", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Midjourney", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gamma", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Perplexity AI", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.html" }
   ];
   
   const favoriteTools = [
-    { toolName: "Chat GPT", url: "#" },
-    { toolName: "Claude", url: "#" },
-    { toolName: "Gemini", url: "#" },
-    { toolName: "툴 #1", url: "#" },
-    { toolName: "Midjourney", url: "#" },
-    { toolName: "Gamma", url: "#" },
-    { toolName: "Perplexity AI", url: "#" },
-    { toolName: "툴 #1", url: "#" }
+    { toolName: "Chat GPT", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Claude", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gemini", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Midjourney", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Gamma", url: "/detail_AI/detail_AI.html" },
+    { toolName: "Perplexity AI", url: "/detail_AI/detail_AI.html" },
+    { toolName: "툴 #1", url: "/detail_AI/detail_AI.htmlß" }
   ];
   
   document.addEventListener("DOMContentLoaded", async () => {
