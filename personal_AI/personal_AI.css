@@ -1,150 +1,152 @@
-/* personal_AI.css */
+/* ✅ 배경 강제 적용 (다른 CSS가 body 배경 덮어도 이게 이김) */
+html, body {
+  min-height: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%) !important;
+}
 
-* {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0;
-    background: #ffffff; /* 전체 배경 흰색 */
-    color: #1f1f1f;
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
-      "Noto Sans KR", "Malgun Gothic", sans-serif;
-  }
-  
-  .personal-ai-page {
-    min-height: 100vh;
-  }
-  
-  /* 탑 배너 자리 (고정은 top-banner.css에서 처리한다고 가정) */
-  .personal-ai-banner-root {
-    width: 100%;
-    min-height: 70px; /* nav-container 높이 기준 */
-  }
-  
+/* ✅ height:100vh 때문에 잘리는 거 방지 */
+body {
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+/* ✅ 탑 배너: 화면 맨 위 고정 */
+.personal-ai-banner-root{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;          /* 가로폭 계산 트릭 없이 그냥 양쪽 0 */
+  z-index: 9999;
+}
+
+/* ✅ 고정된 배너 높이만큼 본문을 아래로 */
+.personal-ai-page{
+  padding-top: 70px; /* 배너 실제 높이에 맞춰 조절 */
+}
+
+.personal-ai-main {
+  width: min(100%, 1080px);  /* 980 → 1080 */
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+/* ===== Hero ===== */
+.personal-ai-hero {
+  padding-top: 40px;
+  margin-bottom: 72px;  /* 44px → 72px */
+  text-align: center;
+}
+
+.personal-ai-hero__title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+/* ===== Sections ===== */
+.tool-board-section {
+  margin-top: 18px;
+}
+
+.tool-board-section__title {
+  margin: 0 0 16px 6px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #111;
+}
+
+.tool-board {
+  border-radius: 18px;
+  padding: 30px 34px;   /* ← 보드 내부 여백 증가 = 보드가 더 커보임 */
+  min-height: 210px;    /* ← 세로 높이 최소값 추가 */
+  background: rgba(245, 248, 255, 0.72);
+  border: 1px solid rgba(220, 226, 238, 0.9);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 아이콘 배치 */
+.tool-board__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px 22px;
+  align-items: start;
+}
+
+/* icon 컴포넌트 mount 자리 */
+.tool-board__grid > .tool-icon-mount {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 96px;
+}
+
+/* common/icon 컴포넌트가 만든 루트가 폭을 좁게 가지더라도 가운데 정렬 */
+.tool-board__grid .tool-icon-card,
+.tool-board__grid .icon-card,
+.tool-board__grid [data-tool-icon-card] {
+  margin: 0 auto;
+}
+
+/* 섹션 간 간격 */
+.tool-board-section + .tool-board-section {
+  margin-top: 28px;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 900px) {
   .personal-ai-main {
-    width: min(100%, 1080px);  /* 980 → 1080 */
-    margin: 0 auto;
-    padding: 28px 20px 40px;
+    width: min(100%, 860px);
+    padding: 22px 16px 32px;
   }
-  
-  /* ===== Hero ===== */
-  .personal-ai-hero {
-    padding-top: 40px;
-    margin-bottom: 72px;  /* 44px → 72px */
-    text-align: center;
-  }
-  
+
   .personal-ai-hero__title {
-    margin: 0;
-    font-size: 25px;
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    color: #111111;
+    font-size: 34px;
   }
-  
-  /* ===== Sections ===== */
-  .tool-board-section {
-    margin-top: 18px;
-  }
-  
+
   .tool-board-section__title {
-    margin: 0 0 16px 6px;
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: #111;
+    font-size: 19px;
   }
-  
+
   .tool-board {
-    border-radius: 18px;
-    padding: 30px 34px;   /* ← 보드 내부 여백 증가 = 보드가 더 커보임 */
-    min-height: 210px;    /* ← 세로 높이 최소값 추가 */
-    background: rgba(245, 248, 255, 0.72);
-    border: 1px solid rgba(220, 226, 238, 0.9);
-    box-shadow:
-      0 8px 22px rgba(0, 0, 0, 0.07),
-      inset 0 1px 0 rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    padding: 18px 16px;
+    border-radius: 14px;
   }
-  
-  /* 아이콘 배치 */
+
   .tool-board__grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px 22px;
-    align-items: start;
+    gap: 16px 14px;
   }
-  
-  /* icon 컴포넌트 mount 자리 */
-  .tool-board__grid > .tool-icon-mount {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 96px;
+}
+
+@media (max-width: 640px) {
+  .personal-ai-hero {
+    margin-bottom: 30px;
   }
-  
-  /* common/icon 컴포넌트가 만든 루트가 폭을 좁게 가지더라도 가운데 정렬 */
-  .tool-board__grid .tool-icon-card,
-  .tool-board__grid .icon-card,
-  .tool-board__grid [data-tool-icon-card] {
-    margin: 0 auto;
+
+  .personal-ai-hero__title {
+    font-size: 26px;
   }
-  
-  /* 섹션 간 간격 */
-  .tool-board-section + .tool-board-section {
-    margin-top: 28px;
+
+  .tool-board-section__title {
+    font-size: 16px;
+    margin-left: 2px;
   }
-  
-  /* ===== 반응형 ===== */
-  @media (max-width: 900px) {
-    .personal-ai-main {
-      width: min(100%, 860px);
-      padding: 22px 16px 32px;
-    }
-  
-    .personal-ai-hero__title {
-      font-size: 34px;
-    }
-  
-    .tool-board-section__title {
-      font-size: 19px;
-    }
-  
-    .tool-board {
-      padding: 18px 16px;
-      border-radius: 14px;
-    }
-  
-    .tool-board__grid {
-      gap: 16px 14px;
-    }
+
+  .tool-board {
+    padding: 14px 12px;
+    border-radius: 12px;
   }
-  
-  @media (max-width: 640px) {
-    .personal-ai-hero {
-      margin-bottom: 30px;
-    }
-  
-    .personal-ai-hero__title {
-      font-size: 26px;
-    }
-  
-    .tool-board-section__title {
-      font-size: 16px;
-      margin-left: 2px;
-    }
-  
-    .tool-board {
-      padding: 14px 12px;
-      border-radius: 12px;
-    }
-  
-    .tool-board__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px 10px;
-    }
+
+  .tool-board__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 10px;
   }
+}

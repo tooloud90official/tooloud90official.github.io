@@ -1,11 +1,27 @@
-/* price_AI.css */
-* { box-sizing: border-box; }
+/* ✅ 배경 강제 적용 (다른 CSS가 body 배경 덮어도 이게 이김) */
+html, body {
+  min-height: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%) !important;
+}
 
+/* ✅ height:100vh 때문에 잘리는 거 방지 */
 body {
-  margin: 0;
-  background: #ffffff;
-  color: #111;
-  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+/* ✅ 페이지 래퍼가 흰 배경 깔아도 투명하게 */
+.category-tools-page,
+.category-tools-main {
+  background: transparent !important;
+}
+/* ✅ 탑 배너: 화면 맨 위 고정 */
+.category-tools-banner-root{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;          /* 가로폭 계산 트릭 없이 그냥 양쪽 0 */
+  z-index: 9999;
 }
 
 .category-tools-main {
