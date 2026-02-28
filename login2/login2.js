@@ -1,7 +1,7 @@
 // login2.js
 // 경로: minju/js/login2.js
 
-import { includeHTML } from '../../common/confirm/include.js';
+import { includeHTML } from '../common/confirm/include.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 

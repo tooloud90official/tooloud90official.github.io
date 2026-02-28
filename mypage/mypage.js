@@ -1,7 +1,7 @@
 // mypage.js
 // 경로: minju/mypage/mypage.js
 
-import { initFaqItems } from '../../common/drop_down/drop_down.js';
+import { initFaqItems } from '../common/drop_down/drop_down.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 

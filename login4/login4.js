@@ -1,7 +1,7 @@
 // login4.js
 // 경로: minju/login4/login4.js
 
-import { includeHTML } from '../../common/confirm/include.js';
+import { includeHTML } from '../common/confirm/include.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 

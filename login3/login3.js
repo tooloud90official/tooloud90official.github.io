@@ -1,6 +1,6 @@
 // login3.js
-import { includeHTML } from '../../common/confirm/include.js';
-import { JeonubSelect } from '../../common/select/select.js';
+import { includeHTML } from '../common/confirm/include.js';
+import { JeonubSelect } from '../common/select/select.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 
