@@ -1,12 +1,8 @@
 // login2.js
-// 경로: minju/js/login2.js
-
-import { includeHTML } from '/_common/confirm/include.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== 비밀번호 유효성 검사 =====
-
   const password        = document.getElementById('password');
   const passwordConfirm = document.getElementById('passwordConfirm');
 
@@ -27,8 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const msg = createMessage(password, 'pw-msg');
 
     if (password.value === '') {
-      msg.textContent = '';
-      return;
+      msg.textContent = ''; return;
     }
 
     if (!PW_REGEX.test(password.value)) {
@@ -46,8 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const msg = createMessage(passwordConfirm, 'pw-confirm-msg');
 
     if (passwordConfirm.value === '') {
-      msg.textContent = '';
-      return;
+      msg.textContent = ''; return;
     }
 
     if (password.value !== passwordConfirm.value) {
@@ -62,9 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   passwordConfirm.addEventListener('input', checkConfirm);
 
 
-  // ===== 가입 버튼 클릭 시 최종 검사 =====
-
-  document.getElementById('signupBtn')?.addEventListener('click', () => {
+  // ===== 다음 버튼 유효성 검사 =====
+  window.validateLogin2 = function() {
     let isValid = true;
 
     if (!PW_REGEX.test(password.value)) {
@@ -81,65 +74,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       isValid = false;
     }
 
-    if (!isValid) return;
-
-    console.log('회원가입 진행');
-  });
+    return isValid;
+  };
 
 
   // ===== confirm 컴포넌트 초기화 =====
-
-  async function initConfirm() {
-    if (!document.getElementById('modal-root')) {
-      const root = document.createElement('div');
-      root.id = 'modal-root';
-      document.body.appendChild(root);
-    }
-
-    await includeHTML('#modal-root', '/_common/confirm/confirm.html');
-
-    const modal     = document.querySelector('[data-confirm-modal]');
-    const dialog    = modal.querySelector('.confirm-modal__dialog');
-    const btnCancel = modal.querySelector('[data-confirm-cancel]');
-    const btnOk     = modal.querySelector('[data-confirm-ok]');
-    const backdrop  = modal.querySelector('[data-confirm-close]');
-
-    function openConfirm() {
-      modal.querySelector('[data-confirm-title]').textContent = '페이지를 나가시겠습니까?';
-      modal.querySelector('[data-confirm-desc]').textContent  = '입력한 내용이 저장되지 않습니다.';
-      modal.hidden = false;
-      modal.setAttribute('aria-hidden', 'false');
-      dialog.focus();
-    }
-
-    function closeConfirm() {
-      modal.hidden = true;
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    btnCancel.addEventListener('click', closeConfirm);
-    backdrop.addEventListener('click', closeConfirm);
-
-    // ✅ 여기 수정됨
-    btnOk.addEventListener('click', () => {
-      closeConfirm();
-      window.location.href = '/login1/login1.html';
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) closeConfirm();
-    });
-
-    return openConfirm;
+  if (!document.getElementById('modal-root')) {
+    const root = document.createElement('div');
+    root.id = 'modal-root';
+    document.body.appendChild(root);
   }
+
+  await window.includeHTML('#modal-root', '/_common/confirm/confirm.html');
+  const confirmModal = new window.ConfirmModal();
 
 
   // ===== 이전으로 돌아가기 버튼 =====
-
-  const backLink = document.querySelector('.back-link');
-  backLink.removeAttribute('onclick');
-
-  const openConfirm = await initConfirm();
-  backLink.addEventListener('click', openConfirm);
+  document.getElementById('backBtn')?.addEventListener('click', async () => {
+    const result = await confirmModal.open({
+      title: '페이지를 나가시겠습니까?',
+      description: '입력한 내용이 저장되지 않습니다.',
+      okText: '확인',
+      cancelText: '취소',
+    });
+    if (result) {
+      window.location.href = '/login1/login1.html';
+    }
+  });
 
 });

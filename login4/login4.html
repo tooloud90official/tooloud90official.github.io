@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="/_common/signup_status/signup_status.css">
   <link rel="stylesheet" href="/_common/button/button.css">
   <link rel="stylesheet" href="/_common/icon/icon.css">
-  <link rel="stylesheet" href="/_common/confirm/confirm.css">
   <link rel="stylesheet" href="/login4/login4.css">
 </head>
 
@@ -23,24 +22,26 @@
     <h1 class="title">관심 있는 AI 툴을 골라주세요.</h1>
     <p class="subtitle">최대 5개의 툴을 선택해주세요.</p>
 
-    <!-- 툴 그리드 영역 -->
+    <!-- 툴 그리드 -->
     <div class="tool-grid-wrap">
-      <div class="tool-grid" id="toolGrid">
-        <!-- icon 컴포넌트들이 JS로 동적 삽입됨 -->
-      </div>
+      <div class="tool-grid" id="toolGrid"></div>
     </div>
 
-    <!-- 선택한 툴 영역 -->
+    <!-- 선택된 툴 -->
     <div class="selected-wrap">
       <h2 class="selected-title">지금까지 선택한 툴</h2>
+
       <div class="selected-progress-bar">
         <div class="selected-progress-fill" id="progressFill"></div>
       </div>
-      <div class="selected-icons" id="selectedIcons">
-        <!-- 선택된 툴 아이콘이 동적으로 표시됨 -->
-      </div>
+
+      <div class="selected-icons" id="selectedIcons"></div>
+
       <p class="selected-count" id="selectedCount">0/5</p>
-      <button type="button" class="btn btn-outline" id="finishBtn">선택 마치기</button>
+
+      <button type="button" class="btn btn-outline" id="finishBtn">
+        선택 마치기
+      </button>
     </div>
 
   </main>

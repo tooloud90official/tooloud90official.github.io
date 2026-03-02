@@ -1,7 +1,7 @@
 /* login3.css */
 body {
     margin: 0;
-    padding: 0;
+    padding-top: 70px;
     font-family: 'Pretendard', sans-serif;
     background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
 }

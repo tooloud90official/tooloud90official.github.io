@@ -2,7 +2,7 @@
 
 body {
   margin: 0;
-  padding: 0;
+  padding-top: 70px;
   min-height: 100vh;
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   color: #1a1a2e;
@@ -42,7 +42,7 @@ body {
 }
 
 .page-title {
-  font-size: 26px;
+  font-size: 40px;
   font-weight: 800;
   margin: 0 0 8px;
   text-align: center;

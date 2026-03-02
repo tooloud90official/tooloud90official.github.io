@@ -122,9 +122,6 @@ document.addEventListener('click', (e) => {
     if (navMenu) navMenu.classList.toggle('open');
   }
 
-  if (authBtn) {
-    alert('로그인 / 회원가입 버튼 클릭');
-  }
 
   if (logo) {
     window.location.href = "/main1/main1.html";   // ✅ 여기 원하는 링크로 바꾸기

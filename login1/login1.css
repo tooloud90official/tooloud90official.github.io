@@ -20,11 +20,18 @@ body {
 }
 
 .login-form {
-  display: flex;
-  align-items: center;
-  margin: 0 auto;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows:
+    auto   /* 이메일 */
+    auto   /* 비밀번호 */
+    24px   /* 에러메시지 고정 높이 */
+    40px   /* 로그인옵션 고정 */
+    auto   /* 소셜 */
+    auto   /* 로그인버튼 */
+    auto;  /* 회원가입 */
+
   gap: 14px;
+  width: 300px;
 }
 
 .login-error {
@@ -45,6 +52,7 @@ body {
   background: #ffffff;
   width: 300px;
 }
+
 
 .login-input:focus {
   outline: none;
@@ -112,4 +120,8 @@ body {
   height: 48px;
   font-size: 15px;
   margin-top: 8px;
+}
+
+.password-error {
+  min-height: 24px;   /* 메시지 한 줄 높이 */
 }

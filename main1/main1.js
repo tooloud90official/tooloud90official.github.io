@@ -1,5 +1,5 @@
 // main1.js
-// 경로: minju/main1/main1.js
+// 경로: main1/main1.js
 // 로그인 전(main1) + 로그인 후(main2) 통합
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     placeholder: '검색어를 입력하세요',
     onSearch: (value) => {
       console.log('검색어:', value);
-      // TODO: 검색 결과 페이지로 이동
     }
   });
 
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderRecommend() {
     const grid = document.getElementById('recommendGrid');
     if (!grid) return;
-    grid.className = 'tool-grid'; // ← 추가
+    grid.className = 'tool-grid';
     grid.innerHTML = '';
     RECOMMEND_TOOLS.forEach(tool => {
       const card = document.createElement('div');
@@ -221,27 +220,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (isLoggedIn) {
     document.getElementById('recommendSection').style.display = 'block';
     renderRecommend();
-
-    setTimeout(async () => {
-      if (!document.getElementById('alert-root')) {
-        const root = document.createElement('div');
-        root.id = 'alert-root';
-        document.body.appendChild(root);
-      }
-
-      if (typeof initAlert === 'function') {
-        await initAlert({
-          triggerSelector: '#bellBtn',
-          mountSelector: '#alert-root',
-          alerts: [
-            { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-            { type: 'message', title: '1:1 문의사항 알림', desc: '회원님의 문의사항에 답글이 달렸어요.',          href: '#' },
-            { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-            { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-          ]
-        });
-      }
-    }, 300);
   }
 
-}); // DOMContentLoaded 끝
+    // 알림 데이터 등록 (include.js가 읽어감)
+  window.ALERT_DATA = [
+    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
+    { type: 'message', title: '1:1 문의사항 알림', desc: '회원님의 문의사항에 답글이 달렸어요.',          href: '#' },
+    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
+    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
+  ];
+}
+
+); // DOMContentLoaded 끝

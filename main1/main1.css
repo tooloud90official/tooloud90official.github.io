@@ -136,7 +136,7 @@ body {
 .profile {
   width: 20px;   /* ← 원하는 크기로 조절 */
   height: 20px;
-  border-radius: 50%;  /* 원형으로 만들고 싶으면 */
+  border-radius: 30%;  /* 원형으로 만들고 싶으면 */
   object-fit: cover;
 }
 
