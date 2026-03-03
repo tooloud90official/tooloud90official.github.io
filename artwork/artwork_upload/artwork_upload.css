@@ -1,0 +1,175 @@
+/* ✅ 탑 배너: 화면 상단 고정 및 전체 너비 */
+#top-banner {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* 최상단 유지 */
+  }
+  
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    color: #111;
+    background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  .upload-page {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 70px 16px 80px; /* 상단 여백 넉넉히 */
+  }
+  
+  .btn-back {
+    display: inline-flex;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #666;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  
+  /* 상단 업로드 히어로 */
+  .upload-hero {
+    position: relative;
+    height: 500px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #333, #666);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  }
+  
+  .drop-zone {
+    text-align: center;
+    color: #fff;
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+  
+  .drop-zone .sub {
+    opacity: 0.8;
+    font-size: 12px;
+  }
+  
+  /* 좌측 상단 툴 박스 */
+  .artwork-post__tool {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.65); /* 투명도 조절 */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  
+  .artwork-post__tool-ic {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #111;
+    flex-shrink: 0;
+  }
+  
+  .tool-select-btn-mount {
+    min-width: 160px;
+  }
+  
+  /* ✅ 3. 본문 메인 카드 (Glassmorphism 적용) */
+  .card {
+    margin: -60px auto 0; /* 히어로 영역 위로 겹침 */
+    width: 100%;
+    position: relative;
+    z-index: 60;
+    
+    /* 초코가 보낸 코드의 핵심 스타일 적용 */
+    background: rgba(255, 255, 255, 0.65); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+  }
+  
+  .profile-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  
+  .avatar-ring {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    padding: 4px;
+    background: conic-gradient(#6EE7FF, #7C3AED, #FF4D8D, #FFD84D, #6EE7FF);
+  }
+  
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: cover;
+    border: 3px solid #fff; /* 아바타 테두리 추가 */
+  }
+  
+  .user-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: #111;
+  }
+  
+  /* 입력 박스도 유리 느낌으로 통일 */
+  .input-box {
+    background: rgba(255, 255, 255, 0.4); 
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 10px;
+  }
+  
+  textarea {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    min-height: 100px;
+    resize: none;
+    font-size: 14px;
+    background: transparent; /* 배경 투명하게 */
+    color: #374151;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 30px;
+  }
+  
+  .btn-wrap {
+    flex: 1;
+    max-width: 180px;
+  }

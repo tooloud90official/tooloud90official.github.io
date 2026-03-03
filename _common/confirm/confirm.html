@@ -1,36 +1,41 @@
-<!-- components/confirm/confirm.html -->
-<div class="confirm-modal" data-confirm-modal hidden aria-hidden="true">
-    <div class="confirm-modal__backdrop" data-confirm-close></div>
-  
-    <section
-      class="confirm-modal__dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirmModalTitle"
-      aria-describedby="confirmModalDesc"
-      tabindex="-1"
-    >
-      <div class="confirm-modal__content">
-        <!-- 제목 / 설명: JS에서 교체 가능 -->
-        <header class="confirm-modal__header">
-          <h2 id="confirmModalTitle" class="confirm-modal__title" data-confirm-title>
-            삭제하시겠습니까?
-          </h2>
-          <p id="confirmModalDesc" class="confirm-modal__desc" data-confirm-desc>
-            이 작업은 취소할 수 없습니다.
-          </p>
-        </header>
-  
-        <!-- 버튼 슬롯 (기본 버튼은 placeholder) -->
-        <div class="confirm-modal__actions" data-confirm-actions>
-          <!-- 기본 버튼 (외부 버튼 컴포넌트로 교체 가능) -->
-          <button type="button" class="confirm-btn confirm-btn--ghost" data-confirm-cancel>
-            취소
-          </button>
-          <button type="button" class="confirm-btn confirm-btn--primary" data-confirm-ok>
-            확인
-          </button>
-        </div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Dialog</title>
+  <link rel="stylesheet" href="/_common/button/button.css" />
+  <link rel="stylesheet" href="/_common/confirm/confirm.css" />
+</head>
+<body>
+
+  <!--
+    ┌────────────────────────────────────────────┐
+    │  Confirm Dialog Template                   │
+    │  API: window.showConfirm({ title, desc,    │
+    │       onConfirm, onCancel,                 │
+    │       confirmText, cancelText, variant })  │
+    └────────────────────────────────────────────┘
+  -->
+
+  <div class="confirm-overlay" id="confirmOverlay"
+       role="dialog" aria-modal="true"
+       aria-labelledby="confirmTitle" aria-hidden="true">
+    <div class="confirm-backdrop" id="confirmBackdrop"></div>
+    <div class="confirm-dialog">
       </div>
-    </section>
+      <div class="confirm-body">
+        <h2 class="confirm-title" id="confirmTitle">삭제하시겠습니까?</h2>
+        <p class="confirm-desc" id="confirmDesc">이 작업은 취소할 수 없습니다.</p>
+      </div>
+      <div class="confirm-actions">
+        <div class="confirm-btn-slot" id="confirmBtnCancel"></div>
+        <div class="confirm-btn-slot" id="confirmBtnOk"></div>
+      </div>
+    </div>
   </div>
+
+  <script src="/_common/button/button.js"></script>
+  <script src="/_common/confirm/confirm.js"></script>
+</body>
+</html>

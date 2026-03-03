@@ -1,5 +1,5 @@
 import { JeonubSelect } from "/_common/select/select.js";
-import { mountArtworkCardTemplate, renderArtworkCards } from "/artwork/artwork-card.js";
+import { mountArtworkCardTemplate, renderArtworkCards } from "/artwork/artwork_card/artwork-card.js";
 /* =========================
    1) 사이드바 토글
 ========================= */

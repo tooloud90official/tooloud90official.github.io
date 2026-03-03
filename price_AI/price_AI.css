@@ -1,26 +1,31 @@
-/* ✅ 배경 강제 적용 (다른 CSS가 body 배경 덮어도 이게 이김) */
+/* ✅ 배경 및 기본 설정 */
 html, body {
   min-height: 100%;
   background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%) !important;
 }
 
-/* ✅ height:100vh 때문에 잘리는 거 방지 */
 body {
-  height: auto !important;
-  min-height: 100vh !important;
+  margin: 0;
+  padding-top: 150px;
+  min-height: 100vh;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: #1a1a2e;
+  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
+  display: block !important;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
 }
 
-/* ✅ 페이지 래퍼가 흰 배경 깔아도 투명하게 */
 .category-tools-page,
 .category-tools-main {
   background: transparent !important;
 }
-/* ✅ 탑 배너: 화면 맨 위 고정 */
-.category-tools-banner-root{
+
+.category-tools-banner-root {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;          /* 가로폭 계산 트릭 없이 그냥 양쪽 0 */
+  right: 0;
   z-index: 9999;
 }
 
@@ -30,50 +35,200 @@ body {
   padding: 28px 20px 48px;
 }
 
-/* Hero */
+/* --- Hero Section --- */
 .category-hero { text-align: center; margin-bottom: 18px; }
-.category-hero__title { font-size: 56px; font-weight: 900; margin: 0; letter-spacing: -0.04em; }
-.category-hero__desc { font-size: 13px; color: #555; margin-top: 8px; }
-.category-hero__desc--accent { color: #2a7cff; }
+.category-hero__title {
+  font-size: 40px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+.category-hero__desc {
+  font-size: 13px;
+  color: #555;
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+.category-hero__desc--accent { color: #1b44ff; }
 
-/* Slider */
-.price-filter { width: min(100%, 700px); margin: 16px auto 34px; }
-.price-filter__labels { display: grid; grid-template-columns: repeat(6, 1fr); margin-bottom: 10px; }
-.price-filter__step-label { text-align: center; font-size: 12px; color: #5a5a5a; transition: color 0.2s; }
-.price-filter__step-label.is-active { color: #1f7bf2; font-weight: 700; }
+/* --- Price Filter Slider --- */
+.price-filter {
+  width: min(100%, 860px);
+  margin: 16px auto 34px;
+}
 
-.price-filter__slider { position: relative; height: 28px; width: 100%; touch-action: none; user-select: none; }
-.price-filter__track { position: absolute; left: 0; right: 0; top: 50%; height: 4px; border-radius: 999px; background: #d8d8d8; transform: translateY(-50%); }
-.price-filter__track-fill { position: absolute; left: 0; top: 50%; height: 4px; background: #1f7bf2; border-radius: 999px; transform: translateY(-50%); transition: width 0.15s ease-out; }
+.price-filter__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 10px;
+}
+.price-filter__step-label {
+  text-align: center;
+  font-size: 12px;
+  color: #5a5a5a;
+  transition: color 0.2s;
+  flex: 0 0 auto;
+}
+.price-filter__step-label.is-active {
+  color: #1f7bf2;
+  font-weight: 700;
+}
 
-.price-filter__dots { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
-.price-filter__dot { pointer-events: auto; width: 12px; height: 12px; border-radius: 50%; border: none; background: #d8d8d8; box-shadow: 0 0 0 3px #fff; cursor: pointer; transition: background 0.2s; }
+.price-filter__slider {
+  position: relative;
+  height: 28px;
+  width: calc(100% - 20px);
+  margin: 0 10px;
+  touch-action: none;
+  user-select: none;
+}
+
+.price-filter__track {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: #dde4f0;
+  transform: translateY(-50%);
+}
+
+.price-filter__track-fill {
+  position: absolute;
+  left: 0; top: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, #5aa3f5, #1f7bf2);
+  border-radius: 999px;
+  transform: translateY(-50%);
+  transition: width 0.15s ease-out;
+}
+
+.price-filter__dots {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.price-filter__dot {
+  pointer-events: auto;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #d0d8e8;
+  box-shadow: 0 0 0 3px #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.price-filter__dot:hover { transform: scale(1.3); }
 .price-filter__dot.is-passed { background: #1f7bf2; }
 
 .price-filter__thumb {
-  position: absolute; top: 50%; transform: translate(-50%, -50%);
-  width: 18px; height: 18px; border-radius: 50%; border: 2px solid #1f7bf2;
-  background: #fff; box-shadow: 0 2px 8px rgba(31, 123, 242, 0.25);
-  cursor: grab; z-index: 2; transition: left 0.15s ease-out;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid #1f7bf2;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(31, 123, 242, 0.3);
+  cursor: grab;
+  z-index: 2;
+  transition: left 0.15s ease-out, box-shadow 0.15s;
+}
+.price-filter__thumb:hover {
+  box-shadow: 0 0 0 6px rgba(31, 123, 242, 0.12), 0 2px 10px rgba(31, 123, 242, 0.3);
 }
 .price-filter__thumb:active { cursor: grabbing; }
 
-.price-filter__hint { font-size: 12px; color: #666; margin-top: 8px; text-align: center; }
-
-/* Grid & Cards */
-.tool-card-grid { width: min(100%, 700px); margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 34px; }
-.tool-price-card {
-  width: 100%; min-height: 158px; border-radius: 20px; background: rgba(245, 248, 255, 0.72);
-  border: 1px solid rgba(226, 232, 243, 0.95); padding: 16px 12px 12px;
-  display: flex; flex-direction: column; align-items: center;
+.price-filter__hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: 12px;
+  text-align: center;
+  letter-spacing: 0.01em;
 }
-.tool-price-card__icon { width: 100%; min-height: 74px; display: flex; justify-content: center; }
-.tool-price-card__name { margin: 8px 0; font-size: 15px; font-weight: 800; color: #111; text-align: center; word-break: keep-all; }
-.tool-price-card__bottom { width: 100%; margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; }
-.tool-price-card__price { font-size: 12px; font-weight: 800; }
-.tool-price-card__more { font-size: 9px; color: #7b7b7b; text-decoration: none; }
 
+/* --- Grid & Cards (중중앙 정렬 수정본) --- */
+.tool-card-grid {
+  width: min(100%, 860px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px 48px;
+}
+
+.tool-price-card {
+  width: 100%;
+  min-height: 200px; /* ✅ 높이를 살짝 키워서 정렬이 더 잘 보이게 했어 */
+  border-radius: 20px;
+  background: rgba(245, 248, 255, 0.72);
+  border: 1px solid rgba(226, 232, 243, 0.95);
+  padding: 24px 18px 18px; /* ✅ 상하좌우 패딩 균형 조절 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* ✅ 아이콘과 이름이 들어가는 영역을 수직 중앙으로! */
+.tool-price-card .tool-icon-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  width: 100%;
+  gap: 12px; /* ✅ 아이콘과 이름 사이의 간격 */
+}
+
+.tool-price-card .tool-icon-card__icon {
+  width: 120px !important;
+  height: 120px !important;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.tool-price-card__name {
+  margin: 0;
+  font-size: 40px !important;
+  font-weight: 800; 
+  color: #111;
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.3;
+}
+
+/* ✅ 하단 가격 및 더보기 영역 */
+.tool-price-card__bottom {
+  width: 100%;
+  margin-top: 20px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tool-price-card__price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #000000;
+}
+
+.tool-price-card__more {
+  font-size: 13px;
+  color: #7b7b7b;
+  text-decoration: none;
+}
+
+/* --- Responsive --- */
 @media (max-width: 640px) {
   .category-hero__title { font-size: 28px; }
   .tool-card-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+  .price-filter { width: 100%; }
+  .tool-price-card { min-height: 280px; }
+  .tool-price-card .tool-icon-card__icon { width: 80px !important; height: 80px !important; }
 }

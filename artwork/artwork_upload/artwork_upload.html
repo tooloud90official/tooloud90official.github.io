@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업물 업로드</title>
+
+  <link rel="stylesheet" href="/_common/button/button.css" />
+  <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
+  <link rel="stylesheet" href="/artwork/artwork_upload/artwork_upload.css" />
+</head>
+<body>
+    <div id="top-banner" class="detail_AI-banner-root"></div>
+  <div class="upload-page">
+
+    <!--
+    <header class="topbar">
+      <a class="btn-back" href="javascript:history.back();">← 이전으로 돌아가기</a>
+    </header>
+-->
+    <section class="upload-hero">
+      <!-- ✅ 좌측 상단 툴 박스 (별점/개발사 제거 + 버튼 컴포넌트로 교체) -->
+      <div class="artwork-post__tool">
+        <div class="artwork-post__tool-ic" aria-hidden="true"></div>
+
+        <!-- 버튼 컴포넌트 마운트 자리 -->
+        <div id="toolSelectBtnMount" class="tool-select-btn-mount"></div>
+      </div>
+
+      <div class="drop-zone">
+        <p>첨부할 파일을 여기에 끌어다 놓거나, 버튼을 클릭하세요.</p>
+        <p class="sub">지원 파일: mp4, mp3, jpg, png, pdf, txt</p>
+        <div id="fileUploadMount"></div>
+      </div>
+    </section>
+
+    <main class="card">
+      <div class="profile-section">
+        <div class="avatar-ring">
+          <img class="avatar" src="/media/profil.png" alt="프로필" />
+        </div>
+        <div class="user-name">Soojin</div>
+      </div>
+
+      <div class="input-section">
+        <label class="label" for="description">설명</label>
+        <div class="input-box">
+          <textarea id="description" placeholder="커뮤니티 가이드라인 위반 시 제재될 수 있습니다."></textarea>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <div id="cancelBtnMount" class="btn-wrap"></div>
+        <div id="submitBtnMount" class="btn-wrap"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/_common/button/button.js"></script>
+  <script src="/artwork/artwork_upload/artwork_upload.js" defer></script>
+  <script src="/_common/top-banner/include.js"></script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+/* 1. 배경 및 기본 설정 */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    color: #111;
+    background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  
+  * { box-sizing: border-box; }
+  .inquiry-banner-root { width: 100%; min-height: 56px; }
+  
+  .post-page {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 12px 16px 48px;
+  }
+  
+  /* 2. 히어로 */
+  .hero {
+    position: relative;
+    height: clamp(320px, 42vw, 520px);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  }
+  
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.1);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .artwork-post__tool {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  
+  .artwork-post__tool-ic {
+    width: 70px !important;
+    height: 70px !important;
+    border-radius: 15px;
+    flex: 0 0 70px;
+    background-color: #374151;
+  }
+  
+  .artwork-post__tool-meta { display: grid; gap: 4px; }
+  .artwork-post__tool-top { display: flex; align-items: center; gap: 10px; }
+  .artwork-post__tool-name { font-size: 17px; font-weight: 900; color: #111; line-height: 1; }
+  .artwork-post__tool-stars { font-size: 13px; color: #f5a524; line-height: 1; }
+  .artwork-post__tool-brand { font-size: 12px; font-weight: 800; color: rgba(0, 0, 0, 0.55); line-height: 1; }
+  
+  /* 3. 본문 카드 */
+  .card {
+    margin-top: -56px;
+    position: relative;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+  }
+  
+  .post-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  .post-head__left { display: flex; align-items: center; gap: 14px; }
+  .post-head__right { display: flex; align-items: center; gap: 10px; }
+  
+  /* 아바타 */
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+    box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+    flex-shrink: 0;
+  }
+  .avatar.sm {
+    width: 40px;
+    height: 40px;
+    padding: 2.5px;
+  }
+  .reply-item .avatar.sm {
+    width: 34px;
+    height: 34px;
+    padding: 2px;
+  }
+  
+  .avatar__inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #fff;
+    background: #fff;
+  }
+  .avatar__inner img,
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .name { font-weight: 900; font-size: 18px; }
+  .date { margin-top: 4px; font-size: 12px; color: #6b7280; }
+  
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    text-decoration: none;
+    color: #111;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s;
+  }
+  .stat:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  
+  .post-body { padding: 20px 4px 10px; }
+  .post-body p { margin: 0; font-size: 15px; line-height: 1.7; color: #374151; }
+  
+  .post-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 0; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.8);
+    cursor: pointer; transition: 0.2s;
+  }
+  .icon-btn:hover { transform: translateY(-2px); background: #fff; }
+  
+  /* 4. 댓글 섹션 */
+  .divider { border: 0; height: 1px; margin: 20px 0; background: rgba(0,0,0,0.06); }
+  .comments__title { font-weight: 900; font-size: 15px; margin-bottom: 16px; }
+  
+  .comment-write { display: flex; gap: 12px; }
+  .write-col { flex: 1; display: grid; gap: 12px; }
+  .box {
+    border-radius: 16px; background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.06); padding: 12px;
+  }
+  textarea {
+    width: 100%; border: 0; outline: 0; resize: vertical;
+    font-size: 14px; min-height: 70px; background: transparent;
+  }
+  .submit { display: flex; justify-content: center; }
+  
+  .comment-list { list-style: none; padding: 0; display: grid; gap: 12px; margin-top: 24px; }
+  
+  .comment-item {
+    padding: 16px; border-radius: 18px;
+    background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.4);
+    transition: 0.2s;
+  }
+  
+  .row-top { display: flex; justify-content: space-between; align-items: center; }
+  .head { display: flex; gap: 12px; align-items: center; }
+  .meta .n { font-weight: 900; font-size: 14px; }
+  .meta .d { font-size: 11px; color: #9ca3af; }
+  .text { margin: 12px 0 0; font-size: 14px; color: #374151; line-height: 1.6; }
+  
+  /* 5. pill */
+  .pill {
+    display: flex; gap: 6px; align-items: center;
+    padding: 6px 12px; border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.7);
+    cursor: pointer; font-size: 13px;
+  }
+  
+  /* 6. 대댓글 패널 */
+  .replies {
+    margin-top: 12px; border-radius: 18px;
+    background: rgba(255,255,255,0.4); overflow: hidden;
+    max-height: 0; opacity: 0; transition: 0.3s ease;
+  }
+  .replies.is-open { max-height: 2000px; opacity: 1; padding-bottom: 12px; }
+  
+  .rin { padding: 12px 16px; display: grid; gap: 12px; }
+  .reply-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  
+  /* ✅ 대댓글 아이템 */
+  .reply-item {
+    border-radius: 14px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .reply-item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #a78bfa, #60a5fa, #34d399);
+    opacity: 0.8;
+  }
+  
+  .reply-item--empty {
+    color: #9ca3af;
+    font-size: 13px;
+    padding-left: 16px;
+    background: transparent;
+    border: none;
+  }
+  .reply-item--empty::before { display: none; }
+  
+  /* ✅ JS가 만드는 reply-item__inner — 아바타 + 본문 가로 배치 */
+  .reply-item__inner {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding-left: 8px;
+  }
+  
+  /* ✅ 대댓글 본문 */
+  .reply-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  /* ✅ 이름 위, 날짜 아래 */
+  .reply-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .reply-head .n {
+    font-weight: 900;
+    font-size: 13px;
+    color: #111;
+    line-height: 1;
+  }
+  
+  .reply-head .d {
+    font-size: 11px;
+    color: #9ca3af;
+    line-height: 1;
+  }
+  
+  /* ✅ 내용은 날짜 아래 */
+  .reply-text {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.6;
+  }
+  
+  .reply-write { margin-top: 4px; }
+  .reply-write textarea { min-height: 50px; }
+  
+  /* ✅ 수정/삭제 우측 하단 */
+  .actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  
+  .act {
+    padding: 6px 10px; border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.05); background: transparent;
+    cursor: pointer; font-weight: 700; font-size: 11px; color: #6b7280;
+  }
+  .act.danger { color: #ef4444; }

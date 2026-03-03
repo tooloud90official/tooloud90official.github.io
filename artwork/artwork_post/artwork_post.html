@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>게시글 상세</title>
+  <link rel="stylesheet" href="/_common/button/button.css" />
+  <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
+  <link rel="stylesheet" href="/artwork/artwork_post/artwork_post.css" />
+</head>
+<body>
+  <div id="top-banner" class="inquiry-banner-root"></div>
+  <div class="post-page">
+
+    <section class="hero">
+      <img class="hero__img" src="/media/work.png" alt="작업물 커버" />
+      <div class="hero__overlay"></div>
+      
+      <div class="artwork-post__tool">
+        <div class="artwork-post__tool-ic"></div>
+        <div class="artwork-post__tool-meta">
+          <div class="artwork-post__tool-top">
+            <span class="artwork-post__tool-name">Adobe Firefly</span>
+            <span class="artwork-post__tool-stars">★★★★☆</span>
+          </div>
+          <div class="artwork-post__tool-brand">@Adobe</div>
+        </div>
+      </div>
+    </section>
+
+    <main class="card">
+      <section class="post-head">
+        <div class="post-head__left">
+          <div class="avatar">
+            <div class="avatar__inner">
+              <img src="/media/profil.png" alt="프로필" />
+            </div>
+          </div>
+          <div class="post-meta">
+            <div class="name">Soojin</div>
+            <div class="date">· 2026년 01월 01일</div>
+          </div>
+        </div>
+        <div class="post-head__right">
+          <button class="stat" id="btnLike" aria-pressed="false"><span class="ic">♡</span><span id="likeCount">210</span></button>
+          <a class="stat" href="#comments"><span class="ic">💬</span><span id="commentCount">0</span></a>
+        </div>
+      </section>
+
+      <section class="post-body">
+        <p>작업 과정과 결과물을 공유합니다! 피드백/질문도 편하게 남겨주세요 🙂</p>
+      </section>
+
+      <section class="post-foot">
+        <button class="icon-btn" id="btnEdit">✎</button>
+        <button class="icon-btn" id="btnDelete">🗑</button>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="comments" id="comments">
+        <div class="comments__title">All comments (<span id="commentCountTitle">0</span>)</div>
+        <div class="comment-write">
+          <div class="avatar sm">
+            <div class="avatar__inner">
+              <img src="/media/profil.png" alt="내 프로필" />
+            </div>
+          </div>
+          <div class="write-col">
+            <div class="box"><textarea id="commentInput" placeholder="댓글을 남겨주세요." rows="3"></textarea></div>
+            <div class="submit" id="commentSubmitMount"></div>
+          </div>
+        </div>
+
+        <ul class="comment-list" id="commentList">
+
+          <li class="comment-item">
+            <div class="row-top">
+              <div class="head">
+                <div class="avatar sm">
+                  <div class="avatar__inner">
+                    <img src="/media/profil.png" alt="댓글 작성자" />
+                  </div>
+                </div>
+                <div class="meta">
+                  <div class="n">Minjung</div>
+                  <div class="d">2026년 01월 02일</div>
+                </div>
+              </div>
+              <button class="pill">💬 대댓글 2</button>
+            </div>
+            <p class="text">정말 멋진 작업이에요! 색감이 너무 좋아요 ✨</p>
+
+            <div class="replies is-open">
+              <div class="rin">
+
+                <div class="reply-item">
+                  <div class="avatar sm">
+                    <div class="avatar__inner">
+                      <img src="/media/profil.png" alt="대댓글 작성자" />
+                    </div>
+                  </div>
+                  <div class="reply-body">
+                    <div class="reply-head">
+                      <span class="n">Soojin</span>
+                      <span class="d">2026년 01월 03일</span>
+                    </div>
+                    <p class="reply-text">감사해요! 색 조합에 가장 신경 썼어요 😊</p>
+                    <div class="actions">
+                      <button class="act">수정</button>
+                      <button class="act danger">삭제</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="reply-item">
+                  <div class="avatar sm">
+                    <div class="avatar__inner">
+                      <img src="/media/profil.png" alt="대댓글 작성자" />
+                    </div>
+                  </div>
+                  <div class="reply-body">
+                    <div class="reply-head">
+                      <span class="n">Hyunwoo</span>
+                      <span class="d">2026년 01월 04일</span>
+                    </div>
+                    <p class="reply-text">저도 배워보고 싶어요! 어떤 레퍼런스 보셨나요?</p>
+                    <div class="actions">
+                      <button class="act">수정</button>
+                      <button class="act danger">삭제</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </li>
+
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="/_common/button/button.js"></script>
+  <script src="/_common/top-banner/include.js"></script>
+  <script src="/artwork/artwork_post/artwork_post.js" defer></script>
+</body>
+</html>

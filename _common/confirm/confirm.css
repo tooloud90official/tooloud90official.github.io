@@ -1,194 +1,135 @@
-/* components/confirm/confirm.css */
+/* ============================================
+   Confirm Dialog — /_common/confirm/confirm.css
+   ============================================ */
 
-/* ====== Optional demo page background ====== */
-body.confirm-demo-bg {
-    margin: 0;
-    min-height: 100vh;
-    background: #ffffff;
-    display: grid;
-    place-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
-      "Noto Sans KR", "Malgun Gothic", sans-serif;
-  }
-  
-  /* ====== Modal Root ====== */
-  .confirm-modal[hidden] {
-    display: none !important;
-  }
-  
-  .confirm-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-  }
-  
-  /* 연한 배경 느낌 */
-  .confirm-modal__backdrop {
-    position: absolute;
-    inset: 0;
-    background: #ffffff;
-    backdrop-filter: blur(1px);
-  }
-  
-  /* ====== Dialog ====== */
-  .confirm-modal__dialog {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    outline: none;
-  }
-  
-  .confirm-modal__content {
-    width: min(720px, calc(100vw - 48px));
-    min-height: 340px;
-    background: #f6f6f6;
-    border-radius: 28px;
-    box-shadow:
-      0 16px 30px rgba(0, 0, 0, 0.12),
-      0 4px 8px rgba(0, 0, 0, 0.08);
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    padding: 40px 32px 36px;
-    box-sizing: border-box;
-  }
-  
-  /* ====== Header ====== */
-  .confirm-modal__header {
-    text-align: center;
-    margin-bottom: 34px;
-  }
-  
-  .confirm-modal__title {
-    margin: 0;
-    font-size: clamp(28px, 3vw, 44px);
-    line-height: 1.2;
-    font-weight: 800;
-    color: #111;
-    letter-spacing: -0.03em;
-  }
-  
-  .confirm-modal__desc {
-    margin: 14px 0 0;
-    font-size: clamp(14px, 1.3vw, 24px);
-    line-height: 1.45;
-    color: #9c9c9c;
-    letter-spacing: -0.02em;
-  }
-  
-  /* ====== Actions ====== */
-  .confirm-modal__actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    flex-wrap: wrap;
-  }
-  
-  /* ====== 기본 버튼 스타일 (외부 컴포넌트로 교체 가능) ====== */
-  .confirm-btn {
-    min-width: 200px;
-    height: 92px;
-    border-radius: 999px;
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
-    outline: none;
-    user-select: none;
-  }
-  
-  .confirm-btn:active {
-    transform: translateY(1px);
-  }
-  
-  .confirm-btn:focus-visible {
-    box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.18);
-  }
-  
-  /* 취소 버튼 (흰 배경 + 파란 아웃라인) */
-  .confirm-btn--ghost {
-    background: #f7f7f7;
-    color: #1877f2;
-    border: 4px solid #1877f2;
-  }
-  
-  .confirm-btn--ghost:hover {
-    background: #ffffff;
-  }
-  
-  /* 확인 버튼 (파란 배경) */
-  .confirm-btn--primary {
-    background: #1877f2;
-    color: #fff;
-    border: 4px solid #1877f2;
-    box-shadow: 0 8px 18px rgba(24, 119, 242, 0.22);
-  }
-  
-  .confirm-btn--primary:hover {
-    background: #146fe3;
-    border-color: #146fe3;
-  }
-  
-  /* ====== Open/Close Animation ====== */
-  .confirm-modal.is-opening .confirm-modal__content,
-  .confirm-modal.is-closing .confirm-modal__content {
-    transform-origin: center;
-  }
-  
-  .confirm-modal.is-opening .confirm-modal__content {
-    animation: confirmPopIn 180ms ease-out;
-  }
-  
-  .confirm-modal.is-closing .confirm-modal__content {
-    animation: confirmPopOut 140ms ease-in forwards;
-  }
-  
-  @keyframes confirmPopIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-  
-  @keyframes confirmPopOut {
-    from {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(4px) scale(0.99);
-    }
-  }
-  
-  /* ====== Responsive ====== */
-  @media (max-width: 640px) {
-    .confirm-modal__content {
-      min-height: 280px;
-      padding: 30px 20px 24px;
-      border-radius: 22px;
-    }
-  
-    .confirm-modal__header {
-      margin-bottom: 26px;
-    }
-  
-    .confirm-btn {
-      min-width: 140px;
-      height: 64px;
-      font-size: 20px;
-      border-width: 3px;
-    }
-  
-    .confirm-modal__actions {
-      gap: 14px;
-    }
-  }
+   @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+
+   :root {
+     --confirm-radius: 20px;
+     --confirm-shadow: 0 8px 40px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.07);
+     --confirm-bg: #ffffff;
+     --confirm-overlay-bg: rgba(30, 35, 50, 0.45);
+     --confirm-title-color: #1a1d27;
+     --confirm-desc-color: #8b90a0;
+     --confirm-icon-bg: #fff4f4;
+     --confirm-icon-color: #f05d5d;
+     --confirm-border: rgba(0, 0, 0, 0.06);
+     --confirm-transition: 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+     --confirm-fade: 0.18s ease;
+   }
+   
+   /* Overlay */
+   .confirm-overlay {
+     position: fixed;
+     inset: 0;
+     z-index: 9999;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 20px;
+     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+   
+     opacity: 0;
+     pointer-events: none;
+     transition: opacity var(--confirm-fade);
+   }
+   
+   .confirm-overlay.is-active {
+     opacity: 1;
+     pointer-events: all;
+   }
+   
+   /* Backdrop */
+   .confirm-backdrop {
+     position: absolute;
+     inset: 0;
+     background: var(--confirm-overlay-bg);
+     backdrop-filter: blur(4px);
+     -webkit-backdrop-filter: blur(4px);
+     cursor: pointer;
+   }
+   
+   /* Dialog Box */
+   .confirm-dialog {
+     position: relative;
+     z-index: 1;
+     background: var(--confirm-bg);
+     border-radius: var(--confirm-radius);
+     box-shadow: var(--confirm-shadow);
+     border: 1px solid var(--confirm-border);
+     padding: 36px 32px 28px;
+     width: 100%;
+     max-width: 360px;
+     text-align: center;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 6px;
+   
+     transform: scale(0.88) translateY(12px);
+     transition: transform var(--confirm-transition);
+   }
+   
+   .confirm-overlay.is-active .confirm-dialog {
+     transform: scale(1) translateY(0);
+   }
+   
+
+   
+   .confirm-overlay.is-active .confirm-icon {
+     transform: scale(1.08);
+     animation: iconPop 0.4s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+   }
+   
+   @keyframes iconPop {
+     0%   { transform: scale(0.5); opacity: 0; }
+     100% { transform: scale(1);   opacity: 1; }
+   }
+   
+   /* Body */
+   .confirm-body {
+     display: flex;
+     flex-direction: column;
+     gap: 6px;
+     margin-bottom: 8px;
+   }
+   
+   .confirm-title {
+     font-size: 18px;
+     font-weight: 700;
+     color: var(--confirm-title-color);
+     margin: 0;
+     letter-spacing: -0.3px;
+     line-height: 1.3;
+   }
+   
+   .confirm-desc {
+     font-size: 13.5px;
+     font-weight: 400;
+     color: var(--confirm-desc-color);
+     margin: 0;
+     line-height: 1.5;
+   }
+   
+   /* Actions */
+   .confirm-actions {
+     display: flex;
+     gap: 3px;
+     width: 100%;
+     margin-top: 10px;
+   }
+   
+   .confirm-btn-slot {
+     flex: 1;
+   }
+   
+   /* Dialog close animation */
+   .confirm-overlay.is-leaving {
+     opacity: 0;
+     transition: opacity 0.15s ease;
+   }
+   
+   .confirm-overlay.is-leaving .confirm-dialog {
+     transform: scale(0.94) translateY(6px);
+     transition: transform 0.15s ease;
+   }

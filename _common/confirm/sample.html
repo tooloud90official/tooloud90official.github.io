@@ -1,73 +1,46 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Confirm Modal Sample</title>
-
-  <!-- 기존 모달 스타일 -->
-  <link rel="stylesheet" href="./confirm.css" />
-
-  <!-- 친구가 만든 공용 버튼 스타일 -->
-  <link rel="stylesheet" href="/_common/button/button.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Confirm Sample</title>
+  <link rel="stylesheet" href="../button/button.css"/>
+  <link rel="stylesheet" href="confirm.css"/>
 </head>
-<body class="confirm-demo-bg">
-  <main>
-    <button id="openConfirm">삭제 모달 열기</button>
-  </main>
+<body>
 
-  <div id="modal-root"></div>
+  <!-- confirm 오버레이 -->
+  <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-hidden="true">
+    <div class="confirm-backdrop" id="confirmBackdrop"></div>
+    <div class="confirm-dialog">
+      <div class="confirm-icon" id="confirmIcon"></div>
+      <h2 class="confirm-title" id="confirmTitle"></h2>
+      <p class="confirm-desc" id="confirmDesc"></p>
+      <div class="confirm-actions">
+        <div class="confirm-btn-slot" id="confirmBtnCancel"></div>
+        <div class="confirm-btn-slot" id="confirmBtnOk"></div>
+      </div>
+    </div>
+  </div>
 
-  <!-- 친구 버튼 시스템 JS (전역 loadButton 제공) -->
-  <script src="/_common/button/button.js"></script>
+  <!-- 트리거 버튼 슬롯 -->
+  <div id="triggerBtn"></div>
 
-  <script type="module">
-    import { includeHTML } from "./include.js";
-    import { ConfirmModal } from "./confirm.js";
-
-    async function init() {
-      // 1) 모달 HTML 삽입
-      await includeHTML("#modal-root", "./confirm.html");
-
-      // 2) 모달 인스턴스 생성
-      const confirmModal = new ConfirmModal();
-
-      // 3) 기본 버튼 대신 "버튼 들어갈 자리(div)"로 교체
-      confirmModal.setActions(`
-        <div id="confirmCancelSlot"></div>
-        <div id="confirmOkSlot"></div>
-      `);
-
-      // 4) 친구 버튼 시스템으로 모달 버튼 생성
-      //    (onClick에서 confirmModal.close(false/true) 직접 호출)
-      loadButton({
-        target: '#confirmCancelSlot',
-        text: '취소',
-        variant: 'outline',
-        onClick: () => confirmModal.close(false)
-      });
-
-      loadButton({
-        target: '#confirmOkSlot',
-        text: '확인',
-        variant: 'primary',
-        onClick: () => confirmModal.close(true)
-      });
-
-      // 5) 열기 버튼
-      document.querySelector("#openConfirm").addEventListener("click", async () => {
-        const result = await confirmModal.open({
-          title: "삭제하시겠습니까?",
-          description: "이 작업은 취소할 수 없습니다."
-        });
-
-        console.log("결과:", result ? "확인" : "취소");
-      });
-    }
-
-    init().catch((err) => {
-      console.error("모달 초기화 실패:", err);
-      alert("모달 파일 로드 실패! 경로 또는 실행 방식 확인해줘.");
+  <script src="../button/button.js"></script>
+  <script src="confirm.js"></script>
+  <script>
+    loadButton({
+      target: '#triggerBtn',
+      text: '삭제하기',
+      variant: 'danger',
+      size: 'md',
+      onClick: () => showConfirm({
+        type: 'danger',
+        title: '삭제하시겠습니까?',
+        desc: '이 작업은 취소할 수 없습니다.',
+        confirmText: '삭제',
+        cancelText: '취소',
+      })
     });
   </script>
 </body>

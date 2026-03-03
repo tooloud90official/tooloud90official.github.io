@@ -1,156 +1,143 @@
-// /_common/confirm/confirm.js
+/**
+ * Confirm Dialog
+ * /_common/confirm/confirm.js
+ *
+ * 사용법:
+ *   window.showConfirm({
+ *     title       : '삭제하시겠습니까?',   // 제목 (선택)
+ *     desc        : '되돌릴 수 없습니다.',  // 본문 (선택)
+ *     confirmText : '확인',               // 확인 버튼 텍스트 (기본: '확인')
+ *     cancelText  : '취소',               // 취소 버튼 텍스트 (기본: '취소')
+ *     variant     : 'danger',             // 확인 버튼 variant: 'primary'|'danger' (기본: 'primary')
+ *     onConfirm   : () => {},             // 확인 콜백
+ *     onCancel    : () => {},             // 취소 콜백
+ *   });
+ *
+ *   또는 Promise 방식:
+ *   const ok = await window.showConfirm({ title: '삭제할까요?' });
+ *   if (ok) { ... }
+ */
 
-window.ConfirmModal = class ConfirmModal {
-    constructor(options = {}) {
-      this.options = {
-        rootSelector: '[data-confirm-modal]',
-        closeOnBackdrop: true,
-        closeOnEsc: true,
-        ...options,
-      };
-  
-      this.root = document.querySelector(this.options.rootSelector);
-      if (!this.root) {
-        throw new Error(`[ConfirmModal] root not found: ${this.options.rootSelector}`);
+(function () {
+  const OVERLAY_ID   = 'confirmOverlay';
+  const BACKDROP_ID  = 'confirmBackdrop';
+  const TITLE_ID     = 'confirmTitle';
+  const DESC_ID      = 'confirmDesc';
+  const BTN_CANCEL   = 'confirmBtnCancel';
+  const BTN_OK       = 'confirmBtnOk';
+
+  // ESC 키 핸들러 참조 보관
+  let _escHandler = null;
+
+  /**
+   * 다이얼로그 닫기 (애니메이션 포함)
+   */
+  function closeDialog(overlay) {
+    overlay.classList.add('is-leaving');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    if (_escHandler) {
+      document.removeEventListener('keydown', _escHandler);
+      _escHandler = null;
+    }
+
+    setTimeout(() => {
+      overlay.classList.remove('is-active', 'is-leaving');
+    }, 160);
+  }
+
+  /**
+   * showConfirm — 메인 API
+   * @param {object} options
+   * @returns {Promise<boolean>}
+   */
+  window.showConfirm = function ({
+    title       = '확인하시겠습니까?',
+    desc        = '',
+    confirmText = '확인',
+    cancelText  = '취소',
+    variant     = 'primary',   // 'primary' | 'danger'
+    onConfirm   = null,
+    onCancel    = null,
+  } = {}) {
+    return new Promise(async (resolve) => {
+      const overlay  = document.getElementById(OVERLAY_ID);
+      const backdrop = document.getElementById(BACKDROP_ID);
+      const titleEl  = document.getElementById(TITLE_ID);
+      const descEl   = document.getElementById(DESC_ID);
+      const cancelEl = document.getElementById(BTN_CANCEL);
+      const okEl     = document.getElementById(BTN_OK);
+
+      if (!overlay) {
+        console.warn('[Confirm] #confirmOverlay 를 찾을 수 없습니다.');
+        resolve(false);
+        return;
       }
-  
-      this.dialog     = this.root.querySelector('.confirm-modal__dialog');
-      this.titleEl    = this.root.querySelector('[data-confirm-title]');
-      this.descEl     = this.root.querySelector('[data-confirm-desc]');
-      this.actionsEl  = this.root.querySelector('[data-confirm-actions]');
-      this.okBtn      = this.root.querySelector('[data-confirm-ok]');
-      this.cancelBtn  = this.root.querySelector('[data-confirm-cancel]');
-  
-      this._resolver = null;
-      this._isOpen   = false;
-      this._previousActiveElement = null;
-  
-      this._bindEvents();
-    }
-  
-    _bindEvents() {
-      this._onRootClick = (e) => {
-        const closeTarget = e.target.closest('[data-confirm-close]');
-        if (closeTarget && this.options.closeOnBackdrop) {
-          this.close(false); return;
-        }
-        const cancelBtn = e.target.closest('[data-confirm-cancel]');
-        if (cancelBtn) { this.close(false); return; }
-        const okBtn = e.target.closest('[data-confirm-ok]');
-        if (okBtn) { this.close(true); }
-      };
-  
-      this._onKeyDown = (e) => {
-        if (!this._isOpen) return;
-        if (e.key === 'Escape' && this.options.closeOnEsc) {
-          e.preventDefault(); this.close(false); return;
-        }
-        if (e.key === 'Enter') {
-          const tag = document.activeElement?.tagName?.toLowerCase();
-          if (tag === 'textarea') return;
-          e.preventDefault(); this.close(true);
-        }
-        if (e.key === 'Tab') { this._trapFocus(e); }
-      };
-  
-      this.root.addEventListener('click', this._onRootClick);
-      document.addEventListener('keydown', this._onKeyDown);
-    }
-  
-    _getFocusableElements() {
-      if (!this.root) return [];
-      const selectors = [
-        'button:not([disabled])', '[href]', 'input:not([disabled])',
-        'select:not([disabled])', 'textarea:not([disabled])',
-        '[tabindex]:not([tabindex="-1"])'
-      ].join(',');
-      return [...this.root.querySelectorAll(selectors)].filter(
-        (el) => el.offsetParent !== null || el === document.activeElement
-      );
-    }
-  
-    _trapFocus(e) {
-      const focusables = this._getFocusableElements();
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last  = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
+
+      // 텍스트 세팅
+      if (titleEl) titleEl.textContent = title;
+      if (descEl)  {
+        descEl.textContent = desc;
+        descEl.style.display = desc ? '' : 'none';
       }
-    }
-  
-    setContent({ title, description, okText, cancelText } = {}) {
-      if (typeof title       === 'string' && this.titleEl)  this.titleEl.textContent  = title;
-      if (typeof description === 'string' && this.descEl)   this.descEl.textContent   = description;
-      if (typeof okText      === 'string' && this.okBtn)    this.okBtn.textContent    = okText;
-      if (typeof cancelText  === 'string' && this.cancelBtn) this.cancelBtn.textContent = cancelText;
-    }
-  
-    setActions(content) {
-      if (!this.actionsEl) return;
-      this.actionsEl.innerHTML = '';
-      if (typeof content === 'string') {
-        this.actionsEl.insertAdjacentHTML('beforeend', content);
-      } else if (content instanceof HTMLElement) {
-        this.actionsEl.appendChild(content);
+
+      // 버튼 슬롯 초기화
+      if (cancelEl) cancelEl.innerHTML = '';
+      if (okEl)     okEl.innerHTML     = '';
+
+      // 결과 처리 공통 함수
+      function handleResult(confirmed) {
+        closeDialog(overlay);
+        if (confirmed) {
+          onConfirm && onConfirm();
+        } else {
+          onCancel && onCancel();
+        }
+        resolve(confirmed);
       }
-      this.okBtn     = this.root.querySelector('[data-confirm-ok]');
-      this.cancelBtn = this.root.querySelector('[data-confirm-cancel]');
-    }
-  
-    open(config = {}) {
-      this.setContent(config);
-      if (config.actionsHTML) this.setActions(config.actionsHTML);
-  
-      this._previousActiveElement = document.activeElement;
-      this._isOpen = true;
-  
-      this.root.hidden = false;
-      this.root.setAttribute('aria-hidden', 'false');
-      this.root.classList.remove('is-closing');
-      this.root.classList.add('is-opening');
-  
-      clearTimeout(this._openAnimTimer);
-      this._openAnimTimer = setTimeout(() => {
-        this.root.classList.remove('is-opening');
-      }, 200);
-  
-      queueMicrotask(() => {
-        const focusTarget = this.cancelBtn || this.okBtn || this.dialog;
-        focusTarget?.focus?.();
+
+      // 취소 버튼 로드
+      if (cancelEl && typeof window.loadButton === 'function') {
+        await window.loadButton({
+          target  : cancelEl,
+          text    : cancelText,
+          variant : 'outline',   // 취소는 아웃라인 스타일
+          size    : 'md',
+          onClick : () => handleResult(false),
+        });
+      }
+
+      // 확인 버튼 로드
+      if (okEl && typeof window.loadButton === 'function') {
+        await window.loadButton({
+          target  : okEl,
+          text    : confirmText,
+          variant : variant,
+          size    : 'md',
+          onClick : () => handleResult(true),
+        });
+      }
+
+      // 백드롭 클릭 → 취소
+      if (backdrop) {
+        backdrop.onclick = () => handleResult(false);
+      }
+
+      // ESC 키 → 취소
+      _escHandler = (e) => {
+        if (e.key === 'Escape') handleResult(false);
+      };
+      document.addEventListener('keydown', _escHandler);
+
+      // 다이얼로그 열기
+      overlay.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('is-active');
+
+      // 포커스 이동 (접근성)
+      requestAnimationFrame(() => {
+        const firstBtn = overlay.querySelector('button');
+        if (firstBtn) firstBtn.focus();
       });
-  
-      return new Promise((resolve) => {
-        this._resolver = resolve;
-      });
-    }
-  
-    close(result = false) {
-      if (!this._isOpen) return;
-      this._isOpen = false;
-      this.root.classList.remove('is-opening');
-      this.root.classList.add('is-closing');
-  
-      clearTimeout(this._closeAnimTimer);
-      this._closeAnimTimer = setTimeout(() => {
-        this.root.hidden = true;
-        this.root.setAttribute('aria-hidden', 'true');
-        this.root.classList.remove('is-closing');
-        if (this._previousActiveElement && typeof this._previousActiveElement.focus === 'function') {
-          this._previousActiveElement.focus();
-        }
-      }, 140);
-  
-      if (this._resolver) {
-        this._resolver(Boolean(result));
-        this._resolver = null;
-      }
-    }
-  
-    destroy() {
-      this.root.removeEventListener('click', this._onRootClick);
-      document.removeEventListener('keydown', this._onKeyDown);
-    }
-};
+    });
+  };
+})();

@@ -5,12 +5,16 @@
     z-index: 20;          /* ⭐ dim/사이드바보다 낮게! */
   }
 /* 기본 */
-.artwork-page{
+.artwork-page {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding-top: 70px;
+  min-height: 100vh;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: #1a1a2e;
   background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
-  height: 100vh;
-  }
+  display: block !important;
+  overflow-x: hidden;
+}
   
   /* ✅ 왼쪽 떠다니는 메뉴 버튼 */
   .artwork-fab{
@@ -90,7 +94,8 @@
     font-weight: 700;
   }
   .artwork-sidebar__item:hover{
-    background: rgba(0,0,0,0.04);
+    background: rgba(11,102,255,0.10);
+    color: #0B66FF;
   }
   .artwork-sidebar__item.is-active{
     background: rgba(11,102,255,0.10);
@@ -128,10 +133,12 @@
     text-align: center;
   }
   .artwork-hero__title{
+    font-size: 40px;
+    font-weight: 700;
+    color: #1a1a2e;
     margin: 0;
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: -0.03em;
+    text-align: center;
+    letter-spacing: -0.5px;
   }
   .artwork-hero__desc{
     margin: 8px 0 0;
