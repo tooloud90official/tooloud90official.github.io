@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding-top: 70px;
   min-height: 100vh;
-  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   color: #1a1a2e;
   background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
   display: block !important;
@@ -44,10 +44,10 @@ body {
   
   .inquiry-hero__title {
     margin: 0;
-    font-size: 50px;
+    font-size: 40px;
     font-weight: 800;
     line-height: 1.1;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.5px;
   }
   
   .inquiry-hero__desc {
@@ -83,8 +83,8 @@ body {
   
   /* ===== Contact us 입력창 ===== */
   .inquiry-contact-wrap {
-    border: 1px solid #bdbdbd;
-    background: #efefef;
+    border: 1px solid #ddd;
+    background: #ffffff;
     border-radius: 2px;
     padding: 8px;
   }

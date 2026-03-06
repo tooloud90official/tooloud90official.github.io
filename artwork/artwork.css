@@ -10,7 +10,7 @@
   margin: 0;
   padding-top: 70px;
   min-height: 100vh;
-  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   color: #1a1a2e;
   background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
   display: block !important;
@@ -160,12 +160,12 @@
   position: relative;
   z-index: 1;
   font-size: 40px;
-  font-weight: 700;
+  font-weight: 800;
   color: #1a1a2e;
   margin: 0;
   text-align: center;
   letter-spacing: -0.5px;
-  margin-top: 90px; /* 제목 위에 여백이 생기면서 아래로 내려감 */
+  margin-top: 80px; /* 제목 위에 여백이 생기면서 아래로 내려감 */
 }
 
 /* 설명/검색은 기존 그대로 (PNG 영역에 “포함”되는 건 아니고, 그냥 아래로 내려감) */

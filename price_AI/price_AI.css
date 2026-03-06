@@ -8,7 +8,7 @@ body {
   margin: 0;
   padding-top: 150px;
   min-height: 100vh;
-  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   color: #1a1a2e;
   background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
   display: block !important;
@@ -39,7 +39,7 @@ body {
 .category-hero { text-align: center; margin-bottom: 18px; }
 .category-hero__title {
   font-size: 40px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
   text-align: center;
   letter-spacing: -0.5px;
