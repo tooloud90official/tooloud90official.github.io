@@ -18,6 +18,8 @@
   box-sizing: border-box;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;  /* ✅ 여기 */
+
 }
 
 .alert-panel::-webkit-scrollbar {
@@ -34,7 +36,7 @@
   background: #f0f0f0;
   border-radius: 14px;
   padding: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   box-sizing: border-box;
 }
 
@@ -104,13 +106,13 @@
   height: 18px;
   background: #ff3b30;
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
+  padding-top: 2px;   /* 여기 추가하면 됨 */
 }
 
 .bell-badge.hidden {

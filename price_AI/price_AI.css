@@ -6,11 +6,11 @@ html, body {
 
 body {
   margin: 0;
-  padding-top: 150px;
+  padding-top: 15
+  0px;
   min-height: 100vh;
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   color: #1a1a2e;
-  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
   display: block !important;
   overflow-x: hidden;
   letter-spacing: -0.01em;

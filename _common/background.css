@@ -1,6 +1,13 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #ffffff 0%, #dce8f8 30%, #eaf3fc 60%, #ffffff 100%);
-  height: 100vh;
+
+  background: linear-gradient(
+    180deg,
+    #ffffff 0px,
+    #dce8f8 400px,
+    #eaf3fc 800px,
+    #ffffff 1400px
+  );
+
+  background-repeat: no-repeat;
 }

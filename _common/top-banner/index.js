@@ -113,20 +113,22 @@ document.addEventListener('mouseover', (e) => {
 
 // ===== 클릭 이벤트 =====
 document.addEventListener('click', (e) => {
-  const toggle  = e.target.closest('#menuToggle');
-  const authBtn = e.target.closest('#authBtn');
-  const logo    = e.target.closest('#logo');
+  const toggle = e.target.closest('#menuToggle');
+  const logo   = e.target.closest('#logo');
 
   if (toggle) {
     const navMenu = document.getElementById('navMenu');
     if (navMenu) navMenu.classList.toggle('open');
   }
-
-
-  if (logo) {
-    window.location.href = "/main1/main1.html";   // ✅ 여기 원하는 링크로 바꾸기
-  }
 });
+
+// ✅ 로고 직접 등록
+const logoEl = document.getElementById('logo');
+if (logoEl) {
+  logoEl.addEventListener('click', () => {
+    window.location.href = '/main1/main1.html';
+  });
+}
 
 // ===== 키보드 접근성 =====
 document.addEventListener('keydown', (e) => {
@@ -138,4 +140,19 @@ document.addEventListener('keydown', (e) => {
     const navMenu = document.getElementById('navMenu');
     if (navMenu) navMenu.classList.toggle('open');
   }
+});
+
+// ===== 마이페이지 로그인 체크 =====
+document.addEventListener('click', (e) => {
+
+  const mypageLink = e.target.closest('.nav-item[data-menu="mypage"] a');
+  if (!mypageLink) return;
+
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+  if (!isLoggedIn) {
+    e.preventDefault(); // 기본 이동 차단
+    window.location.href = '/login1/login1.html';
+  }
+
 });

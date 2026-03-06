@@ -119,7 +119,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         </span>
         <span class="tool-icon-card__title">${tool.name}</span>
       `;
-      card.addEventListener('click', () => console.log('툴 클릭:', tool.name));
+      card.addEventListener('click', () => {
+        const toolName = encodeURIComponent(tool.name);
+        window.location.href = `/detail_AI/detail_AI.html?tool=${toolName}`;
+      });
       grid.appendChild(card);
     });
   }
@@ -152,6 +155,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="work-card__stars">${data.stars}</div>
         <button type="button" class="btn-more">툴 더 알아보기</button>
       `;
+
+      toolEl.querySelector('.btn-more').addEventListener('click', () => {
+        const toolName = encodeURIComponent(data.tool.name);
+        window.location.href = `/detail_AI/detail_AI.html?tool=${toolName}`;
+      });
     }
   }
 
@@ -187,8 +195,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           </span>
           <span class="tool-icon-card__title">${tool.name}</span>
         `;
-        card.addEventListener('click', () => console.log('툴 클릭:', tool.name));
-        grid.appendChild(card);
+        card.addEventListener('click', () => {
+          const toolName = encodeURIComponent(tool.name);
+          window.location.href = `/detail_AI/detail_AI.html?tool=${toolName}`;
+        });
+        grid.appendChild(card);       // ✅ forEach 안에 있어야 함
       });
 
       group.appendChild(label);
@@ -222,13 +233,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderRecommend();
   }
 
-    // 알림 데이터 등록 (include.js가 읽어감)
-  window.ALERT_DATA = [
-    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-    { type: 'message', title: '1:1 문의사항 알림', desc: '회원님의 문의사항에 답글이 달렸어요.',          href: '#' },
-    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-    { type: 'like',    title: '좋아요 알림',      desc: '민주님이 회원님의 작업물에 좋아요를 눌렀어요.', href: '#' },
-  ];
-}
 
-); // DOMContentLoaded 끝
+}); // DOMContentLoaded 끝
