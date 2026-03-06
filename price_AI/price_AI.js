@@ -134,11 +134,8 @@ function initStepSlider() {
   render(0);
 }
 
-/**
- * 페이지 초기화
- */
-document.addEventListener("DOMContentLoaded", async () => {
-  await includeHTML("#top-banner", "/_common/top-banner/top-banner.html");
+// ✅ 수정
+document.addEventListener("DOMContentLoaded", () => {
   initStepSlider();
   renderToolCards();
 });

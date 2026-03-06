@@ -79,15 +79,13 @@ async function includeHTML(targetSelector, filePath) {
     { toolName: "툴 #1", url: "/detail_AI/detail_AI.htmlß" }
   ];
   
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      // top-banner.html 경로는 personal_AI.html과 같은 폴더(yujin/html)에 있다고 가정
-      await includeHTML("#top-banner", "/_common/top-banner/top-banner.html");
-  
-      renderToolIcons("#recommendedTools", recommendedTools);
-      renderToolIcons("#recentTools", recentTools);
-      renderToolIcons("#favoriteTools", favoriteTools);
-    } catch (err) {
-      console.error("[personal_AI] 초기화 실패:", err);
-    }
-  });
+  // ✅ 수정
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    renderToolIcons("#recommendedTools", recommendedTools);
+    renderToolIcons("#recentTools", recentTools);
+    renderToolIcons("#favoriteTools", favoriteTools);
+  } catch (err) {
+    console.error("[personal_AI] 초기화 실패:", err);
+  }
+});
