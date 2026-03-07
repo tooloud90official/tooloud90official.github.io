@@ -133,7 +133,6 @@
 .artwork-hero{
   max-width: 1100px;
   margin: 0 auto;
-  padding: 46px 20px 18px;
   text-align: center;
   position: relative;
 }
@@ -142,7 +141,7 @@
 .artwork-hero__titleWrap{
   position: absolute;
   left: 50%;
-  top: 80px;                 /* 제목 라인에 맞춰 조절 가능 */
+  top: -50px;                 /* 제목 라인에 맞춰 조절 가능 */
   transform: translateX(-50%);
   width: min(760px, 92vw);
   height: 120px;             /* PNG 높이 */

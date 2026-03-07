@@ -22,7 +22,7 @@
 .select__trigger {
   width: 100%; /* 90%에서 100%로 수정하여 부모 너비에 맞춤 */
   box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 추가 */
-  height: 50px;
+  height: 44px;
   border: 1.5px solid var(--jsel-border);
   border-radius: var(--jsel-radius-trigger);
   background: var(--jsel-trigger-bg);
