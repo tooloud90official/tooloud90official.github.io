@@ -1,15 +1,40 @@
 body {
   margin: 0;
-  padding-top: 70px;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding-top: 75px;    /* 헤더 높이 보정 */
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   height: 100vh;
+}
+
+.login-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+.login-logo {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  cursor: pointer;
+}
+
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .login-page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 140px;
+  margin-top: 160px;    /* ← 이 값 하나로 타이틀 y위치 조정 */
 }
 
 .login-title {
@@ -21,30 +46,13 @@ body {
 
 .login-form {
   display: flex;
-  grid-template-rows:
-    auto   /* 이메일 */
-    auto   /* 비밀번호 */
-    24px   /* 에러메시지 고정 높이 */
-    40px   /* 로그인옵션 고정 */
-    auto   /* 소셜 */
-    auto   /* 로그인버튼 */
-    auto;  /* 회원가입 */
-
   flex-direction: column;
-  align-items: center; /* 자식 요소 중앙정렬 */
-  width: 350px; /* 인풋, 버튼과 동일 너비 */
+  align-items: center;
+  width: 350px;
   gap: 14px;
 }
 
-.login-error {
-  color: #ff3b30;
-  font-size: 14px;
-  justify-content: center;
-  margin-left: 20px;
-  margin-top: 8px;
-  min-height: 18px;
-}
-
+/* ===== 인풋 ===== */
 .login-input {
   height: 44px;
   border-radius: 10px;
@@ -53,20 +61,36 @@ body {
   font-size: 14px;
   background: #ffffff;
   width: 350px;
+  box-sizing: border-box;
 }
-
 
 .login-input:focus {
   outline: none;
   border-color: #1677e6;
 }
 
+/* ===== 에러 메시지 ===== */
+.field-error {
+  font-size: 13px;
+  color: #e53e3e;
+  min-height: 0;
+  margin: 4px 0 0 4px;
+  display: none;
+  text-align: left;
+  width: 350px;
+}
+
+.field-error.visible {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== 로그인 옵션 (유지 / 재설정) ===== */
 .login-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: 6px;
   font-size: 13px;
 }
 
@@ -77,59 +101,82 @@ body {
   color: #444;
 }
 
-.social-login {
+/* ===== 로그인 버튼 컨테이너 ===== */
+#loginBtnContainer {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-top: 8px;
+  width: 100%;
 }
 
-.social {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.google {
-  background: #444;
-  color: white;
-}
-
-.social.google img {
-  width: 36px;
-  height: 34px;
-  display: block;
-  padding-left: 12px;
-}
-
-.apple {
-  background: #ddd;
-}
-
-.social.apple img {
-  width: 26px;
-  height: 26px;
-}
-/* 로그인 버튼과 회원가입 버튼을 감싸는 컨테이너를 flex로 중앙 정렬 */
-#loginBtnContainer,
-#signupBtnContainer {
-  display: flex;            /* flex 컨테이너로 변경 */
-  justify-content: center;  /* 가로 중앙 정렬 */
-  width: 100%;              /* 부모 너비 전체 사용 */
-}
-/* ===== loadButton 버튼 너비 확장 ===== */
-#loginBtnContainer .btn,
-#signupBtnContainer .btn {
+#loginBtnContainer .btn {
   width: 350px;
   height: 48px;
   font-size: 15px;
   margin-top: 8px;
 }
 
-.password-error {
-  min-height: 24px;   /* 메시지 한 줄 높이 */
+/* ===== 소셜 로그인 구분선 ===== */
+.social-divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: #888;
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.social-divider span {
+  padding: 0 12px;
+}
+
+/* ===== 소셜 로그인 버튼 컨테이너 ===== */
+#googleBtnContainer,
+#appleBtnContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+#googleBtnContainer .btn,
+#appleBtnContainer .btn {
+  width: 350px;
+  height: 48px;
+  font-size: 15px;
+}
+
+/* ===== 회원가입 텍스트 ===== */
+.signup-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.text-link-btn {
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.text-link-btn:hover {
+  color: #444;
+}
+
+input::placeholder {
+  color: #aaa;  /* 동일한 색으로 통일 */
 }

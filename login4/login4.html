@@ -6,7 +6,6 @@
   <title>관심 툴 추가</title>
 
   <link rel="stylesheet" href="/_common/background.css">
-  <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="/_common/signup_status/signup_status.css">
   <link rel="stylesheet" href="/_common/button/button.css">
   <link rel="stylesheet" href="/_common/icon/icon.css">
@@ -14,8 +13,13 @@
 </head>
 
 <body>
+  <header class="login-header">
+    <div class="login-logo" onclick="window.location.href='/'">
+      <img src="/_common/top-banner/media/logo.png" alt="로고">
+    </div>
+  </header>
 
-  <div id="top-banner"></div>
+  <!-- login2,3과 동일한 위치 -->
   <div id="signup-status" data-step="3"></div>
 
   <main class="login4-container">
@@ -47,7 +51,6 @@
 
   </main>
 
-  <script src="/_common/top-banner/include.js"></script>
   <script src="/_common/signup_status/include.js"></script>
   <script src="/_common/icon/icon.js"></script>
   <script type="module" src="/login4/login4.js"></script>

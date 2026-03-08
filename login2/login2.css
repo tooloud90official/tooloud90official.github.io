@@ -5,46 +5,76 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
-
 
 /* ============================= */
 /* 전체 배경 */
 /* ============================= */
 body {
   min-height: 100vh;
-  padding-top: 70px;
+  padding-top: 75px;    /* 헤더 높이 보정 — login1과 동일 */
+  overflow-x: hidden;
+  width: 100%;
+  min-width: 360px;
 }
 
+/* ============================= */
+/* 로그인 헤더 (로고) */
+/* ============================= */
+.login-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+.login-logo {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  cursor: pointer;
+}
+
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 /* ============================= */
 /* 회원가입 영역 */
 /* ============================= */
+/* 수정 */
 .signup-container {
-  width: 480px;
-  margin: 120px auto 80px auto;   /* 상단 상태바 아래 공간 */
+  width: 520px;
+  margin: 50px auto 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-
 /* ============================= */
 /* 타이틀 */
 /* ============================= */
 .title {
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 50px;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 60px;
+  text-align: center;
 }
-
 
 /* ============================= */
 /* 폼 그룹 */
 /* ============================= */
 .form-group {
-  width: 300px;
+  width: 100%;
+  max-width: 350px;
   margin-bottom: 28px;
 }
 
@@ -53,10 +83,26 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 10px;
-  margin-left: 0;
   color: #222;
 }
 
+/* ============================= */
+/* input 공통 */
+/* ============================= */
+input {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 0 14px;
+  font-size: 14px;
+  background: #ffffff;
+  outline: none;
+  width: 100%;
+}
+
+input:focus {
+  border-color: #1677e6;
+}
 
 /* ============================= */
 /* 이메일 입력 묶음 */
@@ -65,124 +111,99 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 480px;
-  margin: 0 auto
+  width: 100%;
 }
 
 .email-wrap span {
   font-size: 18px;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
+#emailId {
+  flex: 1;
+  min-width: 0;
+}
+
+#emailCustom {
+  width: 100%;
+}
 
 /* ============================= */
-/* input 공통 */
+/* 이메일 도메인 셀렉트 컴포넌트 */
 /* ============================= */
-input,
-select {
+#emailDomainSelect {
+  flex: 1;
+  min-width: 0;
+}
+
+#emailDomainSelect .select__trigger {
+  width: 100%;
   height: 44px;
   border-radius: 10px;
   border: 1px solid #ddd;
   padding: 0 14px;
   font-size: 14px;
   background: #ffffff;
-  outline: none;
-  display: block;
-  margin: 0 auto;
-  width: 300px;
-}
-
-input:focus,
-select:focus {
-  border-color: #2a7cff;
-  background: white;
-}
-
-
-/* 이메일 아이디 */
-#emailId {
-  width: 300px;
- 
-}
-
-/* 도메인 선택 */
-#emailDomain {
-  flex: 1;
-}
-
-/* 직접 입력 */
-#emailCustom {
-  flex: 1;
-}
-
-
-/* 비밀번호 입력 */
-#password,
-#passwordConfirm {
-  width: 300px;
-  margin: 0 auto;
-}
-
-
-/* ============================= */
-/* 회원가입 버튼 */
-/* ============================= */
-.signup-btn {
-  width: 260px;
-  height: 48px;
-  border-radius: 999px;
-  border: none;
-  
-
-  background: linear-gradient(180deg, #2a7cff, #1c6be3);
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-
-  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   cursor: pointer;
-  transition: 0.25s;
 }
 
-.signup-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(42,124,255,0.25);
+#emailDomainSelect .select__trigger:focus {
+  border-color: #1677e6;
+  outline: none;
 }
 
+#emailDomainSelect .select__value {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+#emailDomainSelect .select__option {
+  font-size: 14px;
+  font-weight: 400;
+}
 
 /* ============================= */
-/* 뒤로가기 */
+/* 다음 버튼 컨테이너 */
+/* ============================= */
+#signup-button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+#signup-button .btn {
+  width: 350px;
+  height: 48px;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+/* ============================= */
+/* 이전으로 돌아가기 */
 /* ============================= */
 .back-link {
   margin-top: 22px;
   font-size: 14px;
   color: #333;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  text-align: center;
 }
 
 .back-link:hover {
   text-decoration: underline;
 }
-.confirm_modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.4);
-}
-
-.confirm_modal.show {
-  display: flex;
-}
-
 
 /* ============================= */
-/* signup status 아래 여백 */
+/* signup status 여백 */
 /* ============================= */
 #signup-status {
   margin-top: 40px;
 }
+input::placeholder {
+  color: #aaa;  /* 동일한 색으로 통일 */
+}
+

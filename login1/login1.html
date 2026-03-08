@@ -6,21 +6,28 @@
     <title>로그인</title>
   
     <link rel="stylesheet" href="/_common/background.css">
-    <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
     <link rel="stylesheet" href="/_common/button/button.css">
     <link rel="stylesheet" href="/login1/login1.css">
 </head>
 
 <body>
 
-    <div id="top-banner"></div>
+    <header class="login-header">
+      <div class="login-logo" onclick="window.location.href='/'">
+        <img src="/_common/top-banner/media/logo.png" alt="로고">
+      </div>
+    </header>
+
 
     <main class="login-page">
-        <h1 class="login-title">로그인</h1>
+        <h1 class="login-title">오늘도 함께 시작해볼까요?</h1>
 
         <div class="login-form">
             <input type="email" id="email" class="login-input" placeholder="이메일 입력창" />
+            <p id="emailError" class="field-error"></p>
+
             <input type="password" id="password" class="login-input" placeholder="비밀번호 입력창" />
+            <p id="passwordError" class="field-error"></p>
 
             <div class="login-options">
                 <label class="remember">
@@ -30,28 +37,27 @@
                 <button class="text-btn" id="resetPw">비밀번호 재설정하기</button>
             </div>
 
-            <div id="loginError" class="login-error"></div>
-
-            <!-- 로그인 버튼 (loadButton으로 렌더링) -->
-            <div class="social-login">
-                <button class="social google" id="googleLogin">
-                    <img src="/media/googleLogo.svg" alt="Google 로그인">
-                </button>
-                <button class="social apple" id="appleLogin">
-                    <img src="/media/appleLogo.svg" alt="Apple 로그인">
-                </button>
-            </div>
+            <!-- 로그인 버튼 -->
             <div id="loginBtnContainer"></div>
 
+            <!-- 소셜 로그인 구분선 -->
+            <div class="social-divider">
+                <span>또는</span>
+            </div>
 
+            <!-- 소셜 로그인 버튼 (button 컴포넌트 활용) -->
+            <div id="googleBtnContainer"></div>
+            <div id="appleBtnContainer"></div>
 
-            <!-- 회원가입 버튼 (loadButton으로 렌더링) -->
-            <div id="signupBtnContainer"></div>
+            <!-- 회원가입 텍스트 링크 -->
+            <div class="signup-text">
+                <span>계정이 없나요?</span>
+                <button class="text-link-btn" id="signupLink">가입하기</button>
+            </div>
 
         </div>
     </main>
 
-    <script src="/_common/top-banner/include.js"></script>
     <script src="/_common/button/button.js"></script>
     <script src="/login1/login1.js"></script>
 

@@ -11,11 +11,15 @@ body {
   min-height: 800px;
 }
 
+.page-root {
+  padding-top: 70px; /* top-banner 높이 */
+}
+
 .page-title {
   font-size: 40px;
   font-weight: 700;
-  margin-top: 28px;
   margin-bottom: 100px;
+  margin-top: 28px;
 }
 
 /* [이미지 1] 알약 모양 탭 메뉴 */

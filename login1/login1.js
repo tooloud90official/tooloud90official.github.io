@@ -2,7 +2,6 @@
 
 const emailInput    = document.getElementById('email');
 const passwordInput = document.getElementById('password');
-const loginError    = document.getElementById('loginError');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PW_REGEX    = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
@@ -16,29 +15,72 @@ loadButton({
 });
 
 loadButton({
-  target: '#signupBtnContainer',
-  text: '회원가입',
+  target: '#googleBtnContainer',
+  text: 'Google 계정으로 계속하기',
   variant: 'outline',
-  onClick: () => {
-    window.location.href = '/login2/login2.html';
-  }
+  onClick: () => {}
+}).then(() => {
+  const btn = document.querySelector('#googleBtnContainer .btn');
+  btn.insertAdjacentHTML(
+    'afterbegin',
+    '<img src="/media/googleLogo.svg" alt="Google" style="width:20px;height:20px;margin-right:10px;">'
+  );
+  btn.style.display = 'flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
 });
 
-// ⭐ 여기 추가
+loadButton({
+  target: '#appleBtnContainer',
+  text: 'Apple 계정으로 계속하기',
+  variant: 'outline',
+  onClick: () => {}
+}).then(() => {
+  const btn = document.querySelector('#appleBtnContainer .btn');
+  btn.insertAdjacentHTML(
+    'afterbegin',
+    '<img src="/media/appleLogo.svg" alt="Apple" style="width:20px;height:20px;margin-right:10px;margin-top:-3px;">'
+  );
+  btn.style.display = 'flex';
+  btn.style.alignItems = 'center';
+  btn.style.justifyContent = 'center';
+});
+
+// ===== 회원가입 텍스트 링크 =====
+const signupLink = document.getElementById('signupLink');
+signupLink?.addEventListener('click', () => {
+  window.location.href = '/login2/login2.html';
+});
+
+// ===== 비밀번호 재설정 =====
 const resetPwBtn = document.getElementById('resetPw');
 resetPwBtn?.addEventListener('click', () => {
   window.location.href = '/reset/reset.html';
 });
 
 
+// ===== 에러 메시지 함수 =====
+function showEmailError(text) {
+  const el = document.getElementById('emailError');
+  el.innerHTML = text ? `<img src="/media/caution.png" alt="caution" style="width:14px;height:14px;margin-right:1px;margin-top:-2px;vertical-align:middle;">${text}` : '';
+  el.classList.toggle('visible', text !== '');
+}
+
+function showPasswordError(text) {
+  const el = document.getElementById('passwordError');
+  el.innerHTML = text ? `<img src="/media/caution.png" alt="caution" style="width:14px;height:14px;margin-right:1px;margin-top:-2px;vertical-align:middle;">${text}` : '';
+  el.classList.toggle('visible', text !== '');
+}
+
+
 // ===== 이메일 형식 검사 =====
 emailInput.addEventListener('input', () => {
   const val = emailInput.value.trim();
-  if (val === '') { showMsg('', ''); return; }
+  if (val === '') { showEmailError(''); return; }
   if (!EMAIL_REGEX.test(val)) {
-    showMsg('⚠️ 올바른 이메일 형식이 아닙니다. (예: example@email.com)', '#e53e3e');
+    showEmailError('올바른 이메일 형식이 아닙니다. (예: example@email.com)');
   } else {
-    showMsg('✅ 올바른 이메일 형식입니다.', '#38a169');
+    showEmailError('');
   }
 });
 
@@ -46,11 +88,11 @@ emailInput.addEventListener('input', () => {
 // ===== 비밀번호 형식 검사 =====
 passwordInput.addEventListener('input', () => {
   const val = passwordInput.value;
-  if (val === '') { showMsg('', ''); return; }
+  if (val === '') { showPasswordError(''); return; }
   if (!PW_REGEX.test(val)) {
-    showMsg('⚠️ 비밀번호는 8자 이상, 영문·숫자·특수문자(!@#$%^&*)를 모두 포함해야 합니다.', '#e53e3e');
+    showPasswordError('비밀번호는 8자 이상, 영문·숫자·특수문자를 모두 포함해야 합니다.');
   } else {
-    showMsg('✅ 올바른 비밀번호 형식입니다.', '#38a169');
+    showPasswordError('');
   }
 });
 
@@ -61,31 +103,25 @@ function handleLogin() {
   const password = passwordInput.value;
 
   if (email === '') {
-    showMsg('⚠️ 이메일을 입력해주세요.', '#e53e3e');
+    showEmailError('이메일을 입력해주세요.');
     emailInput.focus(); return;
   }
   if (!EMAIL_REGEX.test(email)) {
-    showMsg('⚠️ 올바른 이메일 형식이 아닙니다.', '#e53e3e');
+    showEmailError('올바른 이메일 형식이 아닙니다.');
     emailInput.focus(); return;
   }
   if (password === '') {
-    showMsg('⚠️ 비밀번호를 입력해주세요.', '#e53e3e');
+    showPasswordError('비밀번호를 입력해주세요.');
     passwordInput.focus(); return;
   }
   if (!PW_REGEX.test(password)) {
-    showMsg('⚠️ 비밀번호는 8자 이상, 영문·숫자·특수문자(!@#$%^&*)를 모두 포함해야 합니다.', '#e53e3e');
+    showPasswordError('비밀번호는 8자 이상, 영문·숫자·특수문자를 모두 포함해야 합니다.');
     passwordInput.focus(); return;
   }
 
-  // ✅ 유효성 통과 → 로그인 처리
-  showMsg('', '');
+  // ✅ 로그인 성공
+  showEmailError('');
+  showPasswordError('');
   localStorage.setItem('isLoggedIn', 'true');
   window.location.href = '/main1/main1.html';
-}
-
-
-// ===== 안내 문구 =====
-function showMsg(text, color) {
-  loginError.textContent = text;
-  loginError.style.color = color;
 }

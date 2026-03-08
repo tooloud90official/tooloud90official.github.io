@@ -6,84 +6,81 @@
   <title>이메일 회원가입</title>
 
   <link rel="stylesheet" href="/_common/background.css">
-  <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="/_common/signup_status/signup_status.css">
-  <link rel="stylesheet" href="/_common/confirm/confirm.css">
+  <link rel="stylesheet" href="/_common/confirm/confirm.css">  <!-- 앞으로 이동 -->
   <link rel="stylesheet" href="/_common/button/button.css">
-  <link rel="stylesheet" href="/login2/login2.css">
- <!-- 버튼 스타일 -->
+  <link rel="stylesheet" href="/_common/select/select.css">
+  <link rel="stylesheet" href="/login2/login2.css"> 
+
+
 </head>
 
 <body>
 
-  <div id="top-banner"></div>
-  <div id="signup-status" data-step="1"></div>
+  <header class="login-header">
+    <div class="login-logo" onclick="window.location.href='/'">
+      <img src="/_common/top-banner/media/logo.png" alt="로고">
+    </div>
+  </header>
 
+  <div id="signup-status" data-step="1"></div>
   <main class="signup-container">
 
-    <h1 class="title">이메일 회원가입</h1>
+    <h1 class="title">계정을 생성해주세요.</h1>
 
+    <!-- 이메일 입력 -->
     <div class="form-group">
       <label>이메일 주소 입력</label>
       <div class="email-wrap">
         <input type="text" id="emailId" placeholder="이메일 입력창">
         <span>@</span>
-        <select id="emailDomain">
-          <option value="">이메일 주소 선택</option>
-          <option value="gmail.com">gmail.com</option>
-          <option value="naver.com">naver.com</option>
-          <option value="icloud.com">icloud.com</option>
-          <option value="direct">직접 입력</option>
-        </select>
-        <input type="text" id="emailCustom" placeholder="직접 입력" style="display:none;">
+        <!-- JeonubSelect 컴포넌트 -->
+        <div class="select" id="emailDomainSelect" role="combobox">
+          <button class="select__trigger" data-select-trigger aria-expanded="false">
+            <span class="select__value" data-select-value>이메일 주소 선택</span>
+            <span class="select__arrow">▾</span>
+          </button>
+          <div class="select__menu-wrap" data-select-menu-wrap>
+            <ul class="select__menu" data-select-menu role="listbox">
+              <li class="select__option" data-select-option data-value="gmail.com">gmail.com</li>
+              <li class="select__option" data-select-option data-value="naver.com">naver.com</li>
+              <li class="select__option" data-select-option data-value="icloud.com">icloud.com</li>
+              <li class="select__option" data-select-option data-value="direct">직접 입력</li>
+            </ul>
+          </div>
+        </div>
       </div>
+      <!-- 직접 입력 시 노출 -->
+      <input type="text" id="emailCustom" placeholder="직접 입력" style="display:none; margin-top:8px;">
     </div>
 
+    <!-- 비밀번호 -->
     <div class="form-group">
       <label>비밀번호 입력</label>
       <input type="password" id="password">
     </div>
 
+    <!-- 비밀번호 재입력 -->
     <div class="form-group">
       <label>비밀번호 재입력</label>
       <input type="password" id="passwordConfirm">
     </div>
 
-    <!-- ✅ 공통 버튼 들어갈 자리 -->
+    <!-- 다음 버튼 -->
     <div id="signup-button"></div>
 
-    <div class="back-link" id="backBtn">
-      ← 이전으로 돌아가기
-    </div>
+    <!-- 이전으로 돌아가기 -->
+    <div class="back-link" id="backBtn">이전으로 돌아가기</div>
 
   </main>
+  <div id="modal-root"></div>  <!-- ← 추가 -->
 
-  <!-- 공통 컴포넌트 -->
-  <script src="/_common/top-banner/include.js"></script>
+  <script src="/_common/confirm/include.js"></script>
   <script src="/_common/signup_status/include.js"></script>
-
-  <!-- 버튼 로더 -->
   <script src="/_common/button/button.js"></script>
+  <script src="/_common/confirm/confirm.js"></script>  <!-- button.js 뒤로 이동 -->
+  <script type="module" src="/login2/login2.js"></script>
 
-  <!-- 버튼 생성 -->
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadButton({
-        target: "#signup-button",
-        text: "다음",
-        variant: "primary",
-        size: "md",
-        onClick: () => {
-          window.location.href = "/login3/login3.html";
-          console.log("회원가입 버튼 클릭");
-          document.getElementById("signupBtn")?.click();
-        }
-      });
-    });
-  </script>
-
-  <!-- 페이지 로직 -->
-  <script src="/login2/login2.js"></script>
 
 </body>
 </html>

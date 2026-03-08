@@ -1,8 +1,39 @@
 // login2.js
+import { JeonubSelect } from '/_common/select/select.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-  // ===== 비밀번호 유효성 검사 =====
+  // ===== 1. 다음 버튼 렌더링 =====
+  loadButton({
+    target: "#signup-button",
+    text: "다음",
+    variant: "primary",
+    size: "md",
+    onClick: () => {
+      if (window.validateLogin2?.()) {
+        window.location.href = "/login3/login3.html";
+      }
+    }
+  });
+
+
+  // ===== 2. 이메일 도메인 셀렉트 (JeonubSelect) =====
+  const emailDomainSelect = new JeonubSelect('#emailDomainSelect', {
+    placeholder: '이메일 주소 선택',
+    onChange: (item) => {
+      const customInput = document.getElementById('emailCustom');
+      if (item.value === 'direct') {
+        customInput.style.display = 'block';
+        customInput.focus();
+      } else {
+        customInput.style.display = 'none';
+        customInput.value = '';
+      }
+    }
+  });
+
+
+  // ===== 3. 비밀번호 유효성 검사 =====
   const password        = document.getElementById('password');
   const passwordConfirm = document.getElementById('passwordConfirm');
 
@@ -11,66 +42,58 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!msg) {
       msg = document.createElement('p');
       msg.id = id;
-      msg.style.cssText = 'font-size:13px; margin-top:5px;';
+      msg.style.cssText = 'font-size:13px; margin-top:5px; display:flex; align-items:center;';
       inputEl.parentNode.insertBefore(msg, inputEl.nextSibling);
     }
     return msg;
   }
 
+  function setMessage(msg, text, color, showIcon = true) {
+  msg.innerHTML = text
+    ? `${showIcon ? `<img src="/media/caution.png" alt="caution" style="width:14px;height:14px;margin-right:1px;margin-top:-2px;vertical-align:middle;">` : ''}${text}`
+    : '';
+  msg.style.color = color || '';
+}
+
   const PW_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
   password.addEventListener('input', () => {
     const msg = createMessage(password, 'pw-msg');
-
-    if (password.value === '') {
-      msg.textContent = ''; return;
-    }
-
+    if (password.value === '') { setMessage(msg, ''); return; }
     if (!PW_REGEX.test(password.value)) {
-      msg.textContent = '⚠️ 비밀번호는 8자 이상, 영문·숫자·특수문자(!@#$%^&*)를 모두 포함해야 합니다.';
-      msg.style.color = '#e53e3e';
+      setMessage(msg, '비밀번호는 8자 이상, 영문·숫자·특수문자를 모두 포함해야 합니다.', '#e53e3e');
     } else {
-      msg.textContent = '✅ 사용 가능한 비밀번호입니다.';
-      msg.style.color = '#38a169';
+      setMessage(msg, '사용 가능한 비밀번호입니다.', '#38a169', false);
     }
-
     if (passwordConfirm.value !== '') checkConfirm();
   });
 
   function checkConfirm() {
     const msg = createMessage(passwordConfirm, 'pw-confirm-msg');
-
-    if (passwordConfirm.value === '') {
-      msg.textContent = ''; return;
-    }
-
+    if (passwordConfirm.value === '') { setMessage(msg, ''); return; }
     if (password.value !== passwordConfirm.value) {
-      msg.textContent = '⚠️ 비밀번호가 일치하지 않습니다.';
-      msg.style.color = '#e53e3e';
+      setMessage(msg, '비밀번호가 일치하지 않습니다.', '#e53e3e');
     } else {
-      msg.textContent = '✅ 비밀번호가 일치합니다.';
-      msg.style.color = '#38a169';
+      setMessage(msg, '비밀번호가 일치합니다.', '#38a169', false);
     }
   }
 
   passwordConfirm.addEventListener('input', checkConfirm);
 
 
-  // ===== 다음 버튼 유효성 검사 =====
+  // ===== 4. 다음 버튼 유효성 검사 함수 =====
   window.validateLogin2 = function() {
     let isValid = true;
 
     if (!PW_REGEX.test(password.value)) {
       const msg = createMessage(password, 'pw-msg');
-      msg.textContent = '⚠️ 비밀번호는 8자 이상, 영문·숫자·특수문자(!@#$%^&*)를 모두 포함해야 합니다.';
-      msg.style.color = '#e53e3e';
+      setMessage(msg, '비밀번호는 8자 이상, 영문·숫자·특수문자를 모두 포함해야 합니다.', '#e53e3e');
       isValid = false;
     }
 
     if (password.value !== passwordConfirm.value) {
       const msg = createMessage(passwordConfirm, 'pw-confirm-msg');
-      msg.textContent = '⚠️ 비밀번호가 일치하지 않습니다.';
-      msg.style.color = '#e53e3e';
+      setMessage(msg, '비밀번호가 일치하지 않습니다.', '#e53e3e');
       isValid = false;
     }
 
@@ -78,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
 
-  // ===== confirm 컴포넌트 초기화 =====
+  // ===== 5. confirm 모달 초기화 =====
   if (!document.getElementById('modal-root')) {
     const root = document.createElement('div');
     root.id = 'modal-root';
@@ -86,16 +109,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   await window.includeHTML('#modal-root', '/_common/confirm/confirm.html');
-  const confirmModal = new window.ConfirmModal();
 
 
-  // ===== 이전으로 돌아가기 버튼 =====
+  // ===== 6. 이전으로 돌아가기 =====
   document.getElementById('backBtn')?.addEventListener('click', async () => {
-    const result = await confirmModal.open({
-      title: '페이지를 나가시겠습니까?',
-      description: '입력한 내용이 저장되지 않습니다.',
-      okText: '확인',
-      cancelText: '취소',
+    const result = await window.showConfirm({
+      title      : '페이지를 나가시겠습니까?',
+      desc       : '입력한 내용이 저장되지 않습니다.',
+      confirmText: '확인',
+      cancelText : '취소',
     });
     if (result) {
       window.location.href = '/login1/login1.html';

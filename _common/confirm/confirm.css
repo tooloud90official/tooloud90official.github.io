@@ -2,134 +2,148 @@
    Confirm Dialog — /_common/confirm/confirm.css
    ============================================ */
 
-   @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
 
-   :root {
-     --confirm-radius: 20px;
-     --confirm-shadow: 0 8px 40px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.07);
-     --confirm-bg: #ffffff;
-     --confirm-overlay-bg: rgba(30, 35, 50, 0.45);
-     --confirm-title-color: #1a1d27;
-     --confirm-desc-color: #8b90a0;
-     --confirm-icon-bg: #fff4f4;
-     --confirm-icon-color: #f05d5d;
-     --confirm-border: rgba(0, 0, 0, 0.06);
-     --confirm-transition: 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-     --confirm-fade: 0.18s ease;
-   }
-   
-   /* Overlay */
-   .confirm-overlay {
-     position: fixed;
-     inset: 0;
-     z-index: 9999;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     padding: 20px;
-     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-   
-     opacity: 0;
-     pointer-events: none;
-     transition: opacity var(--confirm-fade);
-   }
-   
-   .confirm-overlay.is-active {
-     opacity: 1;
-     pointer-events: all;
-   }
-   
-   /* Backdrop */
-   .confirm-backdrop {
-     position: absolute;
-     inset: 0;
-     background: var(--confirm-overlay-bg);
-     backdrop-filter: blur(4px);
-     -webkit-backdrop-filter: blur(4px);
-     cursor: pointer;
-   }
-   
-   /* Dialog Box */
-   .confirm-dialog {
-     position: relative;
-     z-index: 1;
-     background: var(--confirm-bg);
-     border-radius: var(--confirm-radius);
-     box-shadow: var(--confirm-shadow);
-     border: 1px solid var(--confirm-border);
-     padding: 36px 32px 28px;
-     width: 100%;
-     max-width: 360px;
-     text-align: center;
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     gap: 6px;
-   
-     transform: scale(0.88) translateY(12px);
-     transition: transform var(--confirm-transition);
-   }
-   
-   .confirm-overlay.is-active .confirm-dialog {
-     transform: scale(1) translateY(0);
-   }
-   
+:root {
+  --confirm-radius: 20px;
+  --confirm-shadow: 0 8px 40px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.07);
+  --confirm-bg: #ffffff;
+  --confirm-overlay-bg: rgba(30, 35, 50, 0.45);
+  --confirm-title-color: #1a1d27;
+  --confirm-desc-color: #8b90a0;
+  --confirm-icon-bg: #fff4f4;
+  --confirm-icon-color: #f05d5d;
+  --confirm-border: rgba(0, 0, 0, 0.06);
+  --confirm-transition: 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --confirm-fade: 0.18s ease;
+}
 
-   
-   .confirm-overlay.is-active .confirm-icon {
-     transform: scale(1.08);
-     animation: iconPop 0.4s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-   }
-   
-   @keyframes iconPop {
-     0%   { transform: scale(0.5); opacity: 0; }
-     100% { transform: scale(1);   opacity: 1; }
-   }
-   
-   /* Body */
-   .confirm-body {
-     display: flex;
-     flex-direction: column;
-     gap: 6px;
-     margin-bottom: 8px;
-   }
-   
-   .confirm-title {
-     font-size: 18px;
-     font-weight: 700;
-     color: var(--confirm-title-color);
-     margin: 0;
-     letter-spacing: -0.3px;
-     line-height: 1.3;
-   }
-   
-   .confirm-desc {
-     font-size: 13.5px;
-     font-weight: 400;
-     color: var(--confirm-desc-color);
-     margin: 0;
-     line-height: 1.5;
-   }
-   
-   /* Actions */
-   .confirm-actions {
-     display: flex;
-     gap: 3px;
-     width: 100%;
-     margin-top: 10px;
-   }
-   
-   .confirm-btn-slot {
-     flex: 1;
-   }
-   
-   /* Dialog close animation */
-   .confirm-overlay.is-leaving {
-     opacity: 0;
-     transition: opacity 0.15s ease;
-   }
-   
-   .confirm-overlay.is-leaving .confirm-dialog {
-     transform: scale(0.94) translateY(6px);
-     transition: transform 0.15s ease;
-   }
+/* Overlay */
+.confirm-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  background: var(--confirm-overlay-bg);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--confirm-fade);
+}
+
+.confirm-overlay.is-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Backdrop */
+.confirm-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--confirm-overlay-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+/* Dialog Box */
+.confirm-dialog {
+  position: relative !important;
+  z-index: 1;
+  background: var(--confirm-bg);
+  border-radius: var(--confirm-radius);
+  box-shadow: var(--confirm-shadow);
+  border: 1px solid var(--confirm-border);
+  padding: 36px 32px 28px !important;
+  width: 100% !important;
+  max-width: 360px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  text-align: center;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px;
+
+  transform: scale(0.88) translateY(12px);
+  transition: transform var(--confirm-transition);
+}
+
+.confirm-overlay.is-active .confirm-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.confirm-overlay.is-active .confirm-icon {
+  transform: scale(1.08);
+  animation: iconPop 0.4s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes iconPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Body */
+.confirm-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px;
+  margin-bottom: 8px !important;
+  padding: 0 !important;
+}
+
+.confirm-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--confirm-title-color);
+  margin: 0 !important;
+  padding: 0 !important;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+
+.confirm-desc {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  color: var(--confirm-desc-color);
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5;
+}
+
+/* Actions */
+.confirm-actions {
+  display: flex !important;
+  gap: 12px;
+  width: auto !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+  padding: 0 !important;
+}
+
+.confirm-btn-slot {
+  flex: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Dialog close animation */
+.confirm-overlay.is-leaving {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.confirm-overlay.is-leaving .confirm-dialog {
+  transform: scale(0.94) translateY(6px);
+  transition: transform 0.15s ease;
+}

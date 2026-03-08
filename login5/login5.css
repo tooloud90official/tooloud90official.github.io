@@ -9,6 +9,30 @@ body {
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   color: #1a1a2e;
 }
+.login-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+.login-logo {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  cursor: pointer;
+}
+
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 /* ===== 메인 컨테이너 ===== */
 .login5-container {
@@ -60,6 +84,4 @@ body {
   min-width: 350px;
   height: 44px;
   border-radius: 30px;
-  font-size: 15px;
-  font-weight: 600;
 }

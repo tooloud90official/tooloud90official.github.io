@@ -18,7 +18,7 @@ window.loadButton = async function({
   const btn = container.querySelector('.btn');
   btn.textContent = text;
   btn.classList.add(`btn-${variant}`);
-  btn.classList.add('btn-${size}');
-
+  btn.classList.add(`btn-${size}`);
+   
   if (onClick) btn.addEventListener('click', onClick);
 };

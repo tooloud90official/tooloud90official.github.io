@@ -1,5 +1,8 @@
 body {
   margin: 0;
+  min-height: 100vh;
+
+  overflow-y: scroll;
 
   background: linear-gradient(
     180deg,
@@ -10,4 +13,10 @@ body {
   );
 
   background-repeat: no-repeat;
+  background-size: 100% max(100vh, 1400px);
+}
+
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }

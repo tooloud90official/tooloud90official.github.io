@@ -1,41 +1,15 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Confirm Dialog</title>
-  <link rel="stylesheet" href="/_common/button/button.css" />
-  <link rel="stylesheet" href="/_common/confirm/confirm.css" />
-</head>
-<body>
-
-  <!--
-    ┌────────────────────────────────────────────┐
-    │  Confirm Dialog Template                   │
-    │  API: window.showConfirm({ title, desc,    │
-    │       onConfirm, onCancel,                 │
-    │       confirmText, cancelText, variant })  │
-    └────────────────────────────────────────────┘
-  -->
-
-  <div class="confirm-overlay" id="confirmOverlay"
-       role="dialog" aria-modal="true"
-       aria-labelledby="confirmTitle" aria-hidden="true">
-    <div class="confirm-backdrop" id="confirmBackdrop"></div>
-    <div class="confirm-dialog">
-      </div>
-      <div class="confirm-body">
-        <h2 class="confirm-title" id="confirmTitle">삭제하시겠습니까?</h2>
-        <p class="confirm-desc" id="confirmDesc">이 작업은 취소할 수 없습니다.</p>
-      </div>
-      <div class="confirm-actions">
-        <div class="confirm-btn-slot" id="confirmBtnCancel"></div>
-        <div class="confirm-btn-slot" id="confirmBtnOk"></div>
-      </div>
+<div class="confirm-overlay" id="confirmOverlay"
+     role="dialog" aria-modal="true"
+     aria-labelledby="confirmTitle" aria-hidden="true">
+  <div class="confirm-backdrop" id="confirmBackdrop"></div>
+  <div class="confirm-dialog">
+    <div class="confirm-body">
+      <h2 class="confirm-title" id="confirmTitle">삭제하시겠습니까?</h2>
+      <p class="confirm-desc" id="confirmDesc">이 작업은 취소할 수 없습니다.</p>
+    </div>
+    <div class="confirm-actions">
+      <div class="confirm-btn-slot" id="confirmBtnCancel"></div>
+      <div class="confirm-btn-slot" id="confirmBtnOk"></div>
     </div>
   </div>
-
-  <script src="/_common/button/button.js"></script>
-  <script src="/_common/confirm/confirm.js"></script>
-</body>
-</html>
+</div>
