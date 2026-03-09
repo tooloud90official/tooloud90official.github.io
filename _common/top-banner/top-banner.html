@@ -23,7 +23,6 @@
       <a href="/mypage/mypage.html">마이페이지</a>
     </div>
 
-    <!-- 로그인 전: 로그인/회원가입 / 로그인 후: 로그아웃 — include.js가 상태에 따라 표시 -->
     <div class="nav-item nav-item--login" id="mobileLoginItem" style="display:none">
       <a href="/login1/login1.html">로그인 / 회원가입</a>
     </div>
@@ -32,12 +31,8 @@
     </div>
   </nav>
 
-  <!-- 오른쪽: 로그인 상태에 따라 include.js가 동적으로 렌더링 -->
-  <div class="auth" id="authArea">
-    <!-- JS가 로그인 상태 확인 후 채워줌 -->
-  </div>
+  <div class="auth" id="authArea"></div>
 
-  <!-- 모바일 메뉴 버튼 -->
   <div class="mobile-toggle" id="menuToggle" aria-label="메뉴 열기" role="button" tabindex="0">☰</div>
 
 </header>
@@ -49,4 +44,3 @@
     <ul class="dropdown-list" id="dropdownList"></ul>
   </div>
 </div>
-<!-- 알림 패널은 alert.js가 #alert-root에 동적으로 삽입 -->

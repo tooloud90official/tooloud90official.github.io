@@ -100,8 +100,8 @@
 
 .bell-badge {
   position: absolute;
-  top: -6px;
-  right: -8px;
+  top: -5px;
+  right: -4px;
   width: 18px;
   height: 18px;
   background: #ff3b30;

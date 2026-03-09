@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const AI_TOOLS = [
     { name: 'Notion',  img: 'https://logo.clearbit.com/notion.so' },
-    { name: 'Claude',  img: 'https://logo.clearbit.com/anthropic.com' },
+    { name: 'Claude',  img: 'https://cdn.brandfetch.io/ideA07K8J2/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1766207012399' },
     { name: 'Gamma',   img: 'https://logo.clearbit.com/gamma.app' },
   ];
 

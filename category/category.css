@@ -9,20 +9,20 @@ body {
   margin: 0 auto;
   text-align: center;
   min-height: 800px;
+  overflow: hidden;
 }
 
-.page-root {
-  padding-top: 70px; /* top-banner 높이 */
-}
-
+/* ===== 페이지 타이틀 ===== */
 .page-title {
   font-size: 40px;
   font-weight: 700;
-  margin-bottom: 100px;
-  margin-top: 28px;
+  color: #1a1a2e;
+  margin-top: 6px;
+  margin-bottom: 65px;
+  letter-spacing: -0.5px;
 }
 
-/* [이미지 1] 알약 모양 탭 메뉴 */
+/* ===== 알약 모양 탭 메뉴 ===== */
 .category-tabs {
   display: flex;
   justify-content: center;
@@ -48,7 +48,7 @@ body {
   font-weight: 600;
 }
 
-/* [이미지 1] 폴더 그리드 및 카드 */
+/* ===== 폴더 그리드 및 카드 ===== */
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, 180px);
@@ -97,13 +97,13 @@ body {
   color: #333;
 }
 
-/* [이미지 2] 중앙 고정 모달 오버레이 */
+/* ===== 모달 오버레이 ===== */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: none; 
+  background: rgba(0, 0, 0, 0.3); /* ✅ 연하게 */
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 10000;
@@ -111,7 +111,7 @@ body {
 }
 
 .modal-content {
-  background: #D1D1D1;
+  background: #efefef; /* ✅ 연하게 */
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
@@ -133,15 +133,99 @@ body {
 .total-count { font-size: 13px; color: #777; }
 
 .close-btn {
-  background: none; border: none; font-size: 30px; cursor: pointer; color: #555;
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: #555;
+  line-height: 1;
+  padding: 0;
 }
 
+/* ===== 리스트 상단 필터 ===== */
+.modal-list-header {
+  display: flex;
+  justify-content: flex-end; /* ✅ 우측 정렬 */
+  margin-bottom: 12px;
+}
+
+.sort-select {
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: #555;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+/* ✅ 모달 안 select 크기 조정 */
+.modal-sort-select {
+  width: 100px;        /* 모달 사이즈에 맞게 축소 */
+}
+
+.modal-sort-select .select__trigger {
+  height: 32px;        /* 모달 안이므로 살짝 작게 */
+  padding: 0 10px;
+  border-radius: 20px; /* 둥글게 */
+}
+
+.modal-sort-select .select__value {
+  font-size: 12px;
+  color: #555 !important;
+}
+
+.modal-sort-select.select:not(.is-placeholder) .select__value {
+  color: #555 !important;
+}
+
+.modal-sort-select .select__icon {
+  width: 16px;
+  height: 16px;
+  color: #555;
+}
+
+.modal-sort-select .select__chevron {
+  width: 14px;
+  height: 14px;
+}
+
+.modal-sort-select .select__menu {
+  font-size: 12px;
+}
+
+.modal-sort-select .select__option {
+  font-size: 12px;
+  padding: 7px 12px;
+}
+
+/* ===== 모달 바디 스크롤바 ===== */
 .modal-body {
   overflow-y: auto;
-  padding-right: 10px;
+  margin-right: -8px;
+  padding-right: 8px;
 }
 
-/* 리스트 아이템 카드 */
+.modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 999px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* ===== 리스트 아이템 ===== */
 .list-item {
   background: #fff;
   border-radius: 25px;
@@ -153,21 +237,97 @@ body {
 }
 
 .item-badge {
-  background: #007aff; color: #fff;
-  padding: 3px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;
+  background: #007aff;
+  color: #fff;
+  padding: 3px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-/* 말줄임표 관련 수정 부분 */
 .item-desc {
   font-size: 12px;
   color: #666;
   margin: 8px 0;
   line-height: 1.4;
-  
-  /* 여러 줄 말줄임표 설정 */
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; /* 두 줄까지 보여줌 */
-  line-clamp: 2;         /* 표준 속성 병기 */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* ✅ 상세 버튼 */
+.item-detail-btn {
+  font-size: 11px;
+  color: #999;
+  float: right;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.item-detail-btn:hover {
+  color: #2a7cff;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 900px) {
+  .page-title {
+    font-size: 34px;
+  }
+
+  .category-tabs {
+    gap: 8px;
+  }
+
+  .tab-item {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, 150px);
+    gap: 30px 20px;
+  }
+
+  .tool-icon-box {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 26px;
+    margin-top: 65px;
+    margin-bottom: 16px;
+  }
+
+  .category-tabs {
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 0 16px;
+  }
+
+  .tab-item {
+    font-size: 12px;
+    padding: 7px 14px;
+  }
+
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, 130px);
+    gap: 24px 16px;
+  }
+
+  .tool-icon-box {
+    width: 110px;
+    height: 110px;
+    border-radius: 26px;
+    padding: 14px;
+  }
+
+  .group-title {
+    font-size: 12px;
+  }
 }

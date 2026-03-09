@@ -1,3 +1,5 @@
+import { JeonubSelect } from '/_common/select/select.js';
+
 const CATEGORY_DATA = {
   "이미지·오디오·영상": [
     { id: "img-gen", title: "이미지 생성", tools: [
@@ -115,10 +117,22 @@ const CATEGORY_DATA = {
   ]
 };
 
+// ✅ 전역 select 인스턴스
+let sortSelectInstance = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll('.tab-item');
   const modal = document.getElementById('modalOverlay');
   const closeBtn = document.getElementById('closeModal');
+
+  // ✅ JeonubSelect 초기화
+  sortSelectInstance = new JeonubSelect('#modalSortSelect', {
+    placeholder: '이름 순',
+    items: [
+      { label: '이름 순', value: 'name' },
+      { label: '평점 순', value: 'rating' }
+    ]
+  });
 
   tabs.forEach(tab => {
     tab.addEventListener('click', function() {
@@ -142,13 +156,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  renderFolders("이미지·오디오·영상");
+  // ✅ URL 쿼리스트링에서 tab 파라미터 읽기
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get('tab');
+
+  if (tabParam) {
+    // ✅ 해당 탭 찾아서 활성화
+    const matchedTab = [...tabs].find(
+      tab => tab.textContent.trim() === decodeURIComponent(tabParam)
+    );
+    if (matchedTab) {
+      tabs.forEach(t => t.classList.remove('active'));
+      matchedTab.classList.add('active');
+      renderFolders(matchedTab.textContent.trim());
+    } else {
+      renderFolders("이미지·오디오·영상");
+    }
+  } else {
+    renderFolders("이미지·오디오·영상");
+  }
 });
 
 function renderFolders(categoryName) {
   const toolGrid = document.getElementById('toolGrid');
   if (!toolGrid) return;
-  toolGrid.innerHTML = ""; 
+  toolGrid.innerHTML = "";
 
   const folders = CATEGORY_DATA[categoryName] || [];
 
@@ -162,9 +194,45 @@ function renderFolders(categoryName) {
       </div>
       <span class="group-title">${folder.title}</span>
     `;
-
     groupDiv.addEventListener('click', () => openModal(folder));
     toolGrid.appendChild(groupDiv);
+  });
+}
+
+function renderToolList(tools, sortValue) {
+  let sorted = [...tools];
+
+  if (sortValue === 'name') {
+    sorted.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortValue === 'rating') {
+    sorted.sort((a, b) => b.rating - a.rating);
+  }
+
+  const toolListEl = document.getElementById('toolList');
+  if (!toolListEl) return;
+
+  toolListEl.innerHTML = '';
+
+  if (sorted.length === 0) {
+    toolListEl.innerHTML = "<p style='text-align:center; color:#888; margin-top:50px;'>등록된 툴이 없습니다.</p>";
+    return;
+  }
+
+  sorted.forEach(tool => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+    item.innerHTML = `
+      <div style="width:70px; height:70px; background:#eee; border-radius:20px; flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="item-badge">${tool.name}</span>
+          <span style="color:#ffcc00; font-size:14px;">${'★'.repeat(tool.rating)}</span>
+        </div>
+        <p class="item-desc">${tool.desc}</p>
+        <a href="/detail_AI/detail_AI.html" class="item-detail-btn">상세 ></a>
+      </div>
+    `;
+    toolListEl.appendChild(item);
   });
 }
 
@@ -172,7 +240,6 @@ function openModal(folderData) {
   const modal = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
   const modalCount = document.getElementById('modalTotalCount');
-  const modalList = document.getElementById('modalList');
 
   if (!modal || !folderData) return;
 
@@ -180,27 +247,12 @@ function openModal(folderData) {
   const tools = folderData.tools || [];
   modalCount.textContent = `전체 (${tools.length})`;
 
-  modalList.innerHTML = "";
-  if (tools.length === 0) {
-    modalList.innerHTML = "<p style='text-align:center; color:#888; margin-top:50px;'>등록된 툴이 없습니다.</p>";
-  } else {
-    tools.forEach(tool => {
-      const item = document.createElement('div');
-      item.className = 'list-item';
-      item.innerHTML = `
-        <div style="width:70px; height:70px; background:#eee; border-radius:20px; flex-shrink:0;"></div>
-        <div style="flex:1;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="item-badge">${tool.name}</span>
-            <span style="color:#ffcc00; font-size:14px;">${'★'.repeat(tool.rating)}</span>
-          </div>
-          <p class="item-desc">${tool.desc}</p>
-          <span style="font-size:11px; color:#999; float:right; cursor:pointer;">상세 ></span>
-        </div>
-      `;
-      modalList.appendChild(item);
-    });
-  }
+  sortSelectInstance.selectValue('name');
+  renderToolList(tools, 'name');
+
+  sortSelectInstance.onChange = (item) => {
+    renderToolList(tools, item.value);
+  };
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';

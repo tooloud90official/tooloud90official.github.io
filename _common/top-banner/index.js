@@ -6,12 +6,12 @@ const MENU_DATA = {
   category: {
     desc: '카테고리별 AI 툴을\n탐색해보세요.',
     items: [
-      { label: '이미지·오디오·영상', href: '#' },
-      { label: '리서치',             href: '#' },
-      { label: '문서 생성·요약·편집', href: '#' },
-      { label: '개발·코딩',          href: '#' },
-      { label: '학습·교육',          href: '#' },
-      { label: '챗봇·어시스턴트',    href: '#' },
+      { label: '이미지·오디오·영상', href: '/category/category.html?tab=이미지·오디오·영상' }, // ✅
+      { label: '리서치',             href: '/category/category.html?tab=리서치' },              // ✅
+      { label: '문서 생성·요약·편집', href: '/category/category.html?tab=문서 생성·요약·편집' }, // ✅
+      { label: '개발·코딩',          href: '/category/category.html?tab=개발·코딩' },           // ✅
+      { label: '학습·교육',          href: '/category/category.html?tab=학습·교육' },           // ✅
+      { label: '챗봇·어시스턴트',    href: '/category/category.html?tab=챗봇·어시스턴트' },     // ✅
     ]
   },
   price: {
@@ -60,13 +60,11 @@ function renderDropdown(menuKey, navItemEl) {
 
   if (!data || !panel || !descEl || !listEl || !inner) return;
 
-  // 내용 채우기
   descEl.textContent = data.desc;
   listEl.innerHTML = data.items
     .map(item => `<li><a href="${item.href}">${item.label}</a></li>`)
     .join('');
 
-  // ✅ 탭 위치 기준으로 dropdown-inner 좌측 정렬
   if (navItemEl) {
     const rect = navItemEl.getBoundingClientRect();
     inner.style.paddingLeft = `${rect.left-260}px`;
@@ -91,7 +89,7 @@ document.addEventListener('mouseover', (e) => {
 
     if (MENU_DATA[menuKey]) {
       navItem.classList.add('is-active');
-      renderDropdown(menuKey, navItem); // ✅ navItem 전달
+      renderDropdown(menuKey, navItem);
     } else {
       closeDropdown();
     }
@@ -114,7 +112,6 @@ document.addEventListener('mouseover', (e) => {
 // ===== 클릭 이벤트 =====
 document.addEventListener('click', (e) => {
   const toggle = e.target.closest('#menuToggle');
-  const logo   = e.target.closest('#logo');
 
   if (toggle) {
     const navMenu = document.getElementById('navMenu');
@@ -144,15 +141,13 @@ document.addEventListener('keydown', (e) => {
 
 // ===== 마이페이지 로그인 체크 =====
 document.addEventListener('click', (e) => {
-
   const mypageLink = e.target.closest('.nav-item[data-menu="mypage"] a');
   if (!mypageLink) return;
 
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
   if (!isLoggedIn) {
-    e.preventDefault(); // 기본 이동 차단
+    e.preventDefault();
     window.location.href = '/login1/login1.html';
   }
-
 });
