@@ -2,7 +2,7 @@
 #top-banner{
   position: sticky;
   top: 0;
-  z-index: 20;          /* ⭐ dim/사이드바보다 낮게! */
+  z-index: 20;
 }
 
 /* 기본 */
@@ -32,13 +32,12 @@
 }
 
 .artwork-fab__img{
-  width: 100%;         /* ✅ 버튼 크기만큼 */
+  width: 100%;
   height: 100%;
-  display: block;      /* ✅ 아래 여백(인라인 이미지 gap) 제거 */
-  object-fit: contain; /* ✅ 아이콘 전체 보이게 */
+  display: block;
+  object-fit: contain;
 }
 
-/* ✅ 사이드바 열렸을 때 FAB 숨김 */
 .artwork-fab.is-hidden{
   opacity: 0;
   pointer-events: none;
@@ -118,7 +117,7 @@
   pointer-events: auto;
 }
 
-/* ✅ 메인 shell (사이드바 열릴 때 오른쪽으로 밀리기) */
+/* ✅ 메인 shell */
 .artwork-shell{
   transition: transform 220ms ease;
 }
@@ -126,10 +125,7 @@
   transform: translateX(260px);
 }
 
-/* =========================
-   ✅ 상단 헤더 (원래대로: 배경효과 X)
-   - signiture.png는 "제목 뒤"에만 깔림
-========================= */
+/* 상단 헤더 */
 .artwork-hero{
   max-width: 1100px;
   margin: 0 auto;
@@ -137,23 +133,21 @@
   position: relative;
 }
 
-/* ✅ 제목 뒤 장식 PNG 레이어 */
 .artwork-hero__titleWrap{
   position: absolute;
   left: 50%;
-  top: -50px;                 /* 제목 라인에 맞춰 조절 가능 */
+  top: -50px;
   transform: translateX(-50%);
   width: min(760px, 92vw);
-  height: 120px;             /* PNG 높이 */
+  height: 120px;
   background-image: url("/media/signiture.png");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: contain;  /* 투명 PNG 형태 그대로 */
+  background-size: contain;
   pointer-events: none;
   z-index: 0;
 }
 
-/* 제목은 PNG 위로 */
 .artwork-hero__title{
   position: relative;
   z-index: 1;
@@ -163,10 +157,9 @@
   margin: 0;
   text-align: center;
   letter-spacing: -0.5px;
-  margin-top: 70px; /* 제목 위에 여백이 생기면서 아래로 내려감 */
+  margin-top: 70px;
 }
 
-/* 설명/검색은 기존 그대로 (PNG 영역에 “포함”되는 건 아니고, 그냥 아래로 내려감) */
 .artwork-hero__desc{
   margin: 30px 0 0;
   font-size: 15px;
@@ -210,7 +203,7 @@
 }
 
 #search-area{
-  margin-top: 50px; /* 검색창만 더 아래로 */
+  margin-top: 50px;
 }
 
 /* 섹션 헤더 + 필터 */
@@ -234,33 +227,40 @@
   color: rgba(0,0,0,0.45);
 }
 
-/* =========================
-   artwork 페이지: select 튜닝(작게 + 선 얇게 + 메뉴 글자 작게 + 세모 정렬)
-========================= */
-
+/* select 튜닝 */
 .artwork-page .select{
   width: 110px;
 }
 
-/* ✅ 트리거: 높이/글자/정렬/선 굵기 */
+/* native select */
+.artwork-page .select-root {
+  width: 110px;
+}
+
+.artwork-page .select-native {
+  height: 32px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 30px 0 12px;
+  border-radius: 10px;
+  background-size: 10px;
+}
+
+/* custom select */
 .artwork-page .select__trigger{
   height: 32px;
   padding: 0 10px 0 12px;
   border-radius: 10px;
-
-  display: flex;                 /* ⭐ 세모 위치 깨짐 방지 */
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-
   font-size: 12px;
   font-weight: 800;
   line-height: 1;
-
-  border-width: 1px !important;  /* ✅ 선 굵기 줄이기 */
+  border-width: 1px !important;
 }
 
-/* ✅ 트리거 안 텍스트(좋아요 순) */
 .artwork-page .select__value{
   font-size: 12px;
   font-weight: 800;
@@ -268,7 +268,6 @@
   white-space: nowrap;
 }
 
-/* ✅ “세모 아이콘 버튼” 영역(오른쪽) */
 .artwork-page .select__icon{
   width: 16px;
   height: 16px;
@@ -277,29 +276,25 @@
   flex: 0 0 16px;
 }
 
-/* ✅ 세모(svg) 크기/정렬 */
 .artwork-page .select__chevron{
   width: 16px;
   height: 16px;
   display: block;
 }
 
-/* ✅ 펼쳤을 때 메뉴(좋아요 순/최신 순/조회수 순) 글자 크게 보이는 거 해결 */
 .artwork-page .select__menu{
   font-size: 11px !important;
   line-height: 1.2;
 }
 
-/* 메뉴 아이템 */
 .artwork-page .select__menu > li,
 .artwork-page [data-select-item]{
   font-size: 11px !important;
   line-height: 1.2;
-  padding: 7px 10px !important;  /* ✅ 줄 높이(=커 보이는 느낌) 줄이기 */
-  white-space: nowrap;           /* ✅ 줄바꿈으로 커보이는 현상 방지 */
+  padding: 7px 10px !important;
+  white-space: nowrap;
 }
 
-/* ✅ 메뉴 박스 테두리도 얇게 */
 .artwork-page .select__menu-wrap{
   border-width: 1px !important;
 }
@@ -311,7 +306,7 @@
   gap: 22px;
 }
 .artwork-card{
-  aspect-ratio: 1 / 0.72; /* 스샷 느낌(가로로 납작한) */
+  aspect-ratio: 1 / 0.72;
   border-radius: 18px;
   background: rgba(0,0,0,0.55);
   box-shadow: 0 12px 26px rgba(0,0,0,0.10);
@@ -320,13 +315,11 @@
 /* 반응형 */
 @media (max-width: 720px){
   .artwork-shell.is-shift{
-    transform: translateX(0); /* 모바일은 밀기 대신 사이드바만 덮게 */
+    transform: translateX(0);
   }
   .artwork-grid{
     grid-template-columns: 1fr;
   }
-
-  /* 모바일에서 타이틀 배경 높이 살짝 줄이기(선택) */
   .artwork-hero__titleWrap{
     height: 96px;
   }

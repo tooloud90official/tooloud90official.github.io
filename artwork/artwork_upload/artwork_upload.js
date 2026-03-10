@@ -194,12 +194,24 @@ async function renderPdfPage() {
   const canvas = document.getElementById("pdfPreviewCanvas");
   const indicator = document.getElementById("pdfPageIndicator");
   if (!canvas || !indicator || !previewState.pdfDoc) return;
+
   const page = await previewState.pdfDoc.getPage(previewState.pdfPage);
-  const vp = page.getViewport({ scale: 1.2 });
-  const scale = Math.min(canvas.parentElement.clientWidth - 24, 560) / vp.width;
+  const vp = page.getViewport({ scale: 1 });
+
+  const stage = canvas.parentElement;
+  const stageW = stage.clientWidth;
+  const stageH = stage.clientHeight;
+
+  // 가로/세로 둘 다 stage에 맞추고 작은 쪽 기준으로 scale → 전체 페이지가 항상 보임
+  const scaleW = stageW / vp.width;
+  const scaleH = stageH / vp.height;
+  const scale = Math.min(scaleW, scaleH);
+
   const svp = page.getViewport({ scale });
   const ctx = canvas.getContext("2d");
-  canvas.width = svp.width; canvas.height = svp.height;
+  canvas.width = svp.width;
+  canvas.height = svp.height;
+
   await page.render({ canvasContext: ctx, viewport: svp }).promise;
   indicator.textContent = `${previewState.pdfPage} / ${previewState.pdfTotalPages}`;
 }
@@ -217,21 +229,20 @@ async function renderPdfPreview(file) {
     </div>`;
   try {
     cleanupObjectUrl(); currentObjectUrl = URL.createObjectURL(file);
-    
-    // ✅ 전역에 등록된 pdfjsLib 사용 및 워커 주소 설정
+
     const lib = window.pdfjsLib;
     if (!lib) throw new Error("pdf.js not loaded");
     lib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs';
 
     previewState.pdfDoc = await lib.getDocument(currentObjectUrl).promise;
-    previewState.pdfPage = 1; 
+    previewState.pdfPage = 1;
     previewState.pdfTotalPages = previewState.pdfDoc.numPages;
 
-    document.getElementById("pdfPrevBtn").addEventListener("click", async () => { 
-      if (previewState.pdfPage > 1) { previewState.pdfPage--; await renderPdfPage(); } 
+    document.getElementById("pdfPrevBtn").addEventListener("click", async () => {
+      if (previewState.pdfPage > 1) { previewState.pdfPage--; await renderPdfPage(); }
     });
-    document.getElementById("pdfNextBtn").addEventListener("click", async () => { 
-      if (previewState.pdfPage < previewState.pdfTotalPages) { previewState.pdfPage++; await renderPdfPage(); } 
+    document.getElementById("pdfNextBtn").addEventListener("click", async () => {
+      if (previewState.pdfPage < previewState.pdfTotalPages) { previewState.pdfPage++; await renderPdfPage(); }
     });
 
     await renderPdfPage();
@@ -281,7 +292,7 @@ function setupDragDrop() {
   });
 }
 
-/* ── 버튼 렌더링 (loadButton 함수가 있다고 가정) ── */
+/* ── 버튼 렌더링 ── */
 async function mountUploadButton(fileInput) {
   if (typeof loadButton !== "function") return;
   await loadButton({ target: "#fileUploadMount", text: "파일 업로드", variant: "primary", onClick: () => fileInput.click() });

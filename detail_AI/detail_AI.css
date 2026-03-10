@@ -58,11 +58,11 @@ body{
   font-size: 12px;
   color: #2a7cff;
   cursor: pointer;
-  display: flex;        /* 아이콘+텍스트 나란히 */
+  display: flex;
   align-items: center;
   gap: 4px;
   font-weight: 500;
-  text-decoration: none; /* ← 이거 추가 */
+  text-decoration: none;
 }
 .detail_AI__upload-icon {
   width: 14px;
@@ -82,34 +82,33 @@ body{
   grid-column:1;display:grid;justify-items:center;text-align:center;align-self:center;gap:10px
 }
 
-/* ✅ 프로필 아바타 링 스타일 */
 .detail_AI__avatar {
-  width: 140px;          /* 크기는 기존 140px 유지 (너무 크면 56px로 줄여!) */
+  width: 140px;
   height: 140px;
-  border-radius: 50%;    /* 링은 역시 동그라미가 제맛! */
-  padding: 4px;          /* 링과 사진 사이의 간격 */
-  background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399); /* 그라데이션 링 */
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
   box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;      /* 자식 요소(img)가 튀어나가지 않게 */
+  overflow: hidden;
 }
 
 .detail_AI__avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;    /* 사진도 동그랗게! */
-  border: 3px solid #fff; /* 링이랑 사진 사이에 흰색 구분선 (선택사항) */
-  background: #fff;      /* 투명한 PNG 대비용 */
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: #fff;
 }
 
 .detail_AI__profile-meta{display:grid;gap:12px;justify-items:center}
 .detail_AI__profile-name{font-size:14px;font-weight:700;line-height:1.2}
 
 .detail_AI__carousel-wrapper {
-  position: relative;  /* 오버레이 기준점 */
+  position: relative;
 }
 
 .detail_AI__like-overlay {
@@ -120,7 +119,7 @@ body{
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  background: rgba(0, 0, 0, 0.35);  /* 반투명 배경 */
+  background: rgba(0, 0, 0, 0.35);
   border-radius: 10px;
   padding: 6px 10px;
 }
@@ -128,7 +127,7 @@ body{
 .detail_AI__heart-icon {
   width: 20px;
   height: 20px;
-  filter: brightness(0) invert(1);  /* 흰색 아이콘 */
+  filter: brightness(0) invert(1);
 }
 
 .detail_AI__like-count {
@@ -175,7 +174,6 @@ body{
   align-items: center;
   justify-content: center;
 }
-
 
 .site-preview__meta{padding:16px 18px 18px}
 .site-preview__name{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;color:#111}
@@ -250,11 +248,9 @@ body{
   align-items:start;
 }
 
-/* 리뷰 쓰기 */
-
 .review-write{
   display:flex;flex-direction:column;gap:12px;align-items:stretch;
-  padding-top:15px; /* ✅ 이 숫자 조절 */
+  padding-top:15px;
 }
 
 .review-write__head{display:grid;gap:6px}
@@ -266,7 +262,6 @@ body{
   display:flex;flex-direction:column;gap:12px
 }
 
-/* 별점 입력 */
 .review-write__stars{display:flex;gap:4px;align-items:center;font-size:20px;line-height:1}
 .rstar-input{
   cursor:pointer;color:rgba(0,0,0,.18);
@@ -277,7 +272,6 @@ body{
 .rstar-input:hover{transform:scale(1.2)}
 .review-write__hint{font-size:12px;color:rgba(0,0,0,.45);font-weight:700;margin-left:6px}
 
-/* 텍스트 입력창 */
 .review-write__textarea{
   flex:1;min-height:100px;resize:none;
   border:none;outline:none;background:transparent;
@@ -287,7 +281,6 @@ body{
 }
 .review-write__textarea::placeholder{color:rgba(0,0,0,.35)}
 
-/* ✅ 등록 버튼 */
 .review-write__submit{width:100%;display:block}
 .review-write__submit > *{width:100% !important;display:block}
 .review-write__submit .btn{
@@ -303,10 +296,22 @@ body{
 /* 리뷰 리스트 */
 .review-list{display:grid;gap:14px;align-content:start}
 .review-list__top{display:grid;grid-template-columns:1fr auto;align-items:center}
-.review-list__count{font-size:12px;color:rgba(0,0,0,.45);font-weight:700;margin-top:20px; /* ✅ 이 숫자 조절 */}
+.review-list__count{font-size:12px;color:rgba(0,0,0,.45);font-weight:700;margin-top:20px;}
 
 /* Sort select */
 .review-sort{display:grid;justify-items:end}
+#reviewSortSelect .select-root {
+  width: 100px;
+}
+#reviewSortSelect .select-native {
+  height: 32px;
+  font-size: 11px;
+  padding: 0 30px 0 10px;
+  border-radius: 12px;
+  background-size: 10px;
+}
+
+/* 기존 custom select 스타일 (혹시 사용 시) */
 #reviewSortSelect .select{width:120px;position:relative}
 #reviewSortSelect .select__trigger{
   position:relative;height:32px;padding:0 28px 0 10px;border-radius:12px;
@@ -335,7 +340,7 @@ body{
   white-space:nowrap;word-break:keep-all;text-align:left
 }
 
-/* ✅ 리뷰 카드 */
+/* 리뷰 카드 */
 .review-cards{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -347,7 +352,7 @@ body{
   border-radius:16px;border:1px solid rgba(0,0,0,.10);
   background:#fff;
   padding:16px;display:flex;flex-direction:column;gap:10px;
-  min-height:220px; /* ✅ 추가 */
+  min-height:220px;
   box-shadow:0 4px 16px rgba(0,0,0,.06);
   transition:box-shadow .2s;
 }
@@ -358,13 +363,11 @@ body{
 .review-card__rate{font-size:11px;color:rgba(0,0,0,.45);margin-left:4px;font-weight:700}
 .review-card__text{font-size:12px;line-height:1.5;color:rgba(0,0,0,.7);font-weight:500}
 
-/* ✅ user + 버튼 같은 줄 */
 .review-card__user{margin-top:auto;display:flex;align-items:flex-end;gap:8px}
 .review-card__avatar{width:34px;height:34px;border-radius:999px;overflow:hidden;background:rgba(0,0,0,.08);flex-shrink:0}
 .review-card__avatar img{width:100%;height:100%;object-fit:cover}
 .review-card__name{font-size:12px;font-weight:700;flex:1}
 
-/* ✅ 수정/삭제 버튼 */
 .review-card__actions{display:flex;gap:6px;margin-left:auto;align-items:center}
 .review-card__action-btn{
   font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;
@@ -378,6 +381,7 @@ body{
 .review-dots{display:flex;justify-content:center;gap:8px;padding-top:6px}
 .rdot{width:6px;height:6px;border-radius:999px;background:rgba(0,0,0,.18);cursor:pointer;transition:width .2s,background .2s}
 .rdot.is-active{width:16px;background:rgba(0,0,0,.42)}
+
 /* Similar tools */
 .similar-tools{width:min(100%,1100px);margin:38px auto 0;padding:0 20px}
 .similar-tools__header{
@@ -404,7 +408,7 @@ body{
 .sdot{width:6px;height:6px;border-radius:999px;background:rgba(0,0,0,.18)}
 .sdot.is-active{width:16px;background:rgba(0,0,0,.42)}
 
-/* Responsive (sections) */
+/* Responsive */
 @media (max-width:980px){
   .review-panel{grid-template-columns:1fr}
   .review-cards{grid-template-columns:1fr}
@@ -415,5 +419,3 @@ body{
   .similar-tools__row{gap:18px}
   .similar-tools__item{width:92px}
 }
-
-  

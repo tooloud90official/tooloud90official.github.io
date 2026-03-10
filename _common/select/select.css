@@ -3,7 +3,7 @@
   --jsel-menu-bg: #ffffff;
   --jsel-border: #ddd;
   --jsel-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  --jsel-radius-trigger: 8px;
+  --jsel-radius-trigger: 10px;
   --jsel-radius-menu: 8px;
   --jsel-text-main: #222;
   --jsel-text-muted: #aaa;
@@ -13,6 +13,40 @@
   box-sizing: border-box;
 }
 
+/* ===== Native Select (select.html 구조) ===== */
+.select-root {
+  position: relative;
+  width: 220px;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+.select-native {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #ffffff url('/media/arrow.png') no-repeat right 14px center;
+  background-size: 10px;
+  padding: 0 40px 0 14px;
+  font-size: 14px;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: #222;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+.select-root.is-placeholder .select-native {
+  color: #aaa;
+}
+
+.select-native:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Custom Select (기존 .select 구조) ===== */
 .select {
   position: relative;
   width: 220px;
@@ -23,20 +57,20 @@
 .select__trigger {
   width: 100%;
   box-sizing: border-box;
-  height: 44px;
-  border: 1px solid var(--jsel-border);
-  border-radius: var(--jsel-radius-trigger);
-  background: var(--jsel-trigger-bg);
+  height: 48px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #ffffff;
   box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 14px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-/* 선택된 값 텍스트 — 기본(선택 전)은 #aaa */
 .select__value {
   font-size: 14px;
   font-weight: 400;
@@ -45,7 +79,6 @@
   color: #aaa !important;
 }
 
-/* 선택 후 — is-placeholder 클래스가 없을 때 #222 */
 .select:not(.is-placeholder) .select__value {
   color: #222 !important;
 }
@@ -56,17 +89,19 @@
   height: 20px;
   display: grid;
   place-items: center;
-  color: #aaa;
-}
-
-.select__chevron {
-  width: 18px;
-  height: 18px;
+  background-image: url('/media/arrow.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   transition: transform 180ms ease;
 }
 
-.select.is-open .select__chevron {
+.select.is-open .select__icon {
   transform: rotate(180deg);
+}
+
+.select__chevron {
+  display: none;
 }
 
 /* ===== Menu wrap ===== */
@@ -99,22 +134,11 @@
   pointer-events: none;
 }
 
-/* 스크롤바 스타일 */
-.select__menu::-webkit-scrollbar {
-  width: 4px;
-}
-.select__menu::-webkit-scrollbar-track {
-  background: transparent;
-}
-.select__menu::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 4px;
-}
+.select__menu::-webkit-scrollbar { width: 4px; }
+.select__menu::-webkit-scrollbar-track { background: transparent; }
+.select__menu::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
-.select.is-open .select__menu-wrap {
-  pointer-events: auto;
-}
-
+.select.is-open .select__menu-wrap { pointer-events: auto; }
 .select.is-open .select__menu {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -132,10 +156,6 @@
   cursor: pointer;
   user-select: none;
   letter-spacing: normal;
-}
-
-.select__option + .select__option {
-  margin-top: 0;
 }
 
 .select__option:hover,
@@ -188,36 +208,17 @@ body.select-demo {
   display: none;
 }
 
-.sample-row {
-  display: block;
-}
-
-.sample-select-mount {
-  width: 80px;
-}
+.sample-row { display: block; }
+.sample-select-mount { width: 80px; }
 
 @media (max-width: 640px) {
   .select__trigger {
-    height: 44px;
-    padding: 0 12px;
+    height: 48px;
+    padding: 0 14px;
   }
-
-  .select__value {
-    font-size: 14px;
-  }
-
-  .select__icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .select__chevron {
-    width: 16px;
-    height: 16px;
-  }
-
-  .select__option {
-    font-size: 14px;
-    padding: 9px 14px;
-  }
+  .select__value { font-size: 14px; }
+  .select__icon { width: 18px; height: 18px; }
+  .select__option { font-size: 14px; padding: 9px 14px; }
+  .select-root { width: 100%; }
+  .select-native { font-size: 14px; }
 }

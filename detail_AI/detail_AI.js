@@ -1,4 +1,4 @@
-import { JeonubSelect } from "/_common/select/select.js";
+import { loadNativeSelect } from "/_common/select/select.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   await Promise.all([
@@ -407,29 +407,14 @@ function initReviewSort() {
   const mount = document.querySelector("#reviewSortSelect");
   if (!mount) return;
 
-  mount.innerHTML = `
-    <div class="select" data-review-sort-select>
-      <button type="button" class="select__trigger" data-select-trigger aria-haspopup="listbox" aria-expanded="false">
-        <span class="select__value" data-select-value>최신순</span>
-        <span class="select__icon">
-          <svg class="select__chevron" viewBox="0 0 24 24">
-            <path d="M6 9l6 6 6-6Z" fill="currentColor"></path>
-          </svg>
-        </span>
-      </button>
-      <div class="select__menu-wrap" data-select-menu-wrap>
-        <ul id="select-list-review-sort" class="select__menu" data-select-menu role="listbox" tabindex="-1"></ul>
-      </div>
-    </div>
-  `;
-
-  new JeonubSelect("[data-review-sort-select]", {
-    placeholder: "최신순",
-    items: [
-      { label: "최신순",     value: "new" },
+  loadNativeSelect({
+    target: "#reviewSortSelect",
+    options: [
+      { label: "최신순",      value: "new" },
       { label: "평점 높은순", value: "high" },
       { label: "평점 낮은순", value: "low" },
     ],
+    placeholder: "최신순",
     onChange: (item) => console.log("정렬 선택:", item),
   });
 }

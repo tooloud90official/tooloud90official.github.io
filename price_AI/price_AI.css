@@ -202,7 +202,7 @@ body {
 /* --- Grid & Cards --- */
 .tool-card-grid {
   width: min(100%, 860px);
-  margin: 0 auto;
+  margin: 0 auto 80px;  /* bottom만 80px */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 26px 48px;
