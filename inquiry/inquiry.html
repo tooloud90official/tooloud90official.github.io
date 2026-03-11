@@ -5,42 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>문의사항</title>
 
-  <!-- 페이지 스타일 -->
   <link rel="stylesheet" href="/_common/background.css">
   <link rel="stylesheet" href="/inquiry/inquiry.css" />
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
-  <!-- 공용 드롭다운 스타일 -->
   <link rel="stylesheet" href="/_common/drop_down/drop_down.css" />
-
-  <!-- 공용 버튼 스타일 -->
   <link rel="stylesheet" href="/_common/button/button.css" />
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
 </head>
 <body>
+  <!-- 상단 배너 -->
+  <div id="top-banner" class="inquiry-banner-root"></div>
+
   <div class="inquiry-page">
-    <!-- 상단 배너 자리 -->
-    <div id="top-banner" class="inquiry-banner-root"></div>
-    <br><br>
     <main class="inquiry-main">
       <!-- 타이틀 -->
       <section class="inquiry-hero">
         <h1 class="inquiry-hero__title">문의사항</h1>
         <p class="inquiry-hero__desc">궁금하거나 불편한 점을 알려주세요.</p>
       </section>
-      <br>
+
       <!-- FAQ -->
       <section class="inquiry-section">
         <h2 class="inquiry-section__title">Frequently Asked Questions</h2>
         <div id="faqList" class="inquiry-faq-list"></div>
       </section>
 
-      <!-- 문의한 내용 (공용 드롭다운 그대로) -->
+      <!-- 문의한 내용 -->
       <section class="inquiry-section">
         <h2 class="inquiry-section__title">문의한 내용</h2>
         <div id="myInquiryList" class="inquiry-faq-list"></div>
       </section>
 
-      <!-- Contact us (입력창) -->
+      <!-- Contact us -->
       <section class="inquiry-section">
         <h2 class="inquiry-section__title">Contact us</h2>
 
@@ -53,18 +49,17 @@
         </div>
       </section>
 
-      <!-- 버튼 컴포넌트 자리 -->
+      <!-- 버튼 -->
       <div class="inquiry-submit-wrap">
         <div id="submitBtn"></div>
       </div>
     </main>
   </div>
+
   <div id="bottom-banner"></div>
 
-  <!-- 버튼 컴포넌트 JS -->
   <script src="/_common/button/button.js"></script>
-
-  <!-- 페이지 JS -->
+  <script src="/_common/top-banner/include.js"></script>
   <script type="module" src="/inquiry/inquiry.js"></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
