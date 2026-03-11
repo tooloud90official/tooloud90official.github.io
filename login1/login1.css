@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding-top: 75px;    /* 헤더 높이 보정 */
+  padding-top: 50px;    /* 헤더 높이 보정 */
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   min-height: 100vh;
 }

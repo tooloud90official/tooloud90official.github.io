@@ -69,6 +69,8 @@
 
   border: 2px solid #6b6b6b;
   border-radius: 50%;
+  margin-bottom: 4px;
+
 
   position: relative;
 }
@@ -82,8 +84,8 @@
   background: #6b6b6b;
 
   position: absolute;
-  right: -6px;
-  bottom: -3px;
+  right: -7px;
+  bottom: -4px;
 
   transform: rotate(45deg);
   border-radius: 2px;
