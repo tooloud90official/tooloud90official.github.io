@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     isNicknameChecked = true;
     nicknameMsg.innerHTML = '사용 가능한 닉네임입니다.';
-    nicknameMsg.style.color = '#38a169';
+    nicknameMsg.style.color = '#0080ff';
   });
 
 

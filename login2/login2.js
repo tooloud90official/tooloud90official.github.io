@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!PW_REGEX.test(password.value)) {
       setMessage(msg, '비밀번호는 8자 이상, 영문·숫자·특수문자를 모두 포함해야 합니다.', '#e53e3e');
     } else {
-      setMessage(msg, '사용 가능한 비밀번호입니다.', '#38a169', false);
+      setMessage(msg, '사용 가능한 비밀번호입니다.', '#0080ff', false);
     }
     if (passwordConfirm.value !== '') checkConfirm();
   });
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (password.value !== passwordConfirm.value) {
       setMessage(msg, '비밀번호가 일치하지 않습니다.', '#e53e3e');
     } else {
-      setMessage(msg, '비밀번호가 일치합니다.', '#38a169', false);
+      setMessage(msg, '비밀번호가 일치합니다.', '#0080ff', false);
     }
   }
 
