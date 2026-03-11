@@ -22,7 +22,6 @@
     </div>
   </header>
 
-  <!-- signup_status: login2와 동일한 위치 고정 -->
   <div id="signup-status" data-step="2"></div>
 
   <main class="signup-container">
@@ -43,97 +42,31 @@
     <!-- 직군 -->
     <div class="form-group">
       <label>현재 종사하시는 직군을 알려주세요.</label>
-      <div class="select" id="job-select-wrap" role="combobox">
-        <button class="select__trigger" data-select-trigger aria-expanded="false">
-          <span class="select__value" data-select-value>선택 해주세요</span>
-          <span class="select__arrow">▾</span>
-        </button>
-        <div class="select__menu-wrap" data-select-menu-wrap>
-          <ul class="select__menu" data-select-menu role="listbox">
-            <li class="select__option" data-select-option data-value="developer">개발자</li>
-            <li class="select__option" data-select-option data-value="designer">디자이너</li>
-            <li class="select__option" data-select-option data-value="planner">기획자</li>
-            <li class="select__option" data-select-option data-value="marketer">마케터</li>
-            <li class="select__option" data-select-option data-value="writer">작가/크리에이터</li>
-            <li class="select__option" data-select-option data-value="student">학생</li>
-            <li class="select__option" data-select-option data-value="etc">기타</li>
-          </ul>
-        </div>
-      </div>
+      <div id="job-select-wrap"></div>
     </div>
 
     <!-- 생년월일 -->
     <div class="form-group">
       <label>나이를 알려주세요. (태어난 연, 월, 일)</label>
       <div class="date-select-group">
-
-        <!-- 연도 -->
-        <div class="select" id="birth-year-wrap" role="combobox">
-          <button class="select__trigger" data-select-trigger aria-expanded="false">
-            <span class="select__value" data-select-value>연도</span>
-            <span class="select__arrow">▾</span>
-          </button>
-          <div class="select__menu-wrap" data-select-menu-wrap>
-            <ul class="select__menu" data-select-menu role="listbox"></ul>
-          </div>
-        </div>
-
-        <!-- 월 -->
-        <div class="select" id="birth-month-wrap" role="combobox">
-          <button class="select__trigger" data-select-trigger aria-expanded="false">
-            <span class="select__value" data-select-value>월</span>
-            <span class="select__arrow">▾</span>
-          </button>
-          <div class="select__menu-wrap" data-select-menu-wrap>
-            <ul class="select__menu" data-select-menu role="listbox"></ul>
-          </div>
-        </div>
-
-        <!-- 일 -->
-        <div class="select" id="birth-day-wrap" role="combobox">
-          <button class="select__trigger" data-select-trigger aria-expanded="false">
-            <span class="select__value" data-select-value>일</span>
-            <span class="select__arrow">▾</span>
-          </button>
-          <div class="select__menu-wrap" data-select-menu-wrap>
-            <ul class="select__menu" data-select-menu role="listbox"></ul>
-          </div>
-        </div>
-
+        <div id="birth-year-wrap"></div>
+        <div id="birth-month-wrap"></div>
+        <div id="birth-day-wrap"></div>
       </div>
     </div>
 
     <!-- 국가 -->
     <div class="form-group">
       <label>국가를 알려주세요.</label>
-      <div class="select" id="country-select-wrap" role="combobox">
-        <button class="select__trigger" data-select-trigger aria-expanded="false">
-          <span class="select__value" data-select-value>선택 해주세요</span>
-          <span class="select__arrow">▾</span>
-        </button>
-        <div class="select__menu-wrap" data-select-menu-wrap>
-          <ul class="select__menu" data-select-menu role="listbox">
-            <li class="select__option" data-select-option data-value="KR">대한민국</li>
-            <li class="select__option" data-select-option data-value="US">미국</li>
-            <li class="select__option" data-select-option data-value="JP">일본</li>
-            <li class="select__option" data-select-option data-value="CN">중국</li>
-            <li class="select__option" data-select-option data-value="GB">영국</li>
-            <li class="select__option" data-select-option data-value="ETC">기타</li>
-          </ul>
-        </div>
-      </div>
+      <div id="country-select-wrap"></div>
     </div>
 
-    <!-- 다음 버튼 (login2와 동일한 구조) -->
     <div id="signup-button"></div>
-
-    <!-- 이전으로 돌아가기 (login2와 동일한 구조) -->
     <div class="back-link" id="backBtn">이전으로 돌아가기</div>
 
   </main>
   <div id="bottom-banner"></div>
 
-  <!-- confirm 모달 -->
   <div id="modal-root"></div>
 
   <script src="/_common/confirm/include.js"></script>

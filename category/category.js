@@ -1,4 +1,4 @@
-import { JeonubSelect } from '/_common/select/select.js';
+import { loadNativeSelect } from '/_common/select/select.js';
 
 const CATEGORY_DATA = {
   "이미지·오디오·영상": [
@@ -117,22 +117,12 @@ const CATEGORY_DATA = {
   ]
 };
 
-// ✅ 전역 select 인스턴스
 let sortSelectInstance = null;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const tabs = document.querySelectorAll('.tab-item');
   const modal = document.getElementById('modalOverlay');
   const closeBtn = document.getElementById('closeModal');
-
-  // ✅ JeonubSelect 초기화
-  sortSelectInstance = new JeonubSelect('#modalSortSelect', {
-    placeholder: '이름 순',
-    items: [
-      { label: '이름 순', value: 'name' },
-      { label: '평점 순', value: 'rating' }
-    ]
-  });
 
   tabs.forEach(tab => {
     tab.addEventListener('click', function() {
@@ -156,12 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ URL 쿼리스트링에서 tab 파라미터 읽기
   const urlParams = new URLSearchParams(window.location.search);
   const tabParam = urlParams.get('tab');
 
   if (tabParam) {
-    // ✅ 해당 탭 찾아서 활성화
     const matchedTab = [...tabs].find(
       tab => tab.textContent.trim() === decodeURIComponent(tabParam)
     );
@@ -236,7 +224,7 @@ function renderToolList(tools, sortValue) {
   });
 }
 
-function openModal(folderData) {
+async function openModal(folderData) {
   const modal = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
   const modalCount = document.getElementById('modalTotalCount');
@@ -247,12 +235,21 @@ function openModal(folderData) {
   const tools = folderData.tools || [];
   modalCount.textContent = `전체 (${tools.length})`;
 
-  sortSelectInstance.selectValue('name');
-  renderToolList(tools, 'name');
+  // ✅ loadNativeSelect로 교체 - onChange를 초기화 시 전달
+  sortSelectInstance = await loadNativeSelect({
+    target: '#modalSortSelect',
+    placeholder: '이름 순',
+    value: 'name',
+    options: [
+      { label: '이름 순', value: 'name' },
+      { label: '평점 순', value: 'rating' }
+    ],
+    onChange: (item) => {
+      renderToolList(tools, item.value);
+    }
+  });
 
-  sortSelectInstance.onChange = (item) => {
-    renderToolList(tools, item.value);
-  };
+  renderToolList(tools, 'name');
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';

@@ -1,9 +1,9 @@
 // login3.js
-import { JeonubSelect } from '/_common/select/select.js';
+import { loadNativeSelect } from '/_common/select/select.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-  // ===== 1. 다음 버튼 렌더링 (login2와 동일한 구조) =====
+  // ===== 1. 다음 버튼 렌더링 =====
   loadButton({
     target: "#signup-button",
     text: "다음",
@@ -17,81 +17,92 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 
-  // ===== 2. JeonubSelect 초기화 (login2와 동일한 방식) =====
-  const jobSelect = new JeonubSelect('#job-select-wrap', {
-    placeholder: '선택 해주세요'
+  // ===== 2. 직업 / 국가 셀렉트 =====
+  await loadNativeSelect({
+    target: '#job-select-wrap',
+    placeholder: '선택 해주세요',
+    options: [
+      { value: 'developer', label: '개발자' },
+      { value: 'designer',  label: '디자이너' },
+      { value: 'planner',   label: '기획자' },
+      { value: 'marketer',  label: '마케터' },
+      { value: 'writer',    label: '작가/크리에이터' },
+      { value: 'student',   label: '학생' },
+      { value: 'etc',       label: '기타' },
+    ]
   });
 
-  const countrySelect = new JeonubSelect('#country-select-wrap', {
-    placeholder: '선택 해주세요'
+  await loadNativeSelect({
+    target: '#country-select-wrap',
+    placeholder: '선택 해주세요',
+    options: [
+      { value: 'KR',  label: '대한민국' },
+      { value: 'US',  label: '미국' },
+      { value: 'JP',  label: '일본' },
+      { value: 'CN',  label: '중국' },
+      { value: 'GB',  label: '영국' },
+      { value: 'ETC', label: '기타' },
+    ]
   });
 
-  // 연도 목록 생성
+
+  // ===== 3. 생년월일 셀렉트 =====
   const currentYear = new Date().getFullYear();
-  const yearUl = document.querySelector('#birth-year-wrap [data-select-menu]');
+
+  const yearOptions = [];
   for (let y = currentYear; y >= 1924; y--) {
-    const li = document.createElement('li');
-    li.className = 'select__option';
-    li.setAttribute('data-select-option', '');
-    li.setAttribute('data-value', String(y));
-    li.setAttribute('role', 'option');
-    li.textContent = `${y}년`;
-    yearUl.appendChild(li);
+    yearOptions.push({ value: String(y), label: `${y}년` });
   }
 
-  // 월 목록 생성
-  const monthUl = document.querySelector('#birth-month-wrap [data-select-menu]');
+  const monthOptions = [];
   for (let m = 1; m <= 12; m++) {
-    const li = document.createElement('li');
-    li.className = 'select__option';
-    li.setAttribute('data-select-option', '');
-    li.setAttribute('data-value', String(m));
-    li.setAttribute('role', 'option');
-    li.textContent = `${m}월`;
-    monthUl.appendChild(li);
+    monthOptions.push({ value: String(m), label: `${m}월` });
   }
 
-  // 일 목록 생성 함수
-  function buildDayOptions(year, month) {
-    const dayUl = document.querySelector('#birth-day-wrap [data-select-menu]');
-    dayUl.innerHTML = '';
+  function getDayOptions(year, month) {
     const days = new Date(year || 2000, month || 1, 0).getDate();
+    const options = [];
     for (let d = 1; d <= days; d++) {
-      const li = document.createElement('li');
-      li.className = 'select__option';
-      li.setAttribute('data-select-option', '');
-      li.setAttribute('data-value', String(d));
-      li.setAttribute('role', 'option');
-      li.textContent = `${d}일`;
-      dayUl.appendChild(li);
+      options.push({ value: String(d), label: `${d}일` });
     }
+    return options;
   }
-  buildDayOptions(null, null);
 
-  const yearSelect  = new JeonubSelect('#birth-year-wrap',  { placeholder: '연도' });
-  const monthSelect = new JeonubSelect('#birth-month-wrap', { placeholder: '월' });
-  const daySelect   = new JeonubSelect('#birth-day-wrap',   { placeholder: '일' });
+  let yearInstance  = null;
+  let monthInstance = null;
 
-  // 연도/월 변경 시 일 목록 갱신
-  yearSelect.onChange = () => {
-    const y = document.querySelector('#birth-year-wrap [data-select-trigger]')
-                ?.getAttribute('data-value');
-    const m = document.querySelector('#birth-month-wrap [data-select-trigger]')
-                ?.getAttribute('data-value');
-    buildDayOptions(y, m);
-    new JeonubSelect('#birth-day-wrap', { placeholder: '일' });
-  };
-  monthSelect.onChange = () => {
-    const y = document.querySelector('#birth-year-wrap [data-select-trigger]')
-                ?.getAttribute('data-value');
-    const m = document.querySelector('#birth-month-wrap [data-select-trigger]')
-                ?.getAttribute('data-value');
-    buildDayOptions(y, m);
-    new JeonubSelect('#birth-day-wrap', { placeholder: '일' });
-  };
+  async function refreshDaySelect() {
+    const y = yearInstance?.getValue();
+    const m = monthInstance?.getValue();
+    await loadNativeSelect({
+      target: '#birth-day-wrap',
+      placeholder: '일',
+      options: getDayOptions(y ? Number(y) : null, m ? Number(m) : null)
+    });
+  }
+
+  yearInstance = await loadNativeSelect({
+    target: '#birth-year-wrap',
+    placeholder: '연도',
+    options: yearOptions,
+    onChange: () => refreshDaySelect()
+  });
+
+  monthInstance = await loadNativeSelect({
+    target: '#birth-month-wrap',
+    placeholder: '월',
+    options: monthOptions,
+    onChange: () => refreshDaySelect()
+  });
+
+  await loadNativeSelect({
+    target: '#birth-day-wrap',
+    placeholder: '일',
+    options: getDayOptions(null, null)
+  });
 
 
-  // ===== 3. 닉네임 중복 확인 =====
+  // ===== 4. 닉네임 중복 확인 =====
   const nicknameInput = document.getElementById('nickname');
   const nicknameMsg   = document.getElementById('nickname-msg');
   const checkBtn      = document.getElementById('check-duplicate-btn');
@@ -122,7 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 
-  // ===== 4. 다음 버튼 유효성 검사 =====
+  // ===== 5. 다음 버튼 유효성 검사 =====
   window.validateLogin3 = function() {
     if (!isNicknameChecked) {
       nicknameMsg.innerHTML = `${CAUTION_ICON}닉네임 중복 확인을 해주세요.`;
@@ -133,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
 
-  // ===== 5. confirm 모달 초기화 =====
+  // ===== 6. confirm 모달 초기화 =====
   if (!document.getElementById('modal-root')) {
     const root = document.createElement('div');
     root.id = 'modal-root';
@@ -143,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await window.includeHTML('#modal-root', '/_common/confirm/confirm.html');
 
 
-  // ===== 6. 이전으로 돌아가기 (login2와 동일한 구조) =====
+  // ===== 7. 이전으로 돌아가기 =====
   document.getElementById('backBtn')?.addEventListener('click', async () => {
     const result = await window.showConfirm({
       title      : '페이지를 나가시겠습니까?',

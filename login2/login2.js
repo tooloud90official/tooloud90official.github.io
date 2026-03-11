@@ -1,5 +1,5 @@
 // login2.js
-import { JeonubSelect } from '/_common/select/select.js';
+import { loadNativeSelect } from '/_common/select/select.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -17,9 +17,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 
-  // ===== 2. 이메일 도메인 셀렉트 (JeonubSelect) =====
-  const emailDomainSelect = new JeonubSelect('#emailDomainSelect', {
+  // ===== 2. 이메일 도메인 셀렉트 (loadNativeSelect) =====
+  await loadNativeSelect({
+    target: '#emailDomainSelect',
     placeholder: '이메일 주소 선택',
+    options: [
+      { value: 'gmail.com',   label: 'gmail.com' },
+      { value: 'naver.com',   label: 'naver.com' },
+      { value: 'icloud.com',  label: 'icloud.com' },
+      { value: 'direct',      label: '직접 입력' },
+    ],
     onChange: (item) => {
       const customInput = document.getElementById('emailCustom');
       if (item.value === 'direct') {
@@ -49,11 +56,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setMessage(msg, text, color, showIcon = true) {
-  msg.innerHTML = text
-    ? `${showIcon ? `<img src="/media/caution.png" alt="caution" style="width:14px;height:14px;margin-right:1px;margin-top:-2px;vertical-align:middle;">` : ''}${text}`
-    : '';
-  msg.style.color = color || '';
-}
+    msg.innerHTML = text
+      ? `${showIcon ? `<img src="/media/caution.png" alt="caution" style="width:14px;height:14px;margin-right:1px;margin-top:-2px;vertical-align:middle;">` : ''}${text}`
+      : '';
+    msg.style.color = color || '';
+  }
 
   const PW_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 

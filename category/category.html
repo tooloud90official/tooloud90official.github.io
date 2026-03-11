@@ -44,24 +44,7 @@
 
         <!-- ✅ 필터 select -->
         <div class="modal-list-header">
-          <div class="select modal-sort-select" id="modalSortSelect">
-            <button class="select__trigger" data-select-trigger aria-expanded="false">
-              <span class="select__value" data-select-value>이름 순</span>
-              <span class="select__icon">
-                <svg class="select__chevron" viewBox="0 0 20 20" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor"
-                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </button>
-            <div class="select__menu-wrap">
-              <ul class="select__menu" data-select-menu aria-hidden="true" role="listbox">
-                <li class="select__option" data-select-option data-value="name">이름 순</li>
-                <li class="select__option" data-select-option data-value="rating">평점 순</li>
-              </ul>
-            </div>
-          </div>
+          <div id="modalSortSelect"></div>
         </div>
 
         <!-- ✅ 툴 목록 렌더링 영역 -->

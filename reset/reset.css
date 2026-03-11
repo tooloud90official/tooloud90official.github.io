@@ -5,7 +5,6 @@ body {
   height: 100vh;
 }
 
-/* 페이지 중앙 정렬 */
 .reset-page {
   display: flex;
   flex-direction: column;
@@ -13,14 +12,12 @@ body {
   margin-top: 140px;
 }
 
-/* 제목 */
 .title {
   font-size: 40px;
   font-weight: 700;
   margin-bottom: 100px;
 }
 
-/* 폼 영역 */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -33,14 +30,16 @@ body {
   margin-bottom: 10px;
 }
 
-/* 이메일 입력 row */
 .email-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
+  width: 350px; /* ✅ login2와 동일한 너비 */
 }
 
 .email-input {
+  flex: 1;
+  min-width: 0;
   height: 44px;
   border-radius: 10px;
   border: 1px solid #ccc;
@@ -49,41 +48,36 @@ body {
   background: white;
 }
 
-.email-select {
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  padding: 0 40px 0 14px;   /* 화살표 공간 확보 */
-  font-size: 14px;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background: white url('/media/arrow.png') no-repeat right 14px center;
-  background-size: 12px;
-}
-
-.email-input {
-  width: 240px;
-}
-
-.email-select {
-  width: 180px;
+.email-input::placeholder {
+  color: #aaa;
 }
 
 .at {
   font-size: 18px;
 }
 
-/* 버튼 영역 */
+/* ✅ loadNativeSelect로 주입되는 요소 너비 통일 */
+#emailDomain {
+  flex: 1;
+  min-width: 0;
+}
+
+#emailDomain .select-root {
+  width: 100%;
+}
+
+#emailDomain .select-native {
+  width: 100%;
+  height: 44px;
+  font-size: 14px;
+}
+
 #sendCodeBtnContainer .btn {
-  width: 260px;
+  width: 350px;
   height: 48px;
   margin-top: 30px;
 }
 
-/* 뒤로가기 */
 .back-link {
   margin-top: 20px;
   font-size: 14px;

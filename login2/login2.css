@@ -13,7 +13,7 @@
 /* ============================= */
 body {
   min-height: 100vh;
-  padding-top: 75px;    /* 헤더 높이 보정 — login1과 동일 */
+  padding-top: 75px;
   overflow-x: hidden;
   width: 100%;
   min-width: 360px;
@@ -50,7 +50,6 @@ body {
 /* ============================= */
 /* 회원가입 영역 */
 /* ============================= */
-/* 수정 */
 .signup-container {
   width: 520px;
   margin: 50px auto 80px;
@@ -137,33 +136,19 @@ input:focus {
   min-width: 0;
 }
 
-#emailDomainSelect .select__trigger {
+/* ✅ loadNativeSelect로 주입되는 요소 너비 통일 */
+#emailDomainSelect .select-root {
+  width: 100%;
+}
+
+#emailDomainSelect .select-native {
   width: 100%;
   height: 44px;
   border-radius: 10px;
   border: 1px solid #ddd;
-  padding: 0 14px;
+  padding: 0 40px 0 14px;
   font-size: 14px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-#emailDomainSelect .select__trigger:focus {
-  border-color: #1677e6;
-  outline: none;
-}
-
-#emailDomainSelect .select__value {
-  font-size: 14px;
-  font-weight: 400;
-}
-
-#emailDomainSelect .select__option {
-  font-size: 14px;
-  font-weight: 400;
+  background-color: #ffffff;
 }
 
 /* ============================= */
@@ -203,7 +188,7 @@ input:focus {
 #signup-status {
   margin-top: 40px;
 }
-input::placeholder {
-  color: #aaa;  /* 동일한 색으로 통일 */
-}
 
+input::placeholder {
+  color: #aaa;
+}

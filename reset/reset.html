@@ -7,12 +7,12 @@
   <link rel="stylesheet" href="/_common/background.css">
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="/_common/button/button.css">
+  <link rel="stylesheet" href="/_common/select/select.css">
   <link rel="stylesheet" href="/reset/reset.css">
 </head>
 
 <body>
 
-  <!-- top banner -->
   <div id="top-banner"></div>
 
   <main class="reset-page">
@@ -29,31 +29,23 @@
           class="email-input"
           placeholder="이메일 입력창"
         />
-
         <span class="at">@</span>
-
-        <select id="emailDomain" class="email-select">
-          <option value="">이메일 주소 창</option>
-          <option value="gmail.com">gmail.com</option>
-          <option value="naver.com">naver.com</option>
-          <option value="icloud.com">icloud.com</option>        </select>
+        <!-- ✅ 빈 div로 교체 -->
+        <div id="emailDomain"></div>
       </div>
     </div>
 
-    <!-- 코드 전송 버튼 -->
     <div id="sendCodeBtnContainer"></div>
 
-    <!-- 뒤로가기 -->
     <div class="back-link" id="goBack">
       ← 이전으로 돌아가기
     </div>
 
   </main>
 
-  <!-- scripts -->
   <script src="/_common/top-banner/include.js"></script>
   <script src="/_common/button/include.js"></script>
-  <script src="/reset/reset.js"></script>
+  <script type="module" src="/reset/reset.js"></script>
 
 </body>
 </html>

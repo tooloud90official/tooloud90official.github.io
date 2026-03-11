@@ -102,7 +102,7 @@ body {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.3); /* ✅ 연하게 */
+  background: rgba(0, 0, 0, 0.3);
   display: none;
   justify-content: center;
   align-items: center;
@@ -111,7 +111,7 @@ body {
 }
 
 .modal-content {
-  background: #efefef; /* ✅ 연하게 */
+  background: #efefef;
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
@@ -120,6 +120,8 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -145,65 +147,38 @@ body {
 /* ===== 리스트 상단 필터 ===== */
 .modal-list-header {
   display: flex;
-  justify-content: flex-end; /* ✅ 우측 정렬 */
+  justify-content: flex-end;
   margin-bottom: 12px;
 }
 
-.sort-select {
-  border: 1px solid #e0e0e0;
+/* ✅ 모달 안 select 크기 조정 */
+#modalSortSelect {
+  width: 90px;
+}
+
+#modalSortSelect select {
+  width: 90px;
+  height: 32px;
+  padding: 0 26px 0 10px;
   border-radius: 20px;
-  padding: 5px 14px;
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+  background-image: url('/media/arrow.png');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
   font-size: 12px;
   color: #555;
-  background: #fff;
   cursor: pointer;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
 }
-/* ✅ 모달 안 select 크기 조정 */
-.modal-sort-select {
-  width: 100px;        /* 모달 사이즈에 맞게 축소 */
-}
-
-.modal-sort-select .select__trigger {
-  height: 32px;        /* 모달 안이므로 살짝 작게 */
-  padding: 0 10px;
-  border-radius: 20px; /* 둥글게 */
-}
-
-.modal-sort-select .select__value {
-  font-size: 12px;
-  color: #555 !important;
-}
-
-.modal-sort-select.select:not(.is-placeholder) .select__value {
-  color: #555 !important;
-}
-
-.modal-sort-select .select__icon {
-  width: 16px;
-  height: 16px;
-  color: #555;
-}
-
-.modal-sort-select .select__chevron {
-  width: 14px;
-  height: 14px;
-}
-
-.modal-sort-select .select__menu {
-  font-size: 12px;
-}
-
-.modal-sort-select .select__option {
-  font-size: 12px;
-  padding: 7px 12px;
-}
 
 /* ===== 모달 바디 스크롤바 ===== */
 .modal-body {
   overflow-y: auto;
+  overflow-x: hidden;
   margin-right: -8px;
   padding-right: 8px;
 }
@@ -234,6 +209,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
+  box-sizing: border-box;
 }
 
 .item-badge {
