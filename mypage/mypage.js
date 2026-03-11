@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      [0] 빈 상태 플래그
      false = 기본(데이터 있음) / true = 신규 사용자 빈 상태
      ===================================================== */
-  const EMPTY_MODE = true;
+  const EMPTY_MODE = false;
 
 
   /* =====================================================

@@ -49,14 +49,10 @@ body {
 }
 
 .category-hero__desc {
-  font-size: 13px;
-  color: #555;
-  margin-top: 8px;
-  letter-spacing: 0.01em;
-}
-
-.category-hero__desc--accent {
-  color: #1b44ff;
+  margin: 30px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(0,0,0,0.45);
 }
 
 /* --- Price Filter Slider --- */
