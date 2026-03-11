@@ -136,7 +136,7 @@
 .artwork-hero__titleWrap{
   position: absolute;
   left: 50%;
-  top: -50px;
+  top: -40px;
   transform: translateX(-50%);
   width: min(760px, 92vw);
   height: 120px;
