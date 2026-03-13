@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       text: "관심 목록에 추가",
       variant: "outline",
       onClick: () => alert("관심 목록에 추가!"),
+    }).then(() => {
+      const btn = document.querySelector("#wishlistBtn .btn");
+      btn.innerHTML = `<img src="/media/pin.png" style="width:1em;height:1em;object-fit:contain;vertical-align:middle;margin-right:6px;"> 관심 목록에 추가`;
     }),
     window.loadButton({
       target: "#planBtn1",

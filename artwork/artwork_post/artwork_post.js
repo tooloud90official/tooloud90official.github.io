@@ -8,12 +8,11 @@ const esc = (t) =>
     .replaceAll("'", "&#039;");
 const now = () => "방금 전";
 
-// ✅ 작업물 데이터 (DB 연동 시 여기서 fetch로 교체)
 const artworkData = {
   id: "artwork_001",
   description: "신년을 맞아 비즈니스 계획을 세워보았습니다.",
   toolId: "firefly",
-  isMine: true, // 내 작업물 여부
+  isMine: true,
 };
 
 const state = {
@@ -58,6 +57,17 @@ const list = $("#commentList");
 const cCount = $("#commentCount");
 const cCountTitle = $("#commentCountTitle");
 
+// ✅ 좋아요 버튼
+likeBtn.addEventListener("click", () => {
+  state.liked = !state.liked;
+
+  const heartImg = likeBtn.querySelector("img");
+  heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
+
+  const count = parseInt(likeCount.textContent) || 0;
+  likeCount.textContent = state.liked ? count + 1 : count - 1;
+});
+
 function mountBtn() {
   if (typeof loadButton === "function") {
     loadButton({ target: "#commentSubmitMount", text: "등록", variant: "primary" });
@@ -80,13 +90,11 @@ function render() {
       loadButton({ target: replyMountId, text: "등록", variant: "primary" });
     }
 
-    // ✅ 댓글 수정 모드 저장 버튼
     const editSaveMountId = `#edit-save-c-${c.id}`;
     if ($(editSaveMountId) && typeof loadButton === "function") {
       loadButton({ target: editSaveMountId, text: "저장", variant: "primary" });
     }
 
-    // ✅ 대댓글 수정 모드 저장 버튼
     c.replies.forEach((r) => {
       const rEditSaveMountId = `#edit-save-r-${r.id}`;
       if ($(rEditSaveMountId) && typeof loadButton === "function") {
@@ -99,7 +107,6 @@ function render() {
 function commentHTML(c) {
   const rN = c.replies.length;
 
-  // ✅ 수정 모드
   const textArea = c.editMode
     ? `<div class="edit-box">
         <textarea class="edit-textarea" id="edit-input-c-${c.id}" rows="3">${esc(c.text)}</textarea>
@@ -169,7 +176,6 @@ function commentHTML(c) {
 }
 
 function replyHTML(r, cid) {
-  // ✅ 수정 모드
   const textArea = r.editMode
     ? `<div class="edit-box">
         <textarea class="edit-textarea" id="edit-input-r-${r.id}" rows="2">${esc(r.text)}</textarea>
@@ -245,34 +251,28 @@ function addReply(cid) {
   render();
 }
 
-// ✅ 작업물 수정 → 업로드 페이지로 이동 (DB 연동 시 id로 데이터 fetch)
 function editArtwork() {
   window.location.href = `/artwork/artwork_upload/artwork_upload.html?mode=edit&id=${artworkData.id}`;
 }
 
-// ✅ 작업물 삭제
 function deleteArtwork() {
   if (!confirm("작업물을 삭제할까요?")) return;
-  // TODO: DB 연동 시 DELETE API 호출
   alert("작업물이 삭제되었습니다.");
   history.back();
 }
 
 document.addEventListener("click", (e) => {
-  // 댓글 등록
   if (e.target.closest("#commentSubmitMount button")) {
     addComment();
     return;
   }
 
-  // 대댓글 등록
   const rBtnArea = e.target.closest("[id^='reply-submit-']");
   if (rBtnArea && e.target.tagName === "BUTTON") {
     addReply(rBtnArea.id.replace("reply-submit-", ""));
     return;
   }
 
-  // ✅ 댓글 수정 저장
   const cEditSaveArea = e.target.closest("[id^='edit-save-c-']");
   if (cEditSaveArea && e.target.tagName === "BUTTON") {
     const cid = cEditSaveArea.id.replace("edit-save-c-", "");
@@ -284,7 +284,6 @@ document.addEventListener("click", (e) => {
     return;
   }
 
-  // ✅ 대댓글 수정 저장
   const rEditSaveArea = e.target.closest("[id^='edit-save-r-']");
   if (rEditSaveArea && e.target.tagName === "BUTTON") {
     const rid = rEditSaveArea.id.replace("edit-save-r-", "");
@@ -302,25 +301,21 @@ document.addEventListener("click", (e) => {
   if (!t) return;
   const { act, cid, rid } = t.dataset;
 
-  // 대댓글 토글
   if (act === "toggle") {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.isOpen = !c.isOpen; render(); }
   }
 
-  // ✅ 댓글 수정 모드 진입
   if (act === "edit-c") {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.editMode = true; render(); $(`#edit-input-c-${cid}`)?.focus(); }
   }
 
-  // ✅ 댓글 수정 취소
   if (act === "edit-cancel-c") {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.editMode = false; render(); }
   }
 
-  // ✅ 댓글 삭제
   if (act === "del-c") {
     const i = state.comments.findIndex((x) => x.id === cid);
     if (i >= 0 && confirm("댓글을 삭제할까요?")) {
@@ -329,7 +324,6 @@ document.addEventListener("click", (e) => {
     }
   }
 
-  // ✅ 대댓글 수정 모드 진입
   if (act === "edit-r") {
     for (const c of state.comments) {
       const r = c.replies.find((x) => x.id === rid);
@@ -337,7 +331,6 @@ document.addEventListener("click", (e) => {
     }
   }
 
-  // ✅ 대댓글 수정 취소
   if (act === "edit-cancel-r") {
     for (const c of state.comments) {
       const r = c.replies.find((x) => x.id === rid);
@@ -345,7 +338,6 @@ document.addEventListener("click", (e) => {
     }
   }
 
-  // ✅ 대댓글 삭제
   if (act === "del-r") {
     for (const c of state.comments) {
       const i = c.replies.findIndex((x) => x.id === rid);
@@ -357,16 +349,9 @@ document.addEventListener("click", (e) => {
     }
   }
 
-  // ✅ 작업물 수정
   if (act === "edit-artwork") editArtwork();
-
-  // ✅ 작업물 삭제
   if (act === "del-artwork") deleteArtwork();
 });
-
-// ✅ 작업물 수정/삭제 버튼 — HTML에 아래처럼 추가하면 됨
-// <button data-act="edit-artwork">수정</button>
-// <button data-act="del-artwork">삭제</button>
 
 mountBtn();
 render();
