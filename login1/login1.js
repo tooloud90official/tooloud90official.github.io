@@ -1,4 +1,5 @@
 // login1.js
+import { supabase } from '/_ignore/supabase.js';
 
 const emailInput    = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -18,7 +19,15 @@ loadButton({
   target: '#googleBtnContainer',
   text: 'Google 계정으로 계속하기',
   variant: 'outline',
-  onClick: () => {}
+  onClick: async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/login3/login3.html'
+      }
+    });
+    if (error) console.error(error);
+  }
 }).then(() => {
   const btn = document.querySelector('#googleBtnContainer .btn');
   btn.insertAdjacentHTML(
@@ -32,14 +41,22 @@ loadButton({
 
 loadButton({
   target: '#appleBtnContainer',
-  text: 'Apple 계정으로 계속하기',
+  text: 'GitHub 계정으로 계속하기',
   variant: 'outline',
-  onClick: () => {}
+  onClick: async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: window.location.origin + '/login3/login3.html'
+      }
+    });
+    if (error) console.error(error);
+  }
 }).then(() => {
   const btn = document.querySelector('#appleBtnContainer .btn');
   btn.insertAdjacentHTML(
     'afterbegin',
-    '<img src="/media/appleLogo.svg" alt="Apple" style="width:20px;height:20px;margin-right:10px;margin-top:-3px;">'
+    '<img src="/media/githubLogo.svg" alt="GitHub" style="width:20px;height:20px;margin-right:10px;margin-top:-3px;">'
   );
   btn.style.display = 'flex';
   btn.style.alignItems = 'center';
@@ -58,7 +75,6 @@ resetPwBtn?.addEventListener('click', () => {
   window.location.href = '/reset/reset.html';
 });
 
-
 // ===== 에러 메시지 함수 =====
 function showEmailError(text) {
   const el = document.getElementById('emailError');
@@ -72,7 +88,6 @@ function showPasswordError(text) {
   el.classList.toggle('visible', text !== '');
 }
 
-
 // ===== 이메일 형식 검사 =====
 emailInput.addEventListener('input', () => {
   const val = emailInput.value.trim();
@@ -83,7 +98,6 @@ emailInput.addEventListener('input', () => {
     showEmailError('');
   }
 });
-
 
 // ===== 비밀번호 형식 검사 =====
 passwordInput.addEventListener('input', () => {
@@ -96,9 +110,8 @@ passwordInput.addEventListener('input', () => {
   }
 });
 
-
 // ===== 로그인 처리 =====
-function handleLogin() {
+async function handleLogin() {
   const email    = emailInput.value.trim();
   const password = passwordInput.value;
 
@@ -119,9 +132,16 @@ function handleLogin() {
     passwordInput.focus(); return;
   }
 
+  // ✅ Supabase 로그인
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showEmailError('이메일 또는 비밀번호가 올바르지 않습니다.');
+    return;
+  }
+
   // ✅ 로그인 성공
   showEmailError('');
   showPasswordError('');
-  localStorage.setItem('isLoggedIn', 'true');
   window.location.href = '/main1/main1.html';
 }
