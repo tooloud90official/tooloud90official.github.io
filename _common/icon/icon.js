@@ -34,16 +34,27 @@ function fitAllToolIconTitles(root = document) {
 }
 
 /**
+ * 특정 카드에 아이콘 이미지 반영
+ */
+function applyToolIconImage(cardEl, iconUrl) {
+  if (!cardEl) return;
+
+  const iconEl = cardEl.querySelector(".tool-icon-card__icon");
+  if (!iconEl) return;
+
+  if (iconUrl && typeof iconUrl === "string" && iconUrl.trim()) {
+    iconEl.style.backgroundImage = `url("${iconUrl}")`;
+  }
+}
+
+/**
  * 아이콘 카드 클릭 동작 연결
- * - data-url 이 있으면 이동
- * - 없으면 알림
  */
 function bindToolIconCard(cardEl, options = {}) {
   if (!cardEl) return;
 
   const titleEl = cardEl.querySelector(".tool-icon-card__title");
 
-  // 텍스트 교체 옵션
   if (options.toolName && titleEl) {
     titleEl.textContent = options.toolName;
     cardEl.dataset.toolName = options.toolName;
@@ -51,6 +62,11 @@ function bindToolIconCard(cardEl, options = {}) {
 
   if (options.url) {
     cardEl.dataset.url = options.url;
+  }
+
+  if (options.iconUrl) {
+    cardEl.dataset.iconUrl = options.iconUrl;
+    applyToolIconImage(cardEl, options.iconUrl);
   }
 
   const title =
@@ -62,10 +78,8 @@ function bindToolIconCard(cardEl, options = {}) {
   const url = options.url || cardEl.dataset.url || "#";
   const onClick = options.onClick;
 
-  // 제목 1줄 자동 축소 적용
   fitToolIconTitle(titleEl);
 
-  // 중복 바인딩 방지
   if (cardEl.dataset.bound === "true") return;
   cardEl.dataset.bound = "true";
 
@@ -94,8 +108,8 @@ function initToolIconCards(root = document) {
 
 /**
  * 외부 HTML partial(icon.html) 불러와서 특정 영역에 삽입
- * @param {string} mountSelector - 삽입할 요소 선택자
- * @param {object} options - toolName, url, onClick
+ * @param {string} mountSelector
+ * @param {object} options - toolName, url, iconUrl, onClick
  */
 async function loadToolIconCard(mountSelector, options = {}) {
   const mount = document.querySelector(mountSelector);
