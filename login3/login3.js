@@ -5,32 +5,19 @@ import { supabase } from '/_ignore/supabase.js';
 document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== 0. 신규/기존 유저 판단 =====
-  // 소셜 로그인으로 넘어온 경우 users 테이블에 이미 있으면 main1으로
   const { data: { session } } = await supabase.auth.getSession();
 
   if (session?.user) {
     const authEmail = session.user.email;
 
-    // users 테이블에서 이메일로 조회 (auth uid 저장 컬럼 없으므로 이메일 기준)
-    // → user_name이 아니라 별도 컬럼이 없기 때문에 auth.users id 기준으로
-    //   signup_uid를 sessionStorage에 저장해둔 경우를 제외하고
-    //   소셜 로그인 신규 유저는 sessionStorage에 아무것도 없음
-    // → users 테이블에 같은 이메일로 가입된 유저가 있는지 확인하기 위해
-    //   user_id 컬럼에 auth uid를 저장하는 구조가 필요하나,
-    //   현재는 user001 형식이므로 전체 조회 후 auth uid 매칭 불가
-    // → 대신 Supabase auth.users의 created_at과 last_sign_in_at 비교:
-    //   처음 로그인이면 created_at ≈ last_sign_in_at (차이 5초 이내)
-    const createdAt     = new Date(session.user.created_at).getTime();
-    const lastSignIn    = new Date(session.user.last_sign_in_at).getTime();
-    const isNewUser     = Math.abs(lastSignIn - createdAt) < 5000;
+    // sessionStorage에 signup_email이 있으면 → 방금 가입한 신규 유저
+    const isNewUser = !!sessionStorage.getItem('signup_email');
 
     if (!isNewUser) {
-      // 기존 유저 → 바로 메인으로
       window.location.href = '/main1/main1.html';
       return;
     }
 
-    // 신규 소셜 유저 → sessionStorage에 이메일 저장 (login4에서 insert 시 참고용)
     sessionStorage.setItem('signup_email', authEmail);
   }
 

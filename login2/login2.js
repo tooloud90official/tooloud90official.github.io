@@ -106,7 +106,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     btn.disabled = true;
     setFieldMsg(emailMsg, '인증 메일을 전송 중입니다...', '#888');
 
-    const { error } = await supabase.auth.signUp({ email, password: pw });
+    // ⭐ emailRedirectTo 추가
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pw,
+      options: {
+        emailRedirectTo: `http://127.0.0.1:5500/login3/login3.html`
+      }
+    });
 
     if (error) {
       btn.disabled = false;
