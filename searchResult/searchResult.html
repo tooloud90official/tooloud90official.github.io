@@ -20,11 +20,11 @@
   <div id="top-banner"></div>
 
   <section class="result-header">
-    <h1>"이미지를 생성하고 싶어."</h1>
-    <p>총 5건의 일치하는 AI 툴을 발견했습니다.</p>
+    <h1 id="result-keyword"></h1>
+    <p><span id="result-count">0</span>건의 일치하는 AI 툴을 발견했습니다.</p>
   </section>
 
-  <div id="searchBar"></div>
+  <div id="searchbar-container"></div>
 
   <div class="filter-wrap">
     <div class="filter-row">
@@ -32,93 +32,7 @@
     </div>
   </div>
 
-  <section class="result-list">
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="image" data-rating="5">
-      <div class="tool-icon" id="toolIcon-chatgpt"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">ChatGPT</span>
-          <span class="rating">★★★★★</span>
-        </div>
-        <p class="tool-desc">대화형 AI 및 콘텐츠 생성</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="image" data-rating="5">
-      <div class="tool-icon" id="toolIcon-midjourney"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">Midjourney</span>
-          <span class="rating">★★★★★</span>
-        </div>
-        <p class="tool-desc">AI 이미지 생성 특화</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="writing" data-rating="4">
-      <div class="tool-icon" id="toolIcon-notionai"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">Notion AI</span>
-          <span class="rating">★★★★☆</span>
-        </div>
-        <p class="tool-desc">문서 자동 작성 지원</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="video" data-rating="4">
-      <div class="tool-icon" id="toolIcon-runway"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">Runway</span>
-          <span class="rating">★★★★☆</span>
-        </div>
-        <p class="tool-desc">AI 영상 편집 도구</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="code" data-rating="5">
-      <div class="tool-icon" id="toolIcon-copilot"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">GitHub Copilot</span>
-          <span class="rating">★★★★★</span>
-        </div>
-        <p class="tool-desc">AI 코드 자동완성</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-    <div class="tool-card" data-url="/detail_AI/detail_AI.html" data-category="design" data-rating="4">
-      <div class="tool-icon" id="toolIcon-canva"></div>
-      <div class="tool-info">
-        <div class="tool-top">
-          <span class="tool-name">Canva AI</span>
-          <span class="rating">★★★★☆</span>
-        </div>
-        <p class="tool-desc">AI 디자인 자동화</p>
-      </div>
-      <div class="tool-action">
-        <span class="detail">상세 ></span>
-      </div>
-    </div>
-
-  </section>
+  <section class="result-list"></section>
 
   <div id="bottom-banner"></div>
 
@@ -126,7 +40,7 @@
   <script src="/_common/searchBar/searchBar.js"></script>
   <script src="/_common/button/button.js"></script>
   <script src="/_common/icon/icon.js"></script>
-  <script src="/searchResult/searchResult.js"></script>
+  <script type="module" src="/searchResult/searchResult.js"></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
 </html>

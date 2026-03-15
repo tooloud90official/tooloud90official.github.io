@@ -23,6 +23,7 @@ body {
 .result-header p {
   color: #777;
   font-size: 14px;
+  margin-bottom: 20px;
 }
 
 /* ===== 검색바 ===== */
@@ -83,13 +84,21 @@ body {
 
 /* ===== 아이콘 영역 ===== */
 .tool-icon {
-  width: 100px;
-  height: 100px;
+  width: 64px;
+  height: 64px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-right: 20px;
   flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+.tool-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .tool-icon .tool-icon-card__title {
