@@ -12,49 +12,49 @@
   <link rel="stylesheet" href="/_common/searchBar/searchBar.css">
   <link rel="stylesheet" href="/artwork/artwork.css" />
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
+
+  <!-- ✅ upload.js와 동일한 방식으로 pdfjsLib 전역 등록 -->
+  <script type="module">
+    import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js';
+    window.pdfjsLib = pdfjsLib;
+  </script>
 </head>
 
 <body class="artwork-page">
-  <button class="artwork-fab" id="artworkFab" type="button" aria-label="메뉴 열기" aria-expanded="false">
-    <img class="artwork-fab__img" src="/media/menu.png" alt="" aria-hidden="true" />
-  </button>
-
-  <aside class="artwork-sidebar" id="artworkSidebar" aria-hidden="true">
-    <div class="artwork-sidebar__head">
-      <div class="artwork-sidebar__title">메뉴</div>
-    </div>
-
-    <nav class="artwork-sidebar__nav">
-      <div class="artwork-sidebar__section">카테고리 별 작업물 보기</div>
-
-      <!-- ✅ data-tab 추가 -->
-      <a class="artwork-sidebar__item" href="#" data-tab="이미지·오디오·영상">이미지·오디오·영상</a>
-      <a class="artwork-sidebar__item" href="#" data-tab="리서치">리서치</a>
-      <a class="artwork-sidebar__item" href="#" data-tab="문서 생성·요약·편집">문서 생성·요약·편집</a>
-      <a class="artwork-sidebar__item" href="#" data-tab="개발·코드">개발·코드</a>
-      <a class="artwork-sidebar__item" href="#" data-tab="학습·교육">학습·교육</a>
-      <a class="artwork-sidebar__item" href="#" data-tab="AI 추천 작업물 보기">AI 추천 작업물 보기</a>
-
-      <div class="artwork-sidebar__section">작업물</div>
-      <a class="artwork-sidebar__item" href="#" data-tab="내 라이브러리">내 라이브러리</a>
-      <a class="artwork-sidebar__item" href="/artwork/artwork_upload/artwork_upload.html">작업물 올리기</a>
-    </nav>
-  </aside>
-
+  
   <div id="top-banner" class="detail_AI-banner-root"></div>
+
   <div class="artwork-shell" id="artworkShell">
 
     <header class="artwork-hero">
-      <div class="artwork-hero__titleWrap" aria-hidden="true"></div>
-      <h1 class="artwork-hero__title">작업물 라이브러리</h1>
-      <p class="artwork-hero__desc">아티스트가 되어 상상력을 펼쳐 주세요.</p>
-      <div id="search-area"></div>
+      <div class="artwork-hero__box">
+    
+        <div class="artwork-hero__left">
+          <div class="artwork-hero__index">작업물 라이브러리</div>
+          <h1 class="artwork-hero__heading">아티스트가 되어<br>상상력을<br>펼쳐 주세요.</h1>
+          <p class="artwork-hero__sub">창의적인 작업물을 공유하고 영감을 나눠보세요.</p>
+          <div id="search-area"></div>
+        </div>
+    
+        <div class="artwork-hero__right">
+          <img class="artwork-hero__img"
+               src="/media/wave5.png"
+               alt="" />
+          <div class="artwork-hero__img-overlay"></div>
+          <div class="artwork-hero__img-fade"></div>
+          <div class="artwork-hero__caption">
+            <div class="artwork-hero__caption-num">24</div>
+            <div class="artwork-hero__caption-label">WORKS</div>
+          </div>
+        </div>
+    
+      </div>
     </header>
 
     <main class="artwork-main">
       <section class="artwork-section">
         <div class="artwork-section__head">
-          <div>
+          <div class="artwork-section__head-left">
             <div class="artwork-section__title">💙 좋아요 많은 작업물</div>
             <div class="artwork-section__desc">지금 인기있는 작업물들을 감상해보세요.</div>
           </div>
@@ -66,7 +66,6 @@
     </main>
   </div>
 
-  <div class="artwork-dim" id="artworkDim" aria-hidden="true"></div>
   <div id="bottom-banner"></div>
 
   <script src="/_common/searchBar/searchBar.js"></script>

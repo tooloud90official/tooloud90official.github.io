@@ -1,16 +1,17 @@
 <template id="artworkCardTpl">
   <article class="artwork-card">
-    <!-- ✅ 이미지 영역 -->
+    <!-- 미디어 영역 -->
     <div class="artwork-card__media">
-      <img class="artwork-card__img" src="/media/work.png" alt="작업물 이미지" />
+      <div class="artwork-card__preview" data-art-preview></div>
 
-      <!-- ✅ 툴 배지 -->
+      <!-- 툴 배지 -->
       <div class="artwork-card__tool">
-        <a class="artwork-card__tool-icLink" href="https://brandfetch.io/" target="_blank" rel="noopener">
+        <a class="artwork-card__tool-icLink" href="/detail_AI/detail_AI.html">
           <img
             class="artwork-card__tool-ic"
             src="https://cdn.brandfetch.io/ideA07K8J2/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1766207012399"
             alt="툴 아이콘"
+            data-art-tool-icon
           />
         </a>
 
@@ -23,25 +24,35 @@
         </div>
       </div>
 
-      <!-- ✅ 좋아요/댓글 -->
+      <!-- 좋아요 / 댓글 -->
       <div class="artwork-card__actions">
-        <button class="artwork-card__action artwork-card__action--icon" type="button" aria-label="좋아요">
+        <button
+          class="artwork-card__action artwork-card__action--icon"
+          type="button"
+          aria-label="좋아요"
+          data-art-like
+        >
           <img class="artwork-card__action-img" src="/media/heart.png" alt="" />
-          <span class="artwork-card__action-count">21</span>
+          <span class="artwork-card__action-count" data-art-like-count>21</span>
         </button>
 
-        <button class="artwork-card__action artwork-card__action--icon" type="button" aria-label="댓글">
+        <button
+          class="artwork-card__action artwork-card__action--icon"
+          type="button"
+          aria-label="댓글"
+          data-art-comment
+        >
           <img class="artwork-card__action-img" src="/media/comment.png" alt="" />
-          <span class="artwork-card__action-count">5</span>
+          <span class="artwork-card__action-count" data-art-comment-count>5</span>
         </button>
       </div>
     </div>
 
-    <!-- ✅ 흰 패널 -->
+    <!-- 하단 패널 -->
     <div class="artwork-card__panel">
       <div class="artwork-card__profile">
         <div class="artwork-card__avatar-ring">
-          <img class="artwork-card__avatar" src="/media/profil.png" alt="프로필" />
+          <img class="artwork-card__avatar" src="/media/profil.png" alt="프로필" data-art-avatar />
         </div>
         <div class="artwork-card__user" data-art-user>user</div>
       </div>
