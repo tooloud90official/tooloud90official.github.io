@@ -13,10 +13,59 @@
   <div id="top-banner" class="inquiry-banner-root"></div>
   <div class="post-page">
 
+    <!-- 상단 배너 -->
+    <div class="artwork-hero-banner">
+
+      <!-- 오른쪽 상단 수정/삭제 -->
+      <div class="artwork-hero-banner__actions">
+        <button class="icon-btn" data-act="edit-artwork"><img src="/media/edit.png" alt="수정" /></button>
+        <button class="icon-btn" data-act="del-artwork"><img src="/media/delete.png" alt="삭제" /></button>
+      </div>
+
+      <div class="artwork-hero-banner__eyebrow">
+        작업물
+        <div class="artwork-hero-banner__dot"></div>
+        <span id="bannerCategory">디지털 아트</span>
+      </div>
+
+      <h1 class="artwork-hero-banner__title" id="bannerTitle">제목을 불러오는 중…</h1>
+      <p class="artwork-hero-banner__desc" id="bannerDesc"></p>
+
+      <div class="artwork-hero-banner__divider"></div>
+
+      <div class="artwork-hero-banner__profile">
+        <div class="artwork-hero-banner__profile-left">
+          <div class="avatar">
+            <div class="avatar__inner">
+              <img src="/media/profil.png" alt="프로필" />
+            </div>
+          </div>
+          <div>
+            <div class="name" id="bannerUsername">Soojin</div>
+            <div class="date" id="bannerDate">· 2026년 01월 01일</div>
+          </div>
+        </div>
+
+        <div class="artwork-hero-banner__stats">
+          <button class="stat" id="btnLike" aria-pressed="false">
+            <img src="/media/Heart.png" alt="좋아요" />
+            <span id="likeCount">210</span>
+          </button>
+          <a class="stat" href="#comments">
+            <img src="/media/comment.png" alt="댓글" />
+            <span id="commentCount">0</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="artwork-hero-banner__tags" id="bannerTags"></div>
+    </div>
+
+    <!-- 히어로 이미지 -->
     <section class="hero">
       <img class="hero__img" src="/media/work.png" alt="작업물 커버" />
       <div class="hero__overlay"></div>
-      
+
       <div class="artwork-post__tool">
         <img
           class="artwork-post__tool-ic"
@@ -35,41 +84,6 @@
     </section>
 
     <main class="card">
-      <section class="post-head">
-        <div class="post-head__left">
-          <div class="avatar">
-            <div class="avatar__inner">
-              <img src="/media/profil.png" alt="프로필" />
-            </div>
-          </div>
-          <div class="post-meta">
-            <div class="name">Soojin</div>
-            <div class="date">· 2026년 01월 01일</div>
-          </div>
-        </div>
-        <div class="post-head__right">
-          <button class="stat" id="btnLike" aria-pressed="false">
-            <img src="/media/Heart.png" alt="좋아요" />
-            <span id="likeCount">210</span>
-          </button>
-          <a class="stat" href="#comments">
-            <img src="/media/comment.png" alt="댓글" />
-            <span id="commentCount">0</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="post-body">
-        <p>작업 과정과 결과물을 공유합니다! 피드백/질문도 편하게 남겨주세요 🙂</p>
-      </section>
-
-      <!-- ✅ data-act로 JS와 연결 -->
-      <section class="post-foot">
-        <button class="icon-btn" data-act="edit-artwork"><img src="/media/edit.png" alt="수정" /></button>
-        <button class="icon-btn" data-act="del-artwork"><img src="/media/delete.png" alt="삭제" /></button>
-      </section>
-
-      <hr class="divider" />
 
       <section class="comments" id="comments">
         <div class="comments__title">All comments (<span id="commentCountTitle">0</span>)</div>
@@ -95,7 +109,7 @@
 
   <div id="bottom-banner"></div>
   <script src="/_common/button/button.js"></script>
-  <script src="/_common/top-banner/include.js"></script>
+  <script type="module" src="/_common/top-banner/include.js"></script>
   <script src="/artwork/artwork_post/artwork_post.js" defer></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>

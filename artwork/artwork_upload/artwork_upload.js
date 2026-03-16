@@ -25,15 +25,15 @@ let currentObjectUrl = null;
 
 const previewState = { pdfDoc: null, pdfPage: 1, pdfTotalPages: 1 };
 
-// ✅ URL 파라미터 읽기
 const urlParams = new URLSearchParams(window.location.search);
 const isEditMode = urlParams.get("mode") === "edit";
 const editArtworkId = urlParams.get("id") ?? null;
 
-// ✅ edit 모드일 때 DB에서 불러올 더미 데이터 (DB 연동 시 fetch로 교체)
 const EDIT_DUMMY = {
   artwork_001: {
-    description: "신년을 맞아 비즈니스 계획을 세워보았습니다. 좋은 레퍼런스가 될 것 같아 여러분께 공유드립니다.",
+    title: "한여름 밤의 꿈",
+    description: "신년을 맞아 비즈니스 계획을 세워보았습니다.",
+    tags: ["#이미지생성", "#AdobeFirefly", "#디지털아트"],
     toolId: "firefly",
     imageSrc: "/media/work.png",
   },
@@ -181,34 +181,19 @@ function renderVideoPreview(file) {
     </div>`;
 }
 
-// ✅ 오디오 프리뷰 - SVG 음표 + 재생 버튼
 function renderAudioPreview(file) {
   cleanupObjectUrl(); currentObjectUrl = URL.createObjectURL(file);
   const audioId = "audioPlayer_" + Date.now();
   document.getElementById("previewBody").innerHTML = `
-    <div class="preview-audio-wrap" style="display:flex; align-items:center; justify-content:center; padding:24px;">
-      <div style="position:relative; width:220px; height:220px; flex-shrink:0; border-radius:24px; overflow:hidden;">
-        <div style="
-          width:220px;
-          height:220px;
-          border-radius:24px;
-          background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          color:#2a7cff;
-          box-sizing:border-box;
-        ">
-          <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"/>
-            <circle cx="6" cy="18" r="3"/>
-            <circle cx="18" cy="16" r="3"/>
+    <div class="preview-audio-wrap" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="position:relative;width:220px;height:220px;flex-shrink:0;border-radius:24px;overflow:hidden;">
+        <div style="width:220px;height:220px;border-radius:24px;background:linear-gradient(135deg,#dce8f8 0%,#c8d9f5 100%);display:flex;align-items:center;justify-content:center;color:#2a7cff;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
           </svg>
         </div>
         <button id="audioPlayBtn" aria-label="재생"
-          style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; border-radius:24px; transition:background 0.15s;"
+          style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;border-radius:24px;transition:background 0.15s;"
           onmouseover="this.style.background='rgba(0,0,0,0.08)'"
           onmouseout="this.style.background='transparent'">
           <svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
@@ -223,7 +208,6 @@ function renderAudioPreview(file) {
 
   const audio   = document.getElementById(audioId);
   const playBtn = document.getElementById("audioPlayBtn");
-
   playBtn.addEventListener("click", () => {
     if (audio.paused) {
       audio.play();
@@ -233,7 +217,6 @@ function renderAudioPreview(file) {
       playBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M8 5v14l11-7z"/></svg>`;
     }
   });
-
   audio.addEventListener("ended", () => {
     playBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M8 5v14l11-7z"/></svg>`;
   });
@@ -356,25 +339,38 @@ async function mountActionButtons() {
     text: isEditMode ? "수정하기" : "등록하기",
     variant: "primary",
     onClick: () => {
-      const desc = document.querySelector("#description")?.value?.trim() ?? "";
-      const tool = getSelectedTool();
+      const title = document.getElementById("titleInput")?.value?.trim() ?? "";
+      const desc  = document.getElementById("description")?.value?.trim() ?? "";
+      const tool  = getSelectedTool();
       if (isEditMode) {
         history.back();
       } else {
-        alert(`등록하기 클릭\n설명: ${desc || "(없음)"}\n툴: ${tool ? tool.name : "(미선택)"}\n파일: ${currentFile ? currentFile.name : "(미선택)"}`);
+        alert(`등록하기 클릭\n제목: ${title || "(없음)"}\n설명: ${desc || "(없음)"}\n툴: ${tool ? tool.name : "(미선택)"}\n태그: ${tags.join(", ") || "(없음)"}\n파일: ${currentFile ? currentFile.name : "(미선택)"}`);
       }
     },
   });
 }
 
-// ✅ edit 모드일 때 기존 데이터 채우기
+/* ── edit 모드 데이터 채우기 ── */
 function fillEditData() {
   if (!isEditMode || !editArtworkId) return;
   const data = EDIT_DUMMY[editArtworkId];
   if (!data) return;
 
-  const descEl = document.querySelector("#description");
-  if (descEl && data.description) descEl.value = data.description;
+  if (data.title) {
+    const titleEl = document.getElementById("titleInput");
+    if (titleEl) titleEl.value = data.title;
+  }
+
+  if (data.description) {
+    const descEl = document.getElementById("description");
+    if (descEl) descEl.value = data.description;
+  }
+
+  if (Array.isArray(data.tags)) {
+    data.tags.forEach(t => { if (!tags.includes(t)) tags.push(t); });
+    renderTags();
+  }
 
   if (data.toolId) {
     selectedToolId = data.toolId;
@@ -394,18 +390,54 @@ function fillEditData() {
   }
 }
 
-// ✅ edit 모드일 때 페이지 타이틀 변경
 function applyEditModeUI() {
   if (!isEditMode) return;
-  const titleEl = document.querySelector(".upload-hero__title, h1, .upload-title");
-  if (titleEl) titleEl.textContent = "작업물 수정";
+  const modeEl = document.getElementById("bannerMode");
+  if (modeEl) modeEl.textContent = "수정";
   document.title = "작업물 수정";
+}
+
+/* ── 태그 입력 ── */
+const tags = [];
+
+function renderTags() {
+  const tagList = document.getElementById("tagList");
+  if (!tagList) return;
+  tagList.innerHTML = tags.map((t, i) => `
+    <span class="artwork-hero-banner__tag">
+      ${t}
+      <button class="artwork-hero-banner__tag-remove" data-i="${i}" aria-label="태그 삭제">×</button>
+    </span>
+  `).join("");
+  tagList.querySelectorAll("[data-i]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      tags.splice(Number(btn.dataset.i), 1);
+      renderTags();
+    });
+  });
+}
+
+function setupTagInput() {
+  const tagInput = document.getElementById("tagInput");
+  if (!tagInput) return;
+  tagInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    let val = tagInput.value.trim();
+    if (!val) return;
+    if (!val.startsWith("#")) val = "#" + val;
+    if (tags.includes(val) || tags.length >= 10) return;
+    tags.push(val);
+    renderTags();
+    tagInput.value = "";
+  });
 }
 
 /* ── INIT ── */
 document.addEventListener("DOMContentLoaded", async () => {
   applyEditModeUI();
   renderToolCard(null);
+  setupTagInput();
 
   const picker = document.getElementById("toolPicker");
   if (picker) {

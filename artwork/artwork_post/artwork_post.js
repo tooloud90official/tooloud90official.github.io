@@ -10,9 +10,15 @@ const now = () => "방금 전";
 
 const artworkData = {
   id: "artwork_001",
-  description: "신년을 맞아 비즈니스 계획을 세워보았습니다.",
-  toolId: "firefly",
   isMine: true,
+
+  // 배너용 데이터 — 실제 서비스에서는 API 응답값으로 교체하세요
+  title: "한여름 밤의 꿈",
+  category: "디지털 아트",
+  desc: "신년을 맞아 비즈니스 계획을 세워보았습니다.",
+  username: "Soojin",
+  date: "2026년 01월 01일",
+  tags: ["#이미지생성", "#AdobeFirefly", "#디지털아트", "#신년"],
 };
 
 const state = {
@@ -57,13 +63,40 @@ const list = $("#commentList");
 const cCount = $("#commentCount");
 const cCountTitle = $("#commentCountTitle");
 
-// ✅ 좋아요 버튼
+// 배너 채우기
+function fillBanner(data) {
+  if (data.title)    $("#bannerTitle").textContent    = data.title;
+  if (data.category) $("#bannerCategory").textContent = data.category;
+  if (data.username) $("#bannerUsername").textContent = data.username;
+  if (data.date)     $("#bannerDate").textContent     = `· ${data.date}`;
+
+  // description
+  const descEl = $("#bannerDesc");
+  if (descEl) descEl.textContent = data.desc || "";
+
+  // 수정/삭제 버튼 — 내 글 아니면 숨김
+  const actions = $(".artwork-hero-banner__actions");
+  if (actions) actions.style.display = data.isMine ? "flex" : "none";
+
+  // 태그
+  if (Array.isArray(data.tags) && data.tags.length) {
+    $("#bannerTags").innerHTML = data.tags
+      .map(tag => `<span class="artwork-hero-banner__tag">${esc(tag)}</span>`)
+      .join("");
+  }
+}
+
+// 배너 댓글 수 동기화
+function syncBannerComments() {
+  if (cCount) cCount.textContent = String(state.comments.length);
+  if (cCountTitle) cCountTitle.textContent = String(state.comments.length);
+}
+
+// 좋아요
 likeBtn.addEventListener("click", () => {
   state.liked = !state.liked;
-
   const heartImg = likeBtn.querySelector("img");
   heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
-
   const count = parseInt(likeCount.textContent) || 0;
   likeCount.textContent = state.liked ? count + 1 : count - 1;
 });
@@ -75,8 +108,6 @@ function mountBtn() {
 }
 
 function render() {
-  cCount.textContent = String(state.comments.length);
-  cCountTitle.textContent = String(state.comments.length);
   list.innerHTML = state.comments.map((c) => commentHTML(c)).join("");
 
   state.comments.forEach((c) => {
@@ -90,6 +121,8 @@ function render() {
       loadButton({ target: replyMountId, text: "등록", variant: "primary" });
     }
   });
+
+  syncBannerComments();
 }
 
 function commentHTML(c) {
@@ -136,7 +169,6 @@ function commentHTML(c) {
             : `<li class="reply-item reply-item--empty">대댓글이 없습니다.</li>`
           }
         </ul>
-
         <div class="comment-write reply-write">
           <div class="avatar sm">
             <div class="avatar__inner">
@@ -187,9 +219,7 @@ function replyHTML(r, cid) {
           <span class="n">${esc(r.name)}</span>
           <span class="d">${esc(r.date)}</span>
         </div>
-
         ${textArea}
-
         ${r.isMine && !r.editMode
           ? `<div class="actions">
               <button class="act" data-act="edit-r" data-cid="${cid}" data-rid="${r.id}">수정</button>
@@ -269,18 +299,14 @@ document.addEventListener("click", (e) => {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.isOpen = !c.isOpen; render(); }
   }
-
   if (act === "edit-c") {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.editMode = true; render(); $(`#edit-input-c-${cid}`)?.focus(); }
   }
-
   if (act === "edit-cancel-c") {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.editMode = false; render(); }
   }
-
-  // ✅ 댓글 저장
   if (act === "edit-save-c") {
     const ta = $(`#edit-input-c-${cid}`);
     const text = (ta?.value || "").trim();
@@ -288,30 +314,22 @@ document.addEventListener("click", (e) => {
     const c = state.comments.find((x) => x.id === cid);
     if (c) { c.text = text; c.editMode = false; c.date = now(); render(); }
   }
-
   if (act === "del-c") {
     const i = state.comments.findIndex((x) => x.id === cid);
-    if (i >= 0 && confirm("댓글을 삭제할까요?")) {
-      state.comments.splice(i, 1);
-      render();
-    }
+    if (i >= 0 && confirm("댓글을 삭제할까요?")) { state.comments.splice(i, 1); render(); }
   }
-
   if (act === "edit-r") {
     for (const c of state.comments) {
       const r = c.replies.find((x) => x.id === rid);
       if (r) { r.editMode = true; render(); $(`#edit-input-r-${rid}`)?.focus(); break; }
     }
   }
-
   if (act === "edit-cancel-r") {
     for (const c of state.comments) {
       const r = c.replies.find((x) => x.id === rid);
       if (r) { r.editMode = false; render(); break; }
     }
   }
-
-  // ✅ 대댓글 저장
   if (act === "edit-save-r") {
     const ta = $(`#edit-input-r-${rid}`);
     const text = (ta?.value || "").trim();
@@ -321,21 +339,17 @@ document.addEventListener("click", (e) => {
       if (r) { r.text = text; r.editMode = false; r.date = now(); render(); break; }
     }
   }
-
   if (act === "del-r") {
     for (const c of state.comments) {
       const i = c.replies.findIndex((x) => x.id === rid);
-      if (i >= 0 && confirm("대댓글을 삭제할까요?")) {
-        c.replies.splice(i, 1);
-        render();
-        break;
-      }
+      if (i >= 0 && confirm("대댓글을 삭제할까요?")) { c.replies.splice(i, 1); render(); break; }
     }
   }
-
   if (act === "edit-artwork") editArtwork();
   if (act === "del-artwork") deleteArtwork();
 });
 
+// 초기화
+fillBanner(artworkData);
 mountBtn();
 render();

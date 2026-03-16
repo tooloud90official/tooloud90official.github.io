@@ -1,19 +1,11 @@
 import { loadNativeSelect } from "/_common/select/select.js";
 import { supabase } from "/_ignore/supabase.js";
 
-/* ============================================================
-   URL 파라미터
-   - 이전 페이지에서 ?tool=tool_001 처럼 전달됨
-   - 여기서는 tool 값을 tool_ID 로 사용해서 tools 조회
-============================================================ */
 const TOOL_ID = decodeURIComponent(
-  new URLSearchParams(location.search).get("tool") || ""
+  new URLSearchParams(location.search).get("tool_ID") || ""
 ).trim();
 
-/* ============================================================
-   Auth — supabase.auth.getUser() 로 현재 로그인 유저 확인
-============================================================ */
-let currentUser = null; // { id, name, avatar } | null
+let currentUser = null;
 
 async function loadCurrentUser() {
   const {
@@ -32,28 +24,51 @@ async function loadCurrentUser() {
   };
 }
 
-/* ============================================================
-   아이콘 카드에 Brandfetch CDN 이미지 적용
-============================================================ */
 function applyToolIcon(mountSelector, iconUrl) {
   if (!iconUrl) return;
   const iconEl = document.querySelector(`${mountSelector} .tool-icon-card__icon`);
   if (iconEl) iconEl.style.backgroundImage = `url("${iconUrl}")`;
 }
 
-/* ============================================================
-   전역 상태
-============================================================ */
 let reviewData = [];
 let selectedScore = 0;
 let editingId = null;
 let currentSort = "none";
 
-/* ============================================================
-   DOMContentLoaded
-============================================================ */
+// ✅ recent_tools 저장
+async function saveRecentTool() {
+  if (!currentUser || !TOOL_ID) return;
+
+  try {
+    const { data } = await supabase
+      .from("users")
+      .select("recent_tools")
+      .eq("user_id", currentUser.id)
+      .single();
+
+    const current = data?.recent_tools ?? [];
+
+    // 중복 제거 후 맨 앞에 추가, 최대 10개 유지
+    const updated = [
+      TOOL_ID,
+      ...current.filter(id => id !== TOOL_ID)
+    ].slice(0, 8);
+
+    await supabase
+      .from("users")
+      .update({ recent_tools: updated })
+      .eq("user_id", currentUser.id);
+
+  } catch (e) {
+    console.error("recent_tools 저장 실패:", e);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   await loadCurrentUser();
+
+  // ✅ 로그인 유저면 최근 본 툴 저장
+  if (currentUser) await saveRecentTool();
 
   updateAvgScore();
   updateCardStars(0);
@@ -71,29 +86,65 @@ document.addEventListener("DOMContentLoaded", async () => {
       text: "관심 목록에 추가",
       variant: "outline",
       onClick: () => {},
-    }).then(() => {
+    }).then(async () => {
       const btn = document.querySelector("#wishlistBtn .btn");
       if (!btn) return;
 
-      btn.innerHTML = `
-        <img src="/media/pin.png"
-          style="width:1em;height:1em;object-fit:contain;vertical-align:middle;margin-right:6px;">
-        관심 목록에 추가
-      `;
-
       let pinned = false;
 
-      btn.addEventListener("click", () => {
+      if (currentUser) {
+        const { data } = await supabase
+          .from("users")
+          .select("favorite_tools")
+          .eq("user_id", currentUser.id)
+          .single();
+
+        pinned = (data?.favorite_tools ?? []).includes(TOOL_ID);
+      }
+
+      const updateBtnUI = (isPinned) => {
+        btn.innerHTML = `
+          <img src="${isPinned ? "/media/pin_fill.png" : "/media/pin.png"}"
+            style="width:1em;height:1em;object-fit:contain;vertical-align:middle;margin-right:6px;">
+          ${isPinned ? "관심 목록에 추가됨" : "관심 목록에 추가"}
+        `;
+      };
+
+      updateBtnUI(pinned);
+
+      btn.addEventListener("click", async () => {
         if (!currentUser) {
           window.location.href = "/login1/login.html";
           return;
         }
 
-        pinned = !pinned;
-        const img = btn.querySelector("img");
-        if (img) {
-          img.src = pinned ? "/media/pin_fill.png" : "/media/pin.png";
+        const { data } = await supabase
+          .from("users")
+          .select("favorite_tools")
+          .eq("user_id", currentUser.id)
+          .single();
+
+        const current = data?.favorite_tools ?? [];
+
+        let updated;
+        if (pinned) {
+          updated = current.filter(id => id !== TOOL_ID);
+        } else {
+          updated = current.includes(TOOL_ID) ? current : [...current, TOOL_ID];
         }
+
+        const { error } = await supabase
+          .from("users")
+          .update({ favorite_tools: updated })
+          .eq("user_id", currentUser.id);
+
+        if (error) {
+          console.error("관심 목록 업데이트 실패:", error);
+          return;
+        }
+
+        pinned = !pinned;
+        updateBtnUI(pinned);
       });
     }),
 
@@ -145,15 +196,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   initReviewSystem();
 });
 
-/* ============================================================
-   툴 정보 로드 (tools 테이블)
-   - URL의 ?tool=값을 tool_ID 로 조회
-============================================================ */
 async function loadToolInfo() {
   try {
-    if (!TOOL_ID) {
-      throw new Error("URL에 tool 파라미터가 없음");
-    }
+    if (!TOOL_ID) throw new Error("URL에 tool_ID 파라미터가 없음");
 
     const { data, error } = await supabase
       .from("tools")
@@ -196,10 +241,7 @@ async function loadToolInfo() {
     setTextEl("toolDesc", "툴 정보를 불러오지 못했습니다.");
 
     const dotsEl = document.querySelector(".similar-tools__dots");
-    if (dotsEl) {
-      dotsEl.innerHTML = "";
-      dotsEl.style.display = "none";
-    }
+    if (dotsEl) { dotsEl.innerHTML = ""; dotsEl.style.display = "none"; }
 
     const rowEl = document.getElementById("similarToolsRow");
     if (rowEl) renderSimEmpty(rowEl);
@@ -208,29 +250,26 @@ async function loadToolInfo() {
   }
 }
 
-/* ============================================================
-   플랜 카드 렌더링
-============================================================ */
 function renderPlanCards(tool) {
   function getEmoji(text) {
     if (/무제한|unlimited/i.test(text)) return "♾️";
-    if (/무료|free/i.test(text)) return "🆓";
-    if (/API/i.test(text)) return "🔌";
+    if (/무료|free/i.test(text))        return "🆓";
+    if (/API/i.test(text))              return "🔌";
     if (/팀|인원|계정|멤버/i.test(text)) return "👥";
     if (/분석|리포트|통계/i.test(text)) return "📊";
     if (/지원|서포트|support/i.test(text)) return "🛟";
     if (/보안|privacy|SSL/i.test(text)) return "🔒";
-    if (/속도|빠른|fast/i.test(text)) return "⚡";
+    if (/속도|빠른|fast/i.test(text))   return "⚡";
     if (/이미지|생성|create/i.test(text)) return "🎨";
     if (/비디오|영상|video/i.test(text)) return "🎬";
     if (/클라우드|저장|storage/i.test(text)) return "☁️";
-    if (/크레딧|credit/i.test(text)) return "💳";
+    if (/크레딧|credit/i.test(text))    return "💳";
     return "✅";
   }
 
   const plans = [
     { nameKey: "tool_plan1_name", priceKey: "tool_plan1_price_krw", desKey: "tool_plan1_des" },
-    { nameKey: "tool_plan2name", priceKey: "tool_plan2_price_krw", desKey: "tool_plan2_des" },
+    { nameKey: "tool_plan2name",  priceKey: "tool_plan2_price_krw", desKey: "tool_plan2_des" },
     { nameKey: "tool_plan3_name", priceKey: "tool_plan3_price_krw", desKey: "tool_plan3_des" },
   ];
 
@@ -238,13 +277,13 @@ function renderPlanCards(tool) {
     const card = document.querySelectorAll(".plan-card")[i];
     if (!card) return;
 
-    const nameEl = card.querySelector(".plan-card__name");
-    const listEl = card.querySelector(".plan-card__list");
-    const topEl = card.querySelector(".plan-card__top");
+    const nameEl  = card.querySelector(".plan-card__name");
+    const listEl  = card.querySelector(".plan-card__list");
+    const topEl   = card.querySelector(".plan-card__top");
     const badgeEl = card.querySelector(".plan-card__badge");
 
     if (badgeEl) badgeEl.textContent = `플랜 #${i + 1}`;
-    if (nameEl) nameEl.textContent = tool[nameKey] ?? "";
+    if (nameEl)  nameEl.textContent  = tool[nameKey] ?? "";
 
     const price = tool[priceKey];
     let priceEl = topEl?.querySelector(".plan-card__price");
@@ -264,31 +303,22 @@ function renderPlanCards(tool) {
 
     if (listEl) {
       const raw = tool[desKey] ?? "";
-      const lines = raw
-        .split(/[,\n]/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-
+      const lines = raw.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
       listEl.innerHTML = lines
-        .map((line) => `<li><span class="plan-item-emoji">${getEmoji(line)}</span>${line}</li>`)
+        .map(line => `<li><span class="plan-item-emoji">${getEmoji(line)}</span>${line}</li>`)
         .join("");
     }
   });
 }
 
-/* ============================================================
-   프로모션 렌더
-============================================================ */
 function renderPromo(toolName, toolProm) {
-  const section = document.getElementById("promoSection");
-  const titleEl = document.querySelector(".promo__title");
+  const section    = document.getElementById("promoSection");
+  const titleEl    = document.querySelector(".promo__title");
   const headlineEl = document.querySelector(".promo-banner__headline");
-  const subEl = document.querySelector(".promo-banner__sub");
-  const dateEl = document.querySelector(".promo-banner__date");
+  const subEl      = document.querySelector(".promo-banner__sub");
+  const dateEl     = document.querySelector(".promo-banner__date");
 
-  if (titleEl) {
-    titleEl.textContent = toolName ? `${toolName} 에서 진행 중인 프로모션` : "";
-  }
+  if (titleEl) titleEl.textContent = toolName ? `${toolName} 에서 진행 중인 프로모션` : "";
 
   if (!toolProm) {
     if (section) section.style.display = "none";
@@ -297,62 +327,41 @@ function renderPromo(toolName, toolProm) {
 
   if (section) section.style.display = "";
 
-  const lines = toolProm
-    .split(/[\/,\n]/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const lines = toolProm.split(/[\/,\n]/).map(s => s.trim()).filter(Boolean);
 
   function getPromoEmoji(text) {
-    if (/할인|%|dc/i.test(text)) return "🎉";
-    if (/무료|free/i.test(text)) return "🆓";
+    if (/할인|%|dc/i.test(text))     return "🎉";
+    if (/무료|free/i.test(text))     return "🆓";
     if (/기간|기한|만료/i.test(text)) return "📅";
     if (/크레딧|credit/i.test(text)) return "💳";
-    if (/상시|언제든/i.test(text)) return "♾️";
-    if (/Pro|프로/i.test(text)) return "⭐";
-    if (/가입|신규/i.test(text)) return "🙋";
+    if (/상시|언제든/i.test(text))   return "♾️";
+    if (/Pro|프로/i.test(text))      return "⭐";
+    if (/가입|신규/i.test(text))     return "🙋";
     if (/확인|자세|상세/i.test(text)) return "🔍";
     return "✨";
   }
 
-  if (headlineEl) {
-    headlineEl.textContent = lines[0] ? `${getPromoEmoji(lines[0])} ${lines[0]}` : "";
-  }
+  if (headlineEl) headlineEl.textContent = lines[0] ? `${getPromoEmoji(lines[0])} ${lines[0]}` : "";
 
   if (subEl) {
     if (lines.length > 1) {
       subEl.style.display = "";
-      subEl.innerHTML = lines
-        .slice(1)
-        .map((l) => `<span>${getPromoEmoji(l)} ${l}</span>`)
-        .join("<br>");
+      subEl.innerHTML = lines.slice(1).map(l => `<span>${getPromoEmoji(l)} ${l}</span>`).join("<br>");
     } else {
       subEl.innerHTML = "";
       subEl.style.display = "none";
     }
   }
 
-  if (dateEl) {
-    dateEl.textContent = "";
-    dateEl.style.display = "none";
-  }
+  if (dateEl) { dateEl.textContent = ""; dateEl.style.display = "none"; }
 }
 
-/* ============================================================
-   유사 툴 (tool_cat 기반)
-============================================================ */
 async function loadSimilarTools(toolCat, currentToolId) {
-  const rowEl = document.getElementById("similarToolsRow");
+  const rowEl  = document.getElementById("similarToolsRow");
   const dotsEl = document.querySelector(".similar-tools__dots");
 
-  if (dotsEl) {
-    dotsEl.innerHTML = "";
-    dotsEl.style.display = "none";
-  }
-
-  if (!rowEl || !toolCat) {
-    if (rowEl) renderSimEmpty(rowEl);
-    return;
-  }
+  if (dotsEl) { dotsEl.innerHTML = ""; dotsEl.style.display = "none"; }
+  if (!rowEl || !toolCat) { if (rowEl) renderSimEmpty(rowEl); return; }
 
   try {
     const { data, error } = await supabase
@@ -363,11 +372,7 @@ async function loadSimilarTools(toolCat, currentToolId) {
       .limit(8);
 
     if (error) throw error;
-
-    if (!data?.length) {
-      renderSimEmpty(rowEl);
-      return;
-    }
+    if (!data?.length) { renderSimEmpty(rowEl); return; }
 
     const PAGE = 4;
     const totalPages = Math.ceil(data.length / PAGE);
@@ -380,7 +385,7 @@ async function loadSimilarTools(toolCat, currentToolId) {
 
       dotsEl.querySelectorAll(".sdot").forEach((dot, i) => {
         dot.addEventListener("click", async () => {
-          dotsEl.querySelectorAll(".sdot").forEach((d) => d.classList.remove("is-active"));
+          dotsEl.querySelectorAll(".sdot").forEach(d => d.classList.remove("is-active"));
           dot.classList.add("is-active");
           await renderSimPage(data, i, PAGE, rowEl);
         });
@@ -402,35 +407,26 @@ async function renderSimPage(rows, pageIndex, pageSize, rowEl) {
   const pageTools = rows.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
 
   rowEl.innerHTML = pageTools
-    .map(
-      (_, i) => `
+    .map((_, i) => `
       <div class="similar-tools__item">
         <div class="similar-tools__mount" id="simTool${i + 1}"></div>
       </div>
-    `
-    )
-    .join("");
+    `).join("");
 
   await Promise.all(
     pageTools.map(async (tool, i) => {
       await window.loadToolIconCard(`#simTool${i + 1}`, {
         toolName: tool.tool_name,
-        url: tool.tool_link ?? "#",
+        url: `/detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`,
       });
       applyToolIcon(`#simTool${i + 1}`, tool.icon);
     })
   );
 }
 
-/* ============================================================
-   작업물 로드 (works 테이블)
-============================================================ */
 async function loadWorks() {
   try {
-    if (!TOOL_ID) {
-      renderEmptyWorks();
-      return;
-    }
+    if (!TOOL_ID) { renderEmptyWorks(); return; }
 
     const { data, error } = await supabase
       .from("works")
@@ -440,7 +436,6 @@ async function loadWorks() {
       .limit(10);
 
     if (error) throw error;
-
     data?.length ? renderWorksCarousel(data) : renderEmptyWorks();
   } catch (e) {
     console.error("작업물 로드 실패:", e);
@@ -448,39 +443,33 @@ async function loadWorks() {
   }
 }
 
-/* ============================================================
-   작업물 없을 때
-============================================================ */
 function renderEmptyWorks() {
-  const profile = document.querySelector(".detail_AI__profile");
+  const profile  = document.querySelector(".detail_AI__profile");
   const showcase = document.querySelector(".detail_AI__showcase");
   const carousel = document.querySelector(".detail_AI__carousel");
 
-  if (profile) profile.style.display = "none";
+  if (profile)  profile.style.display = "none";
   if (showcase) showcase.style.gridTemplateColumns = "1fr";
   if (carousel) carousel.style.gridColumn = "1";
-
   if (!carousel) return;
 
   const wrapper = carousel.querySelector(".detail_AI__carousel-wrapper");
-  const dots = carousel.querySelector(".detail_AI__dots");
+  const dots    = carousel.querySelector(".detail_AI__dots");
 
-  if (wrapper) {
-    wrapper.outerHTML = `<div class="works-empty-text">아직 등록된 작업물이 없습니다.</div>`;
-  }
-  if (dots) dots.style.display = "none";
+  if (wrapper) wrapper.outerHTML = `<div class="works-empty-text">아직 등록된 작업물이 없습니다.</div>`;
+  if (dots)    dots.style.display = "none";
 }
 
 function renderWorksCarousel(works) {
-  const profile = document.querySelector(".detail_AI__profile");
-  const showcase = document.querySelector(".detail_AI__showcase");
-  const frame = document.querySelector(".detail_AI__carousel-frame img");
-  const likeEl = document.querySelector(".detail_AI__like-count");
-  const dotsEl = document.querySelector(".detail_AI__dots");
-  const nameEl = document.querySelector(".detail_AI__profile-name");
+  const profile   = document.querySelector(".detail_AI__profile");
+  const showcase  = document.querySelector(".detail_AI__showcase");
+  const frame     = document.querySelector(".detail_AI__carousel-frame img");
+  const likeEl    = document.querySelector(".detail_AI__like-count");
+  const dotsEl    = document.querySelector(".detail_AI__dots");
+  const nameEl    = document.querySelector(".detail_AI__profile-name");
   const avatarImg = document.querySelector(".detail_AI__avatar img");
 
-  if (profile) profile.style.display = "";
+  if (profile)  profile.style.display = "";
   if (showcase) showcase.style.gridTemplateColumns = "";
 
   if (frame) {
@@ -488,29 +477,21 @@ function renderWorksCarousel(works) {
     frame.style.display = works[0].work_path ? "" : "none";
   }
 
-  if (likeEl) likeEl.textContent = works[0].like_count ?? 0;
+  if (likeEl)    likeEl.textContent = works[0].like_count ?? 0;
   if (nameEl && works[0].user_id) nameEl.textContent = `by. ${works[0].user_id}`;
   if (avatarImg) avatarImg.src = "/media/profil.png";
 
   if (dotsEl) {
     dotsEl.style.display = works.length > 1 ? "" : "none";
-    dotsEl.innerHTML = works
-      .slice(0, 5)
-      .map(
-        (_, i) =>
-          `<button class="dot${i === 0 ? " is-active" : ""}" type="button" aria-label="${i + 1}"></button>`
-      )
+    dotsEl.innerHTML = works.slice(0, 5)
+      .map((_, i) => `<button class="dot${i === 0 ? " is-active" : ""}" type="button" aria-label="${i + 1}"></button>`)
       .join("");
 
     dotsEl.querySelectorAll(".dot").forEach((dot, i) => {
       dot.addEventListener("click", () => {
-        dotsEl.querySelectorAll(".dot").forEach((d) => d.classList.remove("is-active"));
+        dotsEl.querySelectorAll(".dot").forEach(d => d.classList.remove("is-active"));
         dot.classList.add("is-active");
-
-        if (frame) {
-          frame.src = works[i].work_path ?? "";
-          frame.style.display = works[i].work_path ? "" : "none";
-        }
+        if (frame) { frame.src = works[i].work_path ?? ""; frame.style.display = works[i].work_path ? "" : "none"; }
         if (likeEl) likeEl.textContent = works[i].like_count ?? 0;
         if (nameEl && works[i].user_id) nameEl.textContent = `by. ${works[i].user_id}`;
       });
@@ -518,16 +499,9 @@ function renderWorksCarousel(works) {
   }
 }
 
-/* ============================================================
-   리뷰 로드 (reviews 테이블)
-============================================================ */
 async function loadReviews() {
   try {
-    if (!TOOL_ID) {
-      reviewData = [];
-      updateAvgScore();
-      return;
-    }
+    if (!TOOL_ID) { reviewData = []; updateAvgScore(); return; }
 
     const { data, error } = await supabase
       .from("reviews")
@@ -537,20 +511,18 @@ async function loadReviews() {
 
     if (error) throw error;
 
-    reviewData = (data ?? []).map((r) => ({
-      id: r.review_id,
-      name: r.user_id,
+    reviewData = (data ?? []).map(r => ({
+      id:     r.review_id,
+      name:   r.user_id,
       avatar: "/media/profil.png",
-      date: r.created_at?.slice(0, 10).replace(/-/g, ".") ?? "",
-      score: r.rating ?? 0,
-      text: r.review_content ?? "",
+      date:   r.created_at?.slice(0, 10).replace(/-/g, ".") ?? "",
+      score:  r.rating ?? 0,
+      text:   r.review_content ?? "",
       isMine: currentUser ? r.user_id === currentUser.id : false,
     }));
 
     updateAvgScore();
-    updateCardStars(
-      Math.round(reviewData.reduce((s, r) => s + r.score, 0) / (reviewData.length || 1))
-    );
+    updateCardStars(Math.round(reviewData.reduce((s, r) => s + r.score, 0) / (reviewData.length || 1)));
   } catch (e) {
     console.error("리뷰 로드 실패:", e);
     reviewData = [];
@@ -558,9 +530,6 @@ async function loadReviews() {
   }
 }
 
-/* ============================================================
-   리뷰 시스템
-============================================================ */
 function initReviewSystem() {
   initWriteStars();
   renderReviewList();
@@ -568,18 +537,16 @@ function initReviewSystem() {
 }
 
 function getSortedOtherReviews() {
-  const others = reviewData.filter((r) => !r.isMine);
-
+  const others = reviewData.filter(r => !r.isMine);
   if (currentSort === "high") return [...others].sort((a, b) => b.score - a.score);
-  if (currentSort === "low") return [...others].sort((a, b) => a.score - b.score);
-  if (currentSort === "new") return [...others].sort((a, b) => (b.date > a.date ? 1 : -1));
-
+  if (currentSort === "low")  return [...others].sort((a, b) => a.score - b.score);
+  if (currentSort === "new")  return [...others].sort((a, b) => b.date > a.date ? 1 : -1);
   return others;
 }
 
 function renderReviewList() {
   const container = document.getElementById("reviewCards");
-  const countEl = document.getElementById("reviewCount");
+  const countEl   = document.getElementById("reviewCount");
   if (!container) return;
 
   if (countEl) countEl.textContent = `전체 리뷰 (${reviewData.length})`;
@@ -596,31 +563,22 @@ function renderReviewList() {
     return;
   }
 
-  container.innerHTML = items
-    .map(
-      (r) => `
-      <article class="review-card">
-        <div class="review-card__date">${r.date}</div>
-        <div class="review-card__stars">
-          ${[1, 2, 3, 4, 5]
-            .map((n) => `<span class="rstar ${n <= r.score ? "is-on" : "is-off"}">★</span>`)
-            .join("")}
-          <span class="review-card__rate">(${r.score}점)</span>
-        </div>
-        <div class="review-card__text">${r.text}</div>
-        <div class="review-card__user">
-          <div class="review-card__avatar"><img src="${r.avatar}" alt="${r.name}" /></div>
-          <div class="review-card__name">${r.name}</div>
-        </div>
-      </article>
-    `
-    )
-    .join("");
+  container.innerHTML = items.map(r => `
+    <article class="review-card">
+      <div class="review-card__date">${r.date}</div>
+      <div class="review-card__stars">
+        ${[1,2,3,4,5].map(n => `<span class="rstar ${n <= r.score ? "is-on" : "is-off"}">★</span>`).join("")}
+        <span class="review-card__rate">(${r.score}점)</span>
+      </div>
+      <div class="review-card__text">${r.text}</div>
+      <div class="review-card__user">
+        <div class="review-card__avatar"><img src="${r.avatar}" alt="${r.name}" /></div>
+        <div class="review-card__name">${r.name}</div>
+      </div>
+    </article>
+  `).join("");
 }
 
-/* ============================================================
-   리뷰 쓰기 영역
-============================================================ */
 function renderMyReviewArea() {
   const writeArea = document.querySelector(".review-write");
   if (!writeArea) return;
@@ -633,11 +591,10 @@ function renderMyReviewArea() {
       <div class="review-write__locked">
         <div class="review-write__box review-write__box--disabled" aria-hidden="true">
           <div class="review-write__stars">
-            ${[1, 2, 3, 4, 5].map(() => `<span class="rstar-input">★</span>`).join("")}
+            ${[1,2,3,4,5].map(() => `<span class="rstar-input">★</span>`).join("")}
             <span class="review-write__hint">(0점)</span>
           </div>
-          <textarea class="review-write__textarea"
-            placeholder="리뷰를 작성해주세요." disabled></textarea>
+          <textarea class="review-write__textarea" placeholder="리뷰를 작성해주세요." disabled></textarea>
         </div>
         <div class="review-write__overlay">
           <div class="review-write__overlay-inner">
@@ -651,7 +608,7 @@ function renderMyReviewArea() {
     return;
   }
 
-  const myReview = reviewData.find((r) => r.isMine);
+  const myReview = reviewData.find(r => r.isMine);
 
   if (myReview) {
     writeArea.innerHTML = `
@@ -661,9 +618,7 @@ function renderMyReviewArea() {
       <article class="review-card review-card--mine">
         <div class="review-card__date">${myReview.date}</div>
         <div class="review-card__stars">
-          ${[1, 2, 3, 4, 5]
-            .map((n) => `<span class="rstar ${n <= myReview.score ? "is-on" : "is-off"}">★</span>`)
-            .join("")}
+          ${[1,2,3,4,5].map(n => `<span class="rstar ${n <= myReview.score ? "is-on" : "is-off"}">★</span>`).join("")}
           <span class="review-card__rate">(${myReview.score}점)</span>
         </div>
         <div class="review-card__text">${myReview.text}</div>
@@ -687,7 +642,7 @@ function renderMyReviewArea() {
     </div>
     <div class="review-write__box">
       <div class="review-write__stars" id="writeStars">
-        ${[1, 2, 3, 4, 5].map((n) => `<span class="rstar-input" data-val="${n}">★</span>`).join("")}
+        ${[1,2,3,4,5].map(n => `<span class="rstar-input" data-val="${n}">★</span>`).join("")}
         <span class="review-write__hint" id="writeStarHint">(0점)</span>
       </div>
       <textarea class="review-write__textarea" id="reviewTextarea"
@@ -709,35 +664,30 @@ function renderMyReviewArea() {
 
 function initWriteStars() {
   const stars = Array.from(document.querySelectorAll(".rstar-input"));
-  const hint = document.getElementById("writeStarHint");
+  const hint  = document.getElementById("writeStarHint");
 
-  stars.forEach((star) => {
+  stars.forEach(star => {
     star.addEventListener("mouseenter", () => {
-      stars.forEach((s) => s.classList.toggle("is-on", +s.dataset.val <= +star.dataset.val));
+      stars.forEach(s => s.classList.toggle("is-on", +s.dataset.val <= +star.dataset.val));
     });
-
     star.addEventListener("mouseleave", () => {
-      stars.forEach((s) => s.classList.toggle("is-on", +s.dataset.val <= selectedScore));
+      stars.forEach(s => s.classList.toggle("is-on", +s.dataset.val <= selectedScore));
     });
-
     star.addEventListener("click", () => {
       selectedScore = +star.dataset.val;
-      stars.forEach((s) => s.classList.toggle("is-on", +s.dataset.val <= selectedScore));
+      stars.forEach(s => s.classList.toggle("is-on", +s.dataset.val <= selectedScore));
       if (hint) hint.textContent = `(${selectedScore}점)`;
     });
   });
 }
 
-/* ============================================================
-   리뷰 CRUD
-============================================================ */
 async function submitReview() {
   const textarea = document.getElementById("reviewTextarea");
   const text = textarea?.value.trim();
 
   if (!selectedScore) return alert("별점을 선택해주세요.");
-  if (!text) return alert("리뷰 내용을 입력해주세요.");
-  if (!TOOL_ID) return alert("툴 정보를 찾을 수 없습니다.");
+  if (!text)          return alert("리뷰 내용을 입력해주세요.");
+  if (!TOOL_ID)       return alert("툴 정보를 찾을 수 없습니다.");
 
   try {
     if (editingId !== null) {
@@ -748,25 +698,20 @@ async function submitReview() {
 
       if (error) throw error;
 
-      const target = reviewData.find((r) => r.id === editingId);
-      if (target) {
-        target.score = selectedScore;
-        target.text = text;
-      }
-
+      const target = reviewData.find(r => r.id === editingId);
+      if (target) { target.score = selectedScore; target.text = text; }
       editingId = null;
+
     } else {
       const today = new Date();
-      const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(
-        today.getDate()
-      ).padStart(2, "0")}`;
+      const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,"0")}.${String(today.getDate()).padStart(2,"0")}`;
 
       const { data: inserted, error } = await supabase
         .from("reviews")
         .insert({
-          tool_id: TOOL_ID,
-          user_id: currentUser.id,
-          rating: selectedScore,
+          tool_id:        TOOL_ID,
+          user_id:        currentUser.id,
+          rating:         selectedScore,
           review_content: text,
         })
         .select("review_id")
@@ -775,11 +720,11 @@ async function submitReview() {
       if (error) throw error;
 
       reviewData.unshift({
-        id: inserted?.review_id ?? Date.now(),
-        name: currentUser.name,
+        id:     inserted?.review_id ?? Date.now(),
+        name:   currentUser.name,
         avatar: currentUser.avatar,
-        date: dateStr,
-        score: selectedScore,
+        date:   dateStr,
+        score:  selectedScore,
         text,
         isMine: true,
       });
@@ -797,10 +742,10 @@ async function submitReview() {
 }
 
 function startEditMyReview() {
-  const myReview = reviewData.find((r) => r.isMine);
+  const myReview = reviewData.find(r => r.isMine);
   if (!myReview) return;
 
-  editingId = myReview.id;
+  editingId     = myReview.id;
   selectedScore = myReview.score;
 
   const writeArea = document.querySelector(".review-write");
@@ -812,7 +757,7 @@ function startEditMyReview() {
     </div>
     <div class="review-write__box">
       <div class="review-write__stars" id="writeStars">
-        ${[1, 2, 3, 4, 5].map((n) => `<span class="rstar-input" data-val="${n}">★</span>`).join("")}
+        ${[1,2,3,4,5].map(n => `<span class="rstar-input" data-val="${n}">★</span>`).join("")}
         <span class="review-write__hint" id="writeStarHint">(${selectedScore}점)</span>
       </div>
       <textarea class="review-write__textarea" id="reviewTextarea"
@@ -829,8 +774,7 @@ function startEditMyReview() {
   });
 
   initWriteStars();
-
-  document.querySelectorAll(".rstar-input").forEach((s) => {
+  document.querySelectorAll(".rstar-input").forEach(s => {
     s.classList.toggle("is-on", +s.dataset.val <= selectedScore);
   });
 }
@@ -840,10 +784,8 @@ async function deleteMyReview(id) {
 
   try {
     const { error } = await supabase.from("reviews").delete().eq("review_id", id);
-
     if (error) throw error;
-
-    const idx = reviewData.findIndex((r) => r.id === id);
+    const idx = reviewData.findIndex(r => r.id === id);
     if (idx !== -1) reviewData.splice(idx, 1);
   } catch (e) {
     console.error("리뷰 삭제 실패:", e);
@@ -857,29 +799,23 @@ async function deleteMyReview(id) {
 }
 
 function updateAvgScore() {
-  const numEl = document.getElementById("avgScoreNum");
+  const numEl   = document.getElementById("avgScoreNum");
   const starsEl = document.getElementById("avgScoreStars");
 
   if (!reviewData.length) {
-    if (numEl) numEl.textContent = "0 점";
-    if (starsEl) {
-      starsEl.innerHTML = [1, 2, 3, 4, 5]
-        .map(() => `<span class="rstar is-off">★</span>`)
-        .join("");
-    }
+    if (numEl)   numEl.textContent = "0 점";
+    if (starsEl) starsEl.innerHTML = [1,2,3,4,5].map(() => `<span class="rstar is-off">★</span>`).join("");
     updateCardStars(0);
     return;
   }
 
-  const avg = reviewData.reduce((s, r) => s + r.score, 0) / reviewData.length;
+  const avg     = reviewData.reduce((s, r) => s + r.score, 0) / reviewData.length;
   const rounded = Math.round(avg * 10) / 10;
 
-  if (numEl) numEl.textContent = `${rounded} 점`;
-  if (starsEl) {
-    starsEl.innerHTML = [1, 2, 3, 4, 5]
-      .map((n) => `<span class="rstar ${n <= Math.round(avg) ? "is-on" : "is-off"}">★</span>`)
-      .join("");
-  }
+  if (numEl)   numEl.textContent = `${rounded} 점`;
+  if (starsEl) starsEl.innerHTML = [1,2,3,4,5]
+    .map(n => `<span class="rstar ${n <= Math.round(avg) ? "is-on" : "is-off"}">★</span>`)
+    .join("");
 
   updateCardStars(Math.round(avg));
 }
@@ -887,27 +823,23 @@ function updateAvgScore() {
 function updateCardStars(roundedAvg = 0) {
   const cardStarsEl = document.querySelector(".detail_AI__stars");
   if (!cardStarsEl) return;
-
-  cardStarsEl.innerHTML = [1, 2, 3, 4, 5]
-    .map((n) => `<span class="star ${n <= roundedAvg ? "is-on" : "is-off"}">★</span>`)
+  cardStarsEl.innerHTML = [1,2,3,4,5]
+    .map(n => `<span class="star ${n <= roundedAvg ? "is-on" : "is-off"}">★</span>`)
     .join("");
 }
 
 window.startEditMyReview = startEditMyReview;
-window.deleteMyReview = deleteMyReview;
+window.deleteMyReview    = deleteMyReview;
 
-/* ============================================================
-   리뷰 정렬 셀렉트
-============================================================ */
 function initReviewSort() {
   if (!document.querySelector("#reviewSortSelect")) return;
 
   loadNativeSelect({
     target: "#reviewSortSelect",
     options: [
-      { label: "최신순", value: "new" },
+      { label: "최신순",      value: "new"  },
       { label: "평점 높은순", value: "high" },
-      { label: "평점 낮은순", value: "low" },
+      { label: "평점 낮은순", value: "low"  },
     ],
     placeholder: "선택",
     onChange: (item) => {
@@ -917,24 +849,18 @@ function initReviewSort() {
   });
 }
 
-/* ============================================================
-   사이트 미리보기
-============================================================ */
 function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   const nameEl = document.getElementById("sitePreviewName");
-  const urlEl = document.getElementById("sitePreviewUrl");
+  const urlEl  = document.getElementById("sitePreviewUrl");
 
   if (nameEl) nameEl.textContent = name ?? "";
-  if (urlEl) {
-    urlEl.textContent = url ?? "";
-    urlEl.href = url ?? "#";
-  }
+  if (urlEl)  { urlEl.textContent = url ?? ""; urlEl.href = url ?? "#"; }
 
   const mediaEl = document.querySelector(".site-preview__media");
-  const cardEl = document.querySelector(".site-preview__card");
+  const cardEl  = document.querySelector(".site-preview__card");
   if (!mediaEl) return;
 
-  mediaEl.querySelectorAll("iframe").forEach((el) => el.remove());
+  mediaEl.querySelectorAll("iframe").forEach(el => el.remove());
   cardEl?.classList.remove("has-iframe");
   mediaEl.classList.remove("has-iframe");
 
@@ -953,13 +879,8 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   } else {
     const imgEl = mediaEl.querySelector("img");
     if (imgEl) {
-      if (icon) {
-        imgEl.src = icon;
-        imgEl.style.display = "";
-      } else {
-        imgEl.removeAttribute("src");
-        imgEl.style.display = "none";
-      }
+      if (icon) { imgEl.src = icon; imgEl.style.display = ""; }
+      else      { imgEl.removeAttribute("src"); imgEl.style.display = "none"; }
     }
 
     if (imgEl && !imgEl.closest(".site-preview__fallback-logo")) {
@@ -971,15 +892,12 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   }
 }
 
-/* ============================================================
-   섹션 탭
-============================================================ */
 function initSectionTabs() {
   const tabsRoot = document.getElementById("sectionTabs");
   if (!tabsRoot) return;
 
-  const tabs = Array.from(tabsRoot.querySelectorAll(".section-tab"));
-  const sectionEls = tabs.map((t) => document.getElementById(t.dataset.target)).filter(Boolean);
+  const tabs       = Array.from(tabsRoot.querySelectorAll(".section-tab"));
+  const sectionEls = tabs.map(t => document.getElementById(t.dataset.target)).filter(Boolean);
 
   function getOffset() {
     const bh = document.querySelector(".detail_AI-banner-root")?.getBoundingClientRect().height ?? 0;
@@ -990,13 +908,10 @@ function initSectionTabs() {
   tabsRoot.addEventListener("click", (e) => {
     const tab = e.target.closest(".section-tab");
     if (!tab) return;
-
     const targetEl = document.getElementById(tab.dataset.target);
     if (!targetEl) return;
-
-    tabs.forEach((t) => t.classList.remove("is-active"));
+    tabs.forEach(t => t.classList.remove("is-active"));
     tab.classList.add("is-active");
-
     window.scrollTo({
       top: window.scrollY + targetEl.getBoundingClientRect().top - getOffset(),
       behavior: "smooth",
@@ -1005,29 +920,18 @@ function initSectionTabs() {
 
   const observer = new IntersectionObserver(
     (entries) => {
-      const visible = entries.filter((e) => e.isIntersecting);
+      const visible = entries.filter(e => e.isIntersecting);
       if (!visible.length) return;
-
       visible.sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
       const activeId = visible[0].target.id;
-
-      tabs.forEach((tab) => {
-        tab.classList.toggle("is-active", tab.dataset.target === activeId);
-      });
+      tabs.forEach(tab => { tab.classList.toggle("is-active", tab.dataset.target === activeId); });
     },
-    {
-      root: null,
-      rootMargin: `-${getOffset()}px 0px -60% 0px`,
-      threshold: 0.01,
-    }
+    { root: null, rootMargin: `-${getOffset()}px 0px -60% 0px`, threshold: 0.01 }
   );
 
-  sectionEls.forEach((el) => observer.observe(el));
+  sectionEls.forEach(el => observer.observe(el));
 }
 
-/* ============================================================
-   유틸
-============================================================ */
 function setTextEl(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text ?? "";

@@ -187,8 +187,8 @@ body {
 
 /* --- Grid & Cards --- */
 .tool-card-grid {
-  width: min(100%, 860px);
-  margin: 0 auto 80px;  /* bottom만 80px */
+  width: min(100%, 740px); /* 860px - 좌우 60px씩 = 740px */
+  margin: 0 auto 80px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 26px 48px;

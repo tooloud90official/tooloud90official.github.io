@@ -1,40 +1,53 @@
-/**
- * html 조각 로드 (탑 배너용)
- */
-async function includeHTML(targetSelector, filePath) {
-  const target = document.querySelector(targetSelector);
-  if (!target) return;
-  try {
-    const res = await fetch(filePath);
-    if (!res.ok) return;
-    const html = await res.text();
-    target.innerHTML = html;
-  } catch (err) {
-    console.error("배너 로드 실패:", err);
-  }
-}
+/** 카테고리 한글 → tool_cat 매핑 */
+const CATEGORY_MAP = {
+  "이미지·오디오·영상": "media",
+  "리서치":             "res",
+  "문서 생성·요약·편집": "doc",
+  "개발·코딩":          "dev",
+  "학습·교육":          "edu",
+  "챗봇·어시스턴트":    "ast",
+};
 
-/** 슬라이더 지점 라벨 */
+/** 슬라이더 가격 구간 */
 const SLIDER_LABELS = ["₩0", "₩1–29,999", "₩30,000–59,999", "₩60,000–89,999", "₩90,000+"];
 
-/** 샘플 카드 데이터 */
-const TOOL_CARDS = [
-  { toolName: "Chat GPT",      price: "$35/월", url: "/detail_AI/detail_AI.html" },
-  { toolName: "Claude",        price: "$40/월", url: "/detail_AI/detail_AI.html" },
-  { toolName: "Flexclip",      price: "$45/월", url: "/detail_AI/detail_AI.html" },
-  { toolName: "Adobe Firefly", price: "$50/월", url: "/detail_AI/detail_AI.html" },
-  { toolName: "Descript",      price: "$55/월", url: "/detail_AI/detail_AI.html" },
+const PRICE_RANGES = [
+  { min: 0,     max: 0       },
+  { min: 1,     max: 29999   },
+  { min: 30000, max: 59999   },
+  { min: 60000, max: 89999   },
+  { min: 90000, max: Infinity },
 ];
 
-/**
- * 가격 카드 렌더링
- */
-function renderToolCards() {
+/** 전체 툴 데이터 */
+let ALL_TOOLS = [];
+let currentStep = 0;
+let currentCatKey = "";
+
+/** 툴의 최저 가격 반환 */
+function getMinPrice(tool) {
+  const prices = [
+    tool.tool_plan1_price_krw,
+    tool.tool_plan2_price_krw,
+    tool.tool_plan3_price_krw,
+  ]
+    .map(p => parseInt(p, 10))
+    .filter(p => !isNaN(p) && p >= 0);
+  return prices.length ? Math.min(...prices) : Infinity;
+}
+
+/** 카드 렌더링 */
+function renderToolCards(tools) {
   const grid = document.querySelector("#toolCardGrid");
   if (!grid) return;
   grid.innerHTML = "";
 
-  TOOL_CARDS.forEach((tool, index) => {
+  if (tools.length === 0) {
+    grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px 0;">해당 조건의 툴이 없습니다.</p>`;
+    return;
+  }
+
+  tools.forEach((tool, index) => {
     const card = document.createElement("article");
     card.className = "tool-price-card";
 
@@ -47,13 +60,20 @@ function renderToolCards() {
     const bottom = document.createElement("div");
     bottom.className = "tool-price-card__bottom";
 
+    const minPrice = getMinPrice(tool);
+    const priceText = minPrice === 0
+      ? "무료"
+      : minPrice === Infinity
+        ? "문의"
+        : `₩${minPrice.toLocaleString()}/월`;
+
     const price = document.createElement("div");
     price.className = "tool-price-card__price";
-    price.textContent = tool.price;
+    price.textContent = priceText;
 
     const more = document.createElement("a");
     more.className = "tool-price-card__more";
-    more.href = tool.url || "#";
+    more.href = `/detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`;
     more.textContent = "더보기 >";
 
     bottom.append(price, more);
@@ -62,23 +82,36 @@ function renderToolCards() {
 
     if (typeof window.loadToolIconCard === "function") {
       window.loadToolIconCard(`#${iconMount.id}`, {
-        toolName: tool.toolName,
-        url: tool.url || "#",
+        toolName: tool.tool_name,
+        url: `/detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`,
+        iconUrl: tool.icon,
       });
     }
   });
 }
 
-/**
- * 슬라이더 초기화
- */
+/** 필터링 실행 */
+function applyFilter(step) {
+  let filtered = ALL_TOOLS.filter(t => t.tool_cat === currentCatKey);
+
+  if (step > 0) {
+    const range = PRICE_RANGES[step];
+    filtered = filtered.filter(t => {
+      const min = getMinPrice(t);
+      return min >= range.min && min <= range.max;
+    });
+  }
+
+  renderToolCards(filtered);
+}
+
+/** 슬라이더 초기화 */
 function initStepSlider() {
   const sliderRoot = document.querySelector("#stepSlider");
   const labelsWrap = document.querySelector(".price-filter__labels");
   const track      = document.querySelector(".price-filter__track");
   const fill       = document.querySelector("#sliderFill");
   const thumb      = document.querySelector("#sliderThumb");
-  const hint       = document.querySelector("#sliderHint");
 
   if (!sliderRoot || !thumb || !track || !fill || !labelsWrap) return;
 
@@ -86,7 +119,7 @@ function initStepSlider() {
   const extend  = 10;
   let isDragging = false;
   let stepPositions = [];
-  let currentStep = 0;
+  currentStep = 0;
 
   labelsWrap.innerHTML = "";
   SLIDER_LABELS.forEach((label, i) => {
@@ -118,37 +151,25 @@ function initStepSlider() {
   function layoutTrack() {
     calcStepPositions();
     if (stepPositions.length < 2) return;
-
     const first = stepPositions[0];
     const last  = stepPositions[stepPositions.length - 1];
-
     track.style.left  = (first - extend) + "px";
     track.style.width = (last - first + extend * 2) + "px";
     fill.style.left   = (first - extend) + "px";
-
-    dotEls.forEach((d, i) => {
-      d.style.left = stepPositions[i] + "px";
-    });
+    dotEls.forEach((d, i) => { d.style.left = stepPositions[i] + "px"; });
   }
 
   function render(step) {
     currentStep = Math.max(0, Math.min(maxStep, step));
-
     const px    = stepPositions[currentStep];
     const first = stepPositions[0];
-
     thumb.style.left = px + "px";
     fill.style.width = Math.max(0, px - (first - extend)) + "px";
-
-    dotEls.forEach((d, i) => {
-      d.classList.toggle("is-right", i > currentStep);
-    });
-
+    dotEls.forEach((d, i) => { d.classList.toggle("is-right", i > currentStep); });
     labelsWrap.querySelectorAll(".price-filter__step-label").forEach((l, i) => {
       l.classList.toggle("is-active", i === currentStep);
     });
-
-    if (hint) hint.textContent = `현재 선택: ${SLIDER_LABELS[currentStep]}`;
+    applyFilter(currentStep);
   }
 
   function clientXToStep(clientX) {
@@ -166,39 +187,43 @@ function initStepSlider() {
     isDragging = true;
     thumb.setPointerCapture(e.pointerId);
   });
-
   window.addEventListener("pointermove", (e) => {
     if (!isDragging) return;
     render(clientXToStep(e.clientX));
   });
-
   window.addEventListener("pointerup", () => { isDragging = false; });
-
   sliderRoot.addEventListener("click", (e) => {
     if (e.target.closest(".price-filter__thumb")) return;
     render(clientXToStep(e.clientX));
   });
 
-  function init() {
-    layoutTrack();
-    render(0);
-  }
-
-  init();
-  window.addEventListener("resize", () => {
-    layoutTrack();
-    render(currentStep);
-  });
+  layoutTrack();
+  render(0);
+  window.addEventListener("resize", () => { layoutTrack(); render(currentStep); });
 }
 
 // ✅ DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  // ✅ URL 파라미터로 카테고리 읽어서 텍스트 교체
-  const params = new URLSearchParams(window.location.search);
-  const category = params.get("category");
+document.addEventListener("DOMContentLoaded", async () => {
+  const params   = new URLSearchParams(window.location.search);
+  const category = params.get("category") || "";
+  currentCatKey  = CATEGORY_MAP[category] || "";
+
+  // 헤더 텍스트 교체
   const descEl = document.querySelector(".category-hero__desc--accent");
   if (descEl && category) descEl.textContent = category;
 
+  // ✅ Supabase에서 데이터 로드
+  const supabase = window._supabase;
+  const { data, error } = await supabase
+    .from("tools")
+    .select("tool_ID, tool_cat, tool_name, icon, tool_link, tool_plan1_price_krw, tool_plan2_price_krw, tool_plan3_price_krw")
+    .eq("tool_cat", currentCatKey);
+
+  if (error) {
+    console.error("Supabase 로드 실패:", error);
+  } else {
+    ALL_TOOLS = data || [];
+  }
+
   initStepSlider();
-  renderToolCards();
 });

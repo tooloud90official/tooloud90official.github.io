@@ -1,22 +1,6 @@
-// login4.js
 import { supabase } from '/_ignore/supabase.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  // =============================
-  // 툴 데이터
-  // =============================
-  const TOOLS = [
-    { name: 'Descript',   img: 'https://logo.clearbit.com/descript.com' },
-    { name: 'Adobe',      img: 'https://logo.clearbit.com/adobe.com' },
-    { name: 'Midjourney', img: 'https://logo.clearbit.com/midjourney.com' },
-    { name: 'Lilys',      img: 'https://logo.clearbit.com/lilys.ai' },
-    { name: 'Cursor',     img: 'https://logo.clearbit.com/cursor.sh' },
-    { name: 'Pitch',      img: 'https://logo.clearbit.com/pitch.com' },
-    { name: 'Notion',     img: 'https://logo.clearbit.com/notion.so' },
-    { name: 'Figma',      img: 'https://logo.clearbit.com/figma.com' },
-    { name: 'ChatGPT',    img: 'https://logo.clearbit.com/openai.com' },
-  ];
+document.addEventListener("DOMContentLoaded", async () => {
 
   const MAX_SELECT = 5;
 
@@ -26,8 +10,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const progressFill  = document.getElementById('progressFill');
   const finishBtn     = document.getElementById('finishBtn');
 
-  let selectedTools = [];
+  let selectedTools = []; // tool_ID 배열
+  let TOOLS = [];
 
+  // =============================
+  // Supabase에서 툴 로드
+  // =============================
+  const { data, error } = await supabase
+    .from("tools")
+    .select("tool_ID, tool_name, icon")
+    .in("tool_name", [
+      "Descript", "Adobe", "Midjourney", "Lilys",
+      "Cursor", "Pitch", "Notion", "Figma", "ChatGPT"
+    ]);
+
+  if (error || !data) {
+    console.error("툴 로드 실패:", error);
+    return;
+  }
+
+  TOOLS = data.map(t => ({
+    id:   t.tool_ID,
+    name: t.tool_name,
+    img:  t.icon,
+  }));
 
   // =============================
   // 툴 그리드 렌더링
@@ -37,28 +43,28 @@ document.addEventListener("DOMContentLoaded", () => {
     TOOLS.forEach(tool => {
       const card = document.createElement('div');
       card.className = 'tool-icon-card';
-      card.dataset.toolName = tool.name;
+      card.dataset.toolId = tool.id;
       card.innerHTML = `
         <span class="tool-icon-card__icon">
           <img src="${tool.img}" alt="${tool.name}" onerror="this.style.display='none'">
         </span>
         <span class="tool-icon-card__title">${tool.name}</span>
       `;
-      if (selectedTools.includes(tool.name)) card.classList.add('is-selected');
-      card.addEventListener('click', () => toggleTool(tool.name, card));
+      if (selectedTools.includes(tool.id)) card.classList.add('is-selected');
+      card.addEventListener('click', () => toggleTool(tool.id, card));
       toolGrid.appendChild(card);
     });
     updateMaxClass();
   }
 
-  function toggleTool(name, cardEl) {
-    const isSelected = selectedTools.includes(name);
+  function toggleTool(id, cardEl) {
+    const isSelected = selectedTools.includes(id);
     if (isSelected) {
-      selectedTools = selectedTools.filter(t => t !== name);
+      selectedTools = selectedTools.filter(t => t !== id);
       cardEl.classList.remove('is-selected');
     } else {
       if (selectedTools.length >= MAX_SELECT) return;
-      selectedTools.push(name);
+      selectedTools.push(id);
       cardEl.classList.add('is-selected');
     }
     updateMaxClass();
@@ -72,8 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderSelected() {
     selectedIcons.innerHTML = '';
-    selectedTools.forEach(name => {
-      const tool = TOOLS.find(t => t.name === name);
+    selectedTools.forEach(id => {
+      const tool = TOOLS.find(t => t.id === id);
       if (!tool) return;
       const card = document.createElement('div');
       card.className = 'tool-icon-card';
@@ -93,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
     progressFill.style.width = `${(count / MAX_SELECT) * 100}%`;
   }
 
-
   // =============================
   // 완료 버튼 → users 테이블 insert
   // =============================
@@ -107,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
     finishBtn.textContent = '처리 중...';
 
     try {
-      // Auth 세션에서 user.id 가져오기
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
         alert('로그인 정보가 없습니다. 처음부터 다시 진행해주세요.');
@@ -127,18 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const { error } = await supabase.from('users').insert({
-        user_id        : session.user.id,  // ✅ Auth uuid 그대로
+        user_id        : session.user.id,
         user_name      : nickname,
         user_img       : '시스템 지정 이미지',
         user_country   : country,
         user_age       : age,
         user_job       : job,
-        favorite_tools : selectedTools,
+        favorite_tools : selectedTools, // ✅ ["tool_002", "tool_007", ...]
       });
 
       if (error) throw error;
 
-      // sessionStorage 정리
       ['signup_email', 'signup_password', 'signup_uid',
        'signup_nickname', 'signup_age', 'signup_job', 'signup_country']
         .forEach(k => sessionStorage.removeItem(k));
@@ -152,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
       finishBtn.textContent = '완료';
     }
   });
-
 
   // =============================
   // 초기 렌더

@@ -12,13 +12,70 @@
 
   <script type="module">
     import * as pdfjsLib from './pdf.min.js';
-    window.pdfjsLib = pdfjsLib; // 전역 객체로 등록해서 기존 코드와 호환시켜줄게
+    window.pdfjsLib = pdfjsLib;
   </script>
 </head>
 <body>
   <div id="top-banner" class="detail_AI-banner-root"></div>
 
   <div class="upload-page">
+
+    <!-- 상단 입력 배너 -->
+    <div class="artwork-hero-banner">
+
+      <div class="artwork-hero-banner__eyebrow">
+        작업물
+        <div class="artwork-hero-banner__dot"></div>
+        <span id="bannerMode">업로드</span>
+      </div>
+
+      <input
+        class="artwork-hero-banner__title-input"
+        id="titleInput"
+        type="text"
+        placeholder="제목을 입력해주세요"
+        maxlength="80"
+      />
+
+      <p class="artwork-hero-banner__desc">
+        <textarea
+          class="artwork-hero-banner__desc-input"
+          id="description"
+          placeholder="작업물에 대해 설명해주세요."
+          rows="2"
+        ></textarea>
+      </p>
+
+      <div class="artwork-hero-banner__divider"></div>
+
+      <div class="artwork-hero-banner__profile">
+        <div class="artwork-hero-banner__profile-left">
+          <div class="avatar">
+            <div class="avatar__inner">
+              <img src="/media/profil.png" alt="프로필" />
+            </div>
+          </div>
+          <div>
+            <div class="name">Soojin</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="artwork-hero-banner__tag-wrap">
+        <div class="artwork-hero-banner__tags" id="tagList"></div>
+        <input
+          class="artwork-hero-banner__tag-input"
+          id="tagInput"
+          type="text"
+          placeholder="#태그 입력 후 Enter"
+          maxlength="30"
+        />
+      </div>
+
+    </div>
+
+    <!-- 파일 업로드 히어로 -->
     <section class="upload-hero">
       <div class="artwork-post__tool" id="toolPicker" role="button" tabindex="0" aria-label="툴 선택">
         <div class="artwork-post__tool-ic" aria-hidden="true"></div>
@@ -55,26 +112,20 @@
       </div>
     </section>
 
-    <main class="card">
-      <div class="profile-section">
-        <div class="avatar-ring"><img class="avatar" src="/media/profil.png" alt="프로필" /></div>
-        <div class="user-name">Soojin</div>
-      </div>
-      <div class="input-section">
-        <label class="label" for="description">설명</label>
-        <div class="input-box"><textarea id="description" placeholder="커뮤니티 가이드라인 위반 시 제재될 수 있습니다."></textarea></div>
-      </div>
-      <div class="button-group">
-        <div id="cancelBtnMount" class="btn-wrap"></div>
-        <div id="submitBtnMount" class="btn-wrap"></div>
-      </div>
-    </main>
+    <!-- 취소/등록 버튼 — 작업물 하단 중앙 -->
+    <div class="upload-btn-row">
+      <div id="cancelBtnMount" class="btn-wrap"></div>
+      <div id="submitBtnMount" class="btn-wrap"></div>
+    </div>
+
+    <main class="card" id="mainCard" style="display:none;"></main>
+
   </div>
+
   <div id="bottom-banner"></div>
 
   <script src="/_common/button/button.js"></script>
   <script type="module" src="/_common/top-banner/include.js"></script>
-  
   <script type="module" src="/artwork/artwork_upload/artwork_upload.js" defer></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
