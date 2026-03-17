@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/_common/button/button.css" />
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
   <link rel="stylesheet" href="/artwork/artwork_upload/artwork_upload.css" />
-  <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
+  <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css" />
 
   <script type="module">
     import * as pdfjsLib from './pdf.min.js';
@@ -52,14 +52,13 @@
         <div class="artwork-hero-banner__profile-left">
           <div class="avatar">
             <div class="avatar__inner">
-              <img src="/media/profil.png" alt="프로필" />
+              <img id="profileImg" src="/media/profil.png" alt="프로필" />
             </div>
           </div>
           <div>
-            <div class="name">Soojin</div>
+            <div class="name" id="profileName">사용자</div>
           </div>
         </div>
-
       </div>
 
       <div class="artwork-hero-banner__tag-wrap">
@@ -78,12 +77,24 @@
     <!-- 파일 업로드 히어로 -->
     <section class="upload-hero">
       <div class="artwork-post__tool" id="toolPicker" role="button" tabindex="0" aria-label="툴 선택">
-        <div class="artwork-post__tool-ic" aria-hidden="true"></div>
         <div class="artwork-post__tool-placeholder" id="toolPlaceholder">📂 툴을 선택해주세요.</div>
+
         <div class="artwork-post__tool-meta" id="toolMeta" hidden>
-          <div class="artwork-post__tool-top"><span class="artwork-post__tool-name" id="toolName"></span></div>
-          <span class="artwork-post__tool-stars" id="toolStars"></span>
-          <div class="artwork-post__tool-brand" id="toolBrand"></div>
+          <img
+            id="toolCardIcon"
+            class="artwork-post__tool-ic"
+            src=""
+            alt="툴 아이콘"
+            hidden
+          />
+
+          <div class="artwork-post__tool-text">
+            <div class="artwork-post__tool-top">
+              <span class="artwork-post__tool-name" id="toolName"></span>
+            </div>
+            <span class="artwork-post__tool-stars" id="toolStars" hidden></span>
+            <div class="artwork-post__tool-brand" id="toolBrand"></div>
+          </div>
         </div>
       </div>
 
@@ -93,6 +104,7 @@
           <p class="sub">지원 파일: mp4, mp3, jpg, jpeg, png, pdf, txt</p>
           <div id="fileUploadMount"></div>
         </div>
+
         <div class="preview-card" id="previewCard" hidden>
           <div class="preview-card__header">
             <div class="preview-card__filemeta">
@@ -102,31 +114,32 @@
                 <div class="preview-card__filesize" id="previewFileSize">0 KB</div>
               </div>
             </div>
+
             <div class="preview-card__actions">
               <button type="button" class="preview-action-btn" id="replaceFileBtn">파일 변경</button>
               <button type="button" class="preview-action-btn preview-action-btn--danger" id="removeFileBtn">삭제</button>
             </div>
           </div>
+
           <div class="preview-card__body" id="previewBody"></div>
         </div>
       </div>
     </section>
 
-    <!-- 취소/등록 버튼 — 작업물 하단 중앙 -->
+    <!-- 취소/등록 버튼 -->
     <div class="upload-btn-row">
       <div id="cancelBtnMount" class="btn-wrap"></div>
       <div id="submitBtnMount" class="btn-wrap"></div>
     </div>
 
     <main class="card" id="mainCard" style="display:none;"></main>
-
   </div>
 
   <div id="bottom-banner"></div>
 
   <script src="/_common/button/button.js"></script>
   <script type="module" src="/_common/top-banner/include.js"></script>
-  <script type="module" src="/artwork/artwork_upload/artwork_upload.js" defer></script>
+  <script type="module" src="/artwork/artwork_upload/artwork_upload.js"></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
 </html>

@@ -32,19 +32,22 @@ const MENU_DATA = {
   library: {
     desc: '작업물 라이브러리를\n탐색해보세요.',
     items: [
-      { label: '이미지·오디오·영상', href: '/artwork/artwork.html' },
-      { label: '리서치',             href: '/artwork/artwork.html' },
-      { label: '문서 생성·요약·편집', href: '/artwork/artwork.html' },
-      { label: '개발·코딩',          href: '/artwork/artwork.html' },
-      { label: '학습·교육',          href: '/artwork/artwork.html' },
-      { label: '챗봇·어시스턴트',    href: '/artwork/artwork.html' },
-      { label: 'AI 추천 작업물',     href: '/artwork/artwork.html' },
-      { label: '내 라이브러리',      href: '/artwork/artwork.html' },
+      // ✅ 각 항목의 href 뒤에 ?tab=파라미터를 추가했어!
+      { label: '이미지·오디오·영상', href: '/artwork/artwork.html?tab=이미지·오디오·영상' },
+      { label: '리서치',             href: '/artwork/artwork.html?tab=리서치' },
+      { label: '문서 생성·요약·편집', href: '/artwork/artwork.html?tab=문서 생성·요약·편집' },
+      { label: '개발·코딩',          href: '/artwork/artwork.html?tab=개발·코딩' },
+      { label: '학습·교육',          href: '/artwork/artwork.html?tab=학습·교육' },
+      { label: '챗봇·어시스턴트',    href: '/artwork/artwork.html?tab=챗봇·어시스턴트' },
+      { label: 'AI 추천 작업물',     href: '/artwork/artwork.html?tab=AI 추천 작업물' },
+      { label: '내 라이브러리',      href: '/artwork/artwork.html?tab=내 라이브러리' },
       { label: '작업물 올리기',      href: '/artwork/artwork_upload/artwork_upload.html' },
     ]
   },
   mypage: null
 };
+
+// ... 이하 renderDropdown 및 이벤트 리스너 코드는 동일함 ...
 
 function renderDropdown(menuKey, navItemEl) {
   const data   = MENU_DATA[menuKey];

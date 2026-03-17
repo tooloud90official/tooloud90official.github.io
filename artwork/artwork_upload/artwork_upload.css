@@ -63,7 +63,7 @@ body {
   flex-shrink: 0;
 }
 
-/* 제목 입력 — 개별 페이지 .artwork-hero-banner__title 과 동일 크기/굵기 */
+/* 제목 입력 */
 .artwork-hero-banner__title-input {
   border: none;
   outline: none;
@@ -83,7 +83,7 @@ body {
   font-weight: 700;
 }
 
-/* 내용 입력 — 개별 페이지 .artwork-hero-banner__desc 와 동일 */
+/* 내용 입력 */
 .artwork-hero-banner__desc {
   margin: -4px 0 0;
 }
@@ -569,28 +569,157 @@ body {
 .artwork-post__tool-brand { font-size: 12px; font-weight: 800; color: rgba(0,0,0,0.55); line-height: 1; }
 
 /* 툴 모달 */
-.tool-modal { position: fixed; inset: 0; z-index: 5000; display: none; }
-.tool-modal.is-open { display: block; }
-.tool-modal__dim { position: absolute; inset: 0; background: rgba(0,0,0,0.45); }
-.tool-modal__panel {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(92vw, 420px); max-height: min(70vh, 520px); border-radius: 18px;
-  background: rgba(255,255,255,0.75); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 30px 70px rgba(0,0,0,0.25); overflow: hidden;
+.tool-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: none;
 }
-.tool-modal__header { padding: 14px 14px 10px; display: grid; gap: 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
-.tool-modal__toprow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.tool-modal__title { margin: 0; font-size: 14px; font-weight: 900; color: #111; }
-.tool-modal__close { border: 0; background: transparent; width: 34px; height: 34px; border-radius: 12px; cursor: pointer; font-size: 18px; line-height: 1; color: #111; }
-.tool-modal__close:hover { background: rgba(0,0,0,0.06); }
-.tool-modal__search { width: 100%; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.6); border-radius: 14px; padding: 12px; outline: none; font-size: 13px; }
-.tool-modal__body { padding: 12px; max-height: calc(min(70vh, 520px) - 110px); overflow: auto; }
-.tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.tool-item { border: 1px solid rgba(0,0,0,0.06); background: rgba(255,255,255,0.55); border-radius: 14px; padding: 10px 8px; cursor: pointer; display: grid; justify-items: center; gap: 8px; transition: transform 120ms ease, background 120ms ease; }
-.tool-item:hover { transform: translateY(-1px); background: rgba(255,255,255,0.72); }
-.tool-item.is-selected { border-color: rgba(42,125,255,0.55); box-shadow: 0 10px 22px rgba(42,125,255,0.18); }
-.tool-icon { width: 44px; height: 44px; border-radius: 14px; background: rgba(0,0,0,0.85); }
-.tool-name { font-size: 12px; font-weight: 800; color: #111; text-align: center; line-height: 1.2; word-break: keep-all; }
+
+.tool-modal.is-open {
+  display: block;
+}
+
+.tool-modal__dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+.tool-modal__panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 420px);
+  max-height: min(70vh, 520px);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+.tool-modal__header {
+  padding: 14px 14px 10px;
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.tool-modal__toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tool-modal__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+  color: #111;
+}
+
+.tool-modal__close {
+  border: 0;
+  background: transparent;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #111;
+}
+
+.tool-modal__close:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.tool-modal__search {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.6);
+  border-radius: 14px;
+  padding: 12px;
+  outline: none;
+  font-size: 13px;
+}
+
+.tool-modal__body {
+  padding: 12px;
+  max-height: calc(min(70vh, 520px) - 110px);
+  min-height: 300px;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-grid {
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  align-content: start;
+}
+
+.tool-item {
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.55);
+  border-radius: 14px;
+  padding: 10px 8px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.tool-item:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.72);
+}
+
+.tool-item.is-selected {
+  border-color: rgba(42,125,255,0.55);
+  box-shadow: 0 10px 22px rgba(42,125,255,0.18);
+}
+
+.tool-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.85);
+}
+
+.tool-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #111;
+  text-align: center;
+  line-height: 1.2;
+  word-break: keep-all;
+}
+
+.tool-empty {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.28);
+  letter-spacing: -0.02em;
+}
 
 /* 반응형 */
 @media (max-width: 640px) {
@@ -598,5 +727,20 @@ body {
   .artwork-hero-banner { padding: 24px 20px 20px; border-radius: 16px; }
   .artwork-hero-banner__profile { flex-direction: column; align-items: flex-start; gap: 12px; }
   .artwork-hero-banner__title-input { font-size: 22px; }
-  .artwork-post__tool { left: 14px; top: 14px; padding: 12px 14px; border-radius: 18px; min-width: calc(100% - 28px); }
+
+  .artwork-post__tool {
+    left: 14px;
+    top: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    min-width: calc(100% - 28px);
+  }
+
+  .tool-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tool-empty {
+    min-height: 220px;
+  }
 }

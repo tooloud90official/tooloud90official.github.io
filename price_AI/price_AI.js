@@ -205,7 +205,7 @@ function initStepSlider() {
 // ✅ DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
   const params   = new URLSearchParams(window.location.search);
-  const category = params.get("category") || "";
+  const category = params.get("category") || params.get("tab") || "이미지·오디오·영상"; // ← 이 줄만 수정
   currentCatKey  = CATEGORY_MAP[category] || "";
 
   // 헤더 텍스트 교체
