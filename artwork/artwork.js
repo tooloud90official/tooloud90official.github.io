@@ -22,10 +22,35 @@ let currentSort = "like";
 let currentTab = "이미지·오디오·영상";
 
 /* =========================
-   2) 현재 유저 정보 로드
+   2) 로그인 필수 체크
+========================= */
+async function requireLogin() {
+  const supabase = window._supabase;
+
+  if (!supabase) {
+    window.location.href = "/login1/login1.html";
+    return false;
+  }
+
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session?.user) {
+    window.location.href = "/login1/login1.html";
+    return false;
+  }
+
+  return true;
+}
+
+/* =========================
+   3) 현재 유저 정보 로드
 ========================= */
 async function loadUser() {
   const supabase = window._supabase;
+
   if (!supabase) {
     currentUser = null;
     return;
@@ -43,7 +68,7 @@ async function loadUser() {
 }
 
 /* =========================
-   3) 섹션 텍스트 갱신
+   4) 섹션 텍스트 갱신
 ========================= */
 function updateSectionText(tabKey) {
   const sectionTitle = document.querySelector(".artwork-section__title");
@@ -74,7 +99,7 @@ function updateSectionText(tabKey) {
 }
 
 /* =========================
-   4) 탭 변경
+   5) 탭 변경
 ========================= */
 function setTab(tabKey, options = {}) {
   if (!tabKey) return;
@@ -99,7 +124,7 @@ function setTab(tabKey, options = {}) {
 }
 
 /* =========================
-   5) 정렬 + 필터
+   6) 정렬 + 필터
 ========================= */
 function getSortedWorks() {
   let filtered = [...ALL_WORKS];
@@ -123,7 +148,7 @@ function getSortedWorks() {
 }
 
 /* =========================
-   6) 카드 렌더
+   7) 카드 렌더
 ========================= */
 function renderWorks() {
   const works = getSortedWorks();
@@ -171,7 +196,7 @@ function renderWorks() {
 }
 
 /* =========================
-   7) URL에서 탭 읽기
+   8) URL에서 탭 읽기
 ========================= */
 function initFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -180,7 +205,7 @@ function initFromUrl() {
 }
 
 /* =========================
-   8) 상단 배너 링크 클릭 처리
+   9) 상단 배너 링크 클릭 처리
 ========================= */
 function bindTopBannerArtworkLinks() {
   document.addEventListener("click", (e) => {
@@ -206,7 +231,7 @@ function bindTopBannerArtworkLinks() {
 }
 
 /* =========================
-   9) 브라우저 뒤로가기/앞으로가기
+   10) 브라우저 뒤로가기/앞으로가기
 ========================= */
 function bindPopState() {
   window.addEventListener("popstate", () => {
@@ -215,7 +240,7 @@ function bindPopState() {
 }
 
 /* =========================
-   10) 정렬 select
+   11) 정렬 select
 ========================= */
 function initSortSelect() {
   const selectRoot = document.getElementById("select-root");
@@ -237,9 +262,12 @@ function initSortSelect() {
 }
 
 /* =========================
-   11) 시작
+   12) 시작
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await requireLogin();
+  if (!ok) return;
+
   await loadUser();
   await mountArtworkCardTemplate();
 
