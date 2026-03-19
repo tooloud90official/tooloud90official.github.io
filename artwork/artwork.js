@@ -19,7 +19,7 @@ const CATEGORY_MAP = {
 let ALL_WORKS = [];
 let currentUser = null;
 let currentSort = "like";
-let currentTab = "이미지·오디오·영상";
+let currentTab = "좋아요 많은 작업물";
 
 /* =========================
    2) 로그인 필수 체크
@@ -68,7 +68,157 @@ async function loadUser() {
 }
 
 /* =========================
-   4) 섹션 텍스트 갱신
+   4) works + users + tools + tool_reviews 조회
+   FK 없이 각각 조회 후 합치기
+========================= */
+async function loadWorks() {
+  const supabase = window._supabase;
+  if (!supabase) {
+    ALL_WORKS = [];
+    return;
+  }
+
+  const { data: worksData, error: worksError } = await supabase
+    .from("works")
+    .select(`
+      work_id,
+      work_title,
+      work_path,
+      work_link,
+      user_id,
+      tool_id,
+      tool_cat,
+      like_count,
+      comment_count,
+      updated_at
+    `);
+
+  if (worksError) {
+    console.error("works 불러오기 실패:", worksError);
+    console.log("works error message:", worksError?.message);
+    console.log("works error details:", worksError?.details);
+    console.log("works error hint:", worksError?.hint);
+    console.log("works error code:", worksError?.code);
+    ALL_WORKS = [];
+    return;
+  }
+
+  const works = Array.isArray(worksData) ? worksData : [];
+
+  const userIds = [...new Set(works.map((w) => w.user_id).filter(Boolean))];
+  const toolIds = [...new Set(works.map((w) => w.tool_id).filter(Boolean))];
+
+  let usersMap = {};
+  let toolsMap = {};
+  let ratingsMap = {};
+
+  /* ===== users 조회 ===== */
+  if (userIds.length) {
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select("user_id, user_name, user_img")
+      .in("user_id", userIds);
+
+    if (usersError) {
+      console.error("users 불러오기 실패:", usersError);
+      console.log("users error message:", usersError?.message);
+      console.log("users error details:", usersError?.details);
+      console.log("users error hint:", usersError?.hint);
+      console.log("users error code:", usersError?.code);
+    } else {
+      usersMap = Object.fromEntries(
+        (usersData || []).map((u) => [String(u.user_id), u])
+      );
+    }
+  }
+
+  /* ===== tools 조회 ===== */
+  if (toolIds.length) {
+    const { data: toolsData, error: toolsError } = await supabase
+      .from("tools")
+      .select("tool_ID, tool_name, tool_company, icon")
+      .in("tool_ID", toolIds);
+
+    if (toolsError) {
+      console.error("tools 불러오기 실패:", toolsError);
+      console.log("tools error message:", toolsError?.message);
+      console.log("tools error details:", toolsError?.details);
+      console.log("tools error hint:", toolsError?.hint);
+      console.log("tools error code:", toolsError?.code);
+    } else {
+      toolsMap = Object.fromEntries(
+        (toolsData || []).map((t) => [String(t.tool_ID), t])
+      );
+    }
+  }
+
+  /* ===== tool_reviews 조회 후 평균 rating 계산 =====
+     ⚠️ tool_reviews의 툴 연결 컬럼명이 tool_id가 아니라면
+        아래 select/in/map 부분의 컬럼명만 맞게 바꿔주면 됨
+  ===== */
+  if (toolIds.length) {
+    const { data: reviewsData, error: reviewsError } = await supabase
+      .from("tool_reviews")
+      .select("tool_id, rating")
+      .in("tool_id", toolIds);
+
+    if (reviewsError) {
+      console.error("tool_reviews 불러오기 실패:", reviewsError);
+      console.log("tool_reviews error message:", reviewsError?.message);
+      console.log("tool_reviews error details:", reviewsError?.details);
+      console.log("tool_reviews error hint:", reviewsError?.hint);
+      console.log("tool_reviews error code:", reviewsError?.code);
+    } else {
+      const grouped = {};
+
+      (reviewsData || []).forEach((row) => {
+        const key = String(row.tool_id);
+        const rating = Number(row.rating);
+
+        if (!grouped[key]) {
+          grouped[key] = {
+            sum: 0,
+            count: 0,
+          };
+        }
+
+        if (!Number.isNaN(rating)) {
+          grouped[key].sum += rating;
+          grouped[key].count += 1;
+        }
+      });
+
+      ratingsMap = Object.fromEntries(
+        Object.entries(grouped).map(([toolId, info]) => [
+          toolId,
+          info.count ? Number((info.sum / info.count).toFixed(1)) : 0,
+        ])
+      );
+    }
+  }
+
+  /* ===== works + users + tools + 평균별점 합치기 ===== */
+  ALL_WORKS = works.map((w) => {
+    const tool = toolsMap[String(w.tool_id)] || null;
+    const avgRating = ratingsMap[String(w.tool_id)] ?? 0;
+
+    return {
+      ...w,
+      users: usersMap[String(w.user_id)] || null,
+      tools: tool
+        ? {
+            ...tool,
+            avg_rating: avgRating,
+          }
+        : null,
+    };
+  });
+
+  console.log("works 조회 성공:", ALL_WORKS);
+}
+
+/* =========================
+   5) 섹션 텍스트 갱신
 ========================= */
 function updateSectionText(tabKey) {
   const sectionTitle = document.querySelector(".artwork-section__title");
@@ -77,7 +227,9 @@ function updateSectionText(tabKey) {
 
   if (sectionTitle) {
     sectionTitle.textContent =
-      tabKey === "내 라이브러리"
+      tabKey === "좋아요 많은 작업물"
+        ? "💙 좋아요 많은 작업물"
+        : tabKey === "내 라이브러리"
         ? "📁 내 라이브러리"
         : tabKey === "AI 추천 작업물"
         ? "🤖 AI 추천 작업물"
@@ -86,7 +238,9 @@ function updateSectionText(tabKey) {
 
   if (sectionDesc) {
     sectionDesc.textContent =
-      tabKey === "내 라이브러리"
+      tabKey === "좋아요 많은 작업물"
+        ? "지금 인기있는 전체 작업물들을 감상해보세요."
+        : tabKey === "내 라이브러리"
         ? "내가 저장한 작업물들을 확인해보세요."
         : tabKey === "AI 추천 작업물"
         ? "AI가 추천하는 작업물을 감상해보세요."
@@ -99,7 +253,7 @@ function updateSectionText(tabKey) {
 }
 
 /* =========================
-   5) 탭 변경
+   6) 탭 변경
 ========================= */
 function setTab(tabKey, options = {}) {
   if (!tabKey) return;
@@ -116,7 +270,13 @@ function setTab(tabKey, options = {}) {
 
   if (updateUrl) {
     const url = new URL(window.location.href);
-    url.searchParams.set("tab", tabKey);
+
+    if (tabKey === "좋아요 많은 작업물") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", tabKey);
+    }
+
     history.pushState({ tab: tabKey }, "", url.pathname + url.search);
   }
 
@@ -124,13 +284,17 @@ function setTab(tabKey, options = {}) {
 }
 
 /* =========================
-   6) 정렬 + 필터
+   7) 정렬 + 필터
 ========================= */
 function getSortedWorks() {
   let filtered = [...ALL_WORKS];
 
   if (currentTab === "내 라이브러리") {
-    filtered = filtered.filter((w) => w.user_id === currentUser?.id);
+    filtered = filtered.filter(
+      (w) => String(w.user_id) === String(currentUser?.id)
+    );
+  } else if (currentTab === "좋아요 많은 작업물") {
+    // 전체 작업물 그대로
   } else if (CATEGORY_MAP[currentTab]) {
     const targetCat = CATEGORY_MAP[currentTab];
     filtered = filtered.filter((w) => w.tool_cat === targetCat);
@@ -148,7 +312,7 @@ function getSortedWorks() {
 }
 
 /* =========================
-   7) 카드 렌더
+   8) 카드 렌더
 ========================= */
 function renderWorks() {
   const works = getSortedWorks();
@@ -168,18 +332,16 @@ function renderWorks() {
       work_id: w.work_id,
       work_title: w.work_title,
 
-      previewSrc: w.previewSrc
-        ? w.previewSrc
-        : w.work_path
-        ? `${window._supabaseUrl}/storage/v1/object/public/works/${w.work_path}`
-        : null,
+      previewSrc: w.work_link || null,
 
-      user_name: w.user_name,
-      user_img: w.user_img,
+      user_name: w.users?.user_name ?? "작성자",
+      user_img: w.users?.user_img ?? "/media/profil.png",
 
-      tool_name: w.tool_name,
+      tool_name: w.tools?.tool_name ?? "툴 정보 없음",
+      tool_brand: w.tools?.tool_company ?? "개발사 정보 없음",
+      tool_stars: w.tools?.avg_rating ?? 0,
       tool_id: w.tool_id,
-      icon: w.tool_icon,
+      icon: w.tools?.icon ?? "/media/tool-default.png",
 
       dateText: w.updated_at
         ? new Date(w.updated_at).toLocaleDateString("ko-KR", {
@@ -196,16 +358,16 @@ function renderWorks() {
 }
 
 /* =========================
-   8) URL에서 탭 읽기
+   9) URL에서 탭 읽기
 ========================= */
 function initFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  const tab = params.get("tab") || "이미지·오디오·영상";
+  const tab = params.get("tab") || "좋아요 많은 작업물";
   setTab(tab);
 }
 
 /* =========================
-   9) 상단 배너 링크 클릭 처리
+   10) 상단 배너 링크 클릭 처리
 ========================= */
 function bindTopBannerArtworkLinks() {
   document.addEventListener("click", (e) => {
@@ -217,7 +379,6 @@ function bindTopBannerArtworkLinks() {
 
     const url = new URL(href, window.location.origin);
     const tab = url.searchParams.get("tab");
-    if (!tab) return;
 
     const isArtworkPage =
       window.location.pathname === "/artwork/artwork.html" ||
@@ -225,13 +386,18 @@ function bindTopBannerArtworkLinks() {
 
     if (isArtworkPage) {
       e.preventDefault();
-      setTab(tab, { updateUrl: true });
+
+      if (!tab) {
+        setTab("좋아요 많은 작업물", { updateUrl: true });
+      } else {
+        setTab(tab, { updateUrl: true });
+      }
     }
   });
 }
 
 /* =========================
-   10) 브라우저 뒤로가기/앞으로가기
+   11) 브라우저 뒤로가기/앞으로가기
 ========================= */
 function bindPopState() {
   window.addEventListener("popstate", () => {
@@ -240,7 +406,7 @@ function bindPopState() {
 }
 
 /* =========================
-   11) 정렬 select
+   12) 정렬 select
 ========================= */
 function initSortSelect() {
   const selectRoot = document.getElementById("select-root");
@@ -262,7 +428,7 @@ function initSortSelect() {
 }
 
 /* =========================
-   12) 시작
+   13) 시작
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
   const ok = await requireLogin();
@@ -270,74 +436,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadUser();
   await mountArtworkCardTemplate();
+  await loadWorks();
 
   bindTopBannerArtworkLinks();
   bindPopState();
   initSortSelect();
-
-  /* ⭐ 테스트용 샘플 데이터 */
-  ALL_WORKS = [
-    {
-      work_id: "sample_pdf",
-      work_title: "PDF 미리보기 테스트",
-      previewSrc: "/media/sample3.pdf",
-
-      user_id: "test_user_1",
-      user_name: "테스트유저",
-      user_img: "/media/profil.png",
-
-      tool_name: "Test Tool",
-      tool_id: "tool_001",
-      tool_icon: "/media/tool-default.png",
-
-      tool_cat: "media",
-
-      like_count: 4,
-      comment_count: 2,
-
-      updated_at: new Date().toISOString(),
-    },
-    {
-      work_id: "sample_img_1",
-      work_title: "리서치 작업물 테스트",
-      previewSrc: "/media/sample.jpg",
-
-      user_id: "test_user_2",
-      user_name: "초코",
-      user_img: "/media/profil.png",
-
-      tool_name: "Research Tool",
-      tool_id: "tool_002",
-      tool_icon: "/media/tool-default.png",
-
-      tool_cat: "res",
-
-      like_count: 8,
-      comment_count: 1,
-
-      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    },
-    {
-      work_id: "sample_img_2",
-      work_title: "개발 작업물 테스트",
-      previewSrc: "/media/sample2.jpg",
-
-      user_id: currentUser?.id ?? "test_user_3",
-      user_name: "나",
-      user_img: "/media/profil.png",
-
-      tool_name: "Dev Tool",
-      tool_id: "tool_003",
-      tool_icon: "/media/tool-default.png",
-
-      tool_cat: "dev",
-
-      like_count: 2,
-      comment_count: 0,
-
-      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    },
-  ];
-
   initFromUrl();
 });

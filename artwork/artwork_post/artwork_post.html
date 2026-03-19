@@ -4,13 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>게시글 상세</title>
+
   <link rel="stylesheet" href="/_common/button/button.css" />
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
   <link rel="stylesheet" href="/artwork/artwork_post/artwork_post.css" />
-  <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
+  <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css" />
+
+  <!-- PDF.js -->
+  <script type="module">
+    import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+    window.pdfjsLib = pdfjsLib;
+  </script>
 </head>
 <body>
   <div id="top-banner" class="inquiry-banner-root"></div>
+
   <div class="post-page">
 
     <!-- 상단 배너 -->
@@ -18,14 +28,18 @@
 
       <!-- 오른쪽 상단 수정/삭제 -->
       <div class="artwork-hero-banner__actions">
-        <button class="icon-btn" data-act="edit-artwork"><img src="/media/edit.png" alt="수정" /></button>
-        <button class="icon-btn" data-act="del-artwork"><img src="/media/delete.png" alt="삭제" /></button>
+        <button class="icon-btn" data-act="edit-artwork">
+          <img src="/media/edit.png" alt="수정" />
+        </button>
+        <button class="icon-btn" data-act="del-artwork">
+          <img src="/media/delete.png" alt="삭제" />
+        </button>
       </div>
 
       <div class="artwork-hero-banner__eyebrow">
         작업물
         <div class="artwork-hero-banner__dot"></div>
-        <span id="bannerCategory">디지털 아트</span>
+        <span id="bannerCategory">카테고리 불러오는 중…</span>
       </div>
 
       <h1 class="artwork-hero-banner__title" id="bannerTitle">제목을 불러오는 중…</h1>
@@ -37,20 +51,21 @@
         <div class="artwork-hero-banner__profile-left">
           <div class="avatar">
             <div class="avatar__inner">
-              <img src="/media/profil.png" alt="프로필" />
+              <img id="bannerProfileImg" src="/media/profil.png" alt="프로필" />
             </div>
           </div>
           <div>
-            <div class="name" id="bannerUsername">Soojin</div>
-            <div class="date" id="bannerDate">· 2026년 01월 01일</div>
+            <div class="name" id="bannerUsername">작성자 불러오는 중…</div>
+            <div class="date" id="bannerDate">· 날짜 불러오는 중…</div>
           </div>
         </div>
 
         <div class="artwork-hero-banner__stats">
           <button class="stat" id="btnLike" aria-pressed="false">
             <img src="/media/Heart.png" alt="좋아요" />
-            <span id="likeCount">210</span>
+            <span id="likeCount">0</span>
           </button>
+
           <a class="stat" href="#comments">
             <img src="/media/comment.png" alt="댓글" />
             <span id="commentCount">0</span>
@@ -63,22 +78,25 @@
 
     <!-- 히어로 이미지 -->
     <section class="hero">
-      <img class="hero__img" src="/media/work.png" alt="작업물 커버" />
+      <img class="hero__img" src="" alt="작업물 미리보기" />
       <div class="hero__overlay"></div>
 
+      <!-- 툴 정보 카드 -->
       <div class="artwork-post__tool">
         <img
           class="artwork-post__tool-ic"
-          src="https://cdn.brandfetch.io/ideA07K8J2/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1766207012399"
-          alt=""
-          aria-hidden="true"
+          id="bannerToolIcon"
+          src="/media/image.png"
+          alt="툴 아이콘"
         />
+
         <div class="artwork-post__tool-meta">
           <div class="artwork-post__tool-top">
-            <span class="artwork-post__tool-name">Adobe Firefly</span>
+            <span class="artwork-post__tool-name" id="bannerToolName">툴 이름 불러오는 중…</span>
           </div>
-          <span class="artwork-post__tool-stars">★★★★☆</span>
-          <div class="artwork-post__tool-brand">@Adobe</div>
+
+          <span class="artwork-post__tool-stars" id="bannerToolRating">0.0</span>
+          <div class="artwork-post__tool-brand" id="bannerToolCompany">@회사명 불러오는 중…</div>
         </div>
       </div>
     </section>
@@ -86,14 +104,17 @@
     <main class="card">
 
       <section class="comments" id="comments">
-        <div class="comments__title">All comments (<span id="commentCountTitle">0</span>)</div>
+        <div class="comments__title">
+          All comments (<span id="commentCountTitle">0</span>)
+        </div>
 
         <div class="comment-write">
           <div class="avatar sm">
             <div class="avatar__inner">
-              <img src="/media/profil.png" alt="내 프로필" />
+              <img id="myProfileImg" src="/media/profil.png" alt="내 프로필" />
             </div>
           </div>
+
           <div class="write-col">
             <div class="box">
               <textarea id="commentInput" placeholder="댓글을 남겨주세요." rows="3"></textarea>
@@ -108,6 +129,7 @@
   </div>
 
   <div id="bottom-banner"></div>
+
   <script src="/_common/button/button.js"></script>
   <script type="module" src="/_common/top-banner/include.js"></script>
   <script src="/artwork/artwork_post/artwork_post.js" defer></script>

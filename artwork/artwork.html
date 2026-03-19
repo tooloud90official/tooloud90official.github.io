@@ -13,16 +13,8 @@
 <link rel="stylesheet" href="/artwork/artwork.css">
 <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
 
-<!-- PDF.js -->
-<script type="module">
-import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-window.pdfjsLib = pdfjsLib;
-</script>
-
+ <!-- PDF.js --> <script type="module"> import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js'; pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs"; window.pdfjsLib = pdfjsLib; </script>
 </head>
 
 <body class="artwork-page">

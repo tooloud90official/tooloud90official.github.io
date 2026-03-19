@@ -99,9 +99,8 @@ function debounce(fn, delay = 100) {
 }
 
 function generateWorkId() {
-  return "work_" + crypto.randomUUID().replaceAll("-", "");
+  return crypto.randomUUID().replaceAll("-", "");
 }
-
 function getSelectedTool() {
   return TOOL_LIST.find((t) => String(t.id) === String(selectedToolId)) || null;
 }
@@ -193,7 +192,7 @@ async function loadToolsFromDB() {
     // 1차: 기존 쿼리 그대로
     let { data, error } = await supabase
       .from("tools")
-      .select("tool_ID, tool_name, tool_company, icon, tool_cat, tool_rate")
+      .select("tool_ID, tool_name, tool_company, icon, tool_cat")
       .order("tool_name", { ascending: true });
 
     console.log("[tools] first query data:", data);
@@ -205,7 +204,7 @@ async function loadToolsFromDB() {
       // 2차: order 제거해서 재시도
       const retry1 = await supabase
         .from("tools")
-        .select("tool_ID, tool_name, tool_company, icon, tool_cat, tool_rate");
+        .select("tool_ID, tool_name, tool_company, icon, tool_cat");
 
       console.log("[tools] retry without order data:", retry1.data);
       console.log("[tools] retry without order error:", retry1.error);
@@ -238,14 +237,26 @@ async function loadToolsFromDB() {
       }
     }
 
-    TOOL_LIST = (data || []).map((t) => ({
-      id: String(t.tool_ID ?? ""),
-      name: t.tool_name || "",
-      brand: t.tool_company ? `@${t.tool_company}` : "@Tool",
-      icon: t.icon || "",
-      tool_cat: t.tool_cat || "",
-      stars: Number(t.tool_rate) || 0,
-    }));
+    const { data: reviews } = await supabase
+  .from("tool_reviews")
+  .select("tool_id, rating");
+
+    TOOL_LIST = (data || []).map((t) => {
+      const related = (reviews || []).filter(r => r.tool_id == t.tool_ID);
+      const avg =
+        related.length > 0
+          ? related.reduce((a, b) => a + b.rating, 0) / related.length
+          : 0;
+    
+      return {
+        id: String(t.tool_ID ?? ""),
+        name: t.tool_name || "",
+        brand: t.tool_company ? `@${t.tool_company}` : "@Tool",
+        icon: t.icon || "",
+        tool_cat: t.tool_cat || "",
+        stars: avg,
+      };
+    });
 
     console.log("[tools] TOOL_LIST:", TOOL_LIST);
     console.log("[tools] count:", TOOL_LIST.length);
@@ -946,6 +957,8 @@ async function uploadFileToStorage(file, workId) {
   const fileName = `${Date.now()}.${safeExt}`;
   const path = `${currentUser.id}/${workId}/${fileName}`;
 
+  console.log("path:", path); // 👈 여기 추가
+
   const { error } = await supabase.storage
     .from("works")
     .upload(path, file, {
@@ -1017,8 +1030,8 @@ async function fillEditDataFromDB() {
   }
   renderTags();
 
-  if (work.tool_ID) {
-    selectedToolId = String(work.tool_ID);
+  if (work.tool_id) {
+    selectedToolId = String(work.tool_id);
     await loadToolsFromDB();
     renderToolCard(getSelectedTool());
   }
@@ -1084,6 +1097,12 @@ async function mountActionButtons() {
 ========================================================= */
 async function submitArtwork() {
   try {
+
+    if (!currentUser) {
+      await loadCurrentUser();
+    }
+    console.log("currentUser:", currentUser);
+
     if (!currentUser) {
       alert("로그인이 필요합니다.");
       window.location.href = "/login1/login1.html";
@@ -1138,7 +1157,7 @@ async function submitArtwork() {
       const payload = {
         work_id: workId,
         user_id: currentUser.id,
-        tool_ID: tool.id,
+        tool_id: tool.id,
         tool_cat: tool.tool_cat || "",
         work_link: uploaded?.url || "",
         work_desc: desc,
@@ -1154,7 +1173,7 @@ async function submitArtwork() {
       if (error) throw error;
 
       alert("작업물이 등록되었습니다.");
-      window.location.href = `/artwork/post/post.html?id=${workId}`;
+      window.location.href = `/artwork/artwork_post/artwork_post.html?id=${workId}`;
       return;
     }
 
@@ -1177,7 +1196,7 @@ async function submitArtwork() {
     }
 
     const updatePayload = {
-      tool_ID: tool.id,
+      tool_id: tool.id,
       tool_cat: tool.tool_cat || "",
       work_link: nextLink,
       work_desc: desc,
@@ -1196,7 +1215,7 @@ async function submitArtwork() {
     if (error) throw error;
 
     alert("작업물이 수정되었습니다.");
-    window.location.href = `/artwork/post/post.html?id=${originalWorkData.work_id}`;
+    window.location.href = `/artwork/artwork_post/artwork_post.html?id=${originalWorkData.work_id}`;
   } catch (err) {
     console.error("등록/수정 실패:", err);
     alert(`저장에 실패했습니다.\n${err.message || "알 수 없는 오류"}`);

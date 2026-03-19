@@ -8,89 +8,339 @@ const esc = (t) =>
     .replaceAll("'", "&#039;");
 
 const supabase = window._supabase;
-const params   = new URLSearchParams(window.location.search);
-const workId   = params.get("id");
+const params = new URLSearchParams(window.location.search);
+const workId = params.get("id");
 
-let currentUser  = null; // 로그인한 유저
-let artworkData  = null; // 작업물 데이터
-let workOwnerId  = null; // 작업물 주인 user_id
-let state        = { liked: false, likeCount: 0, comments: [] };
+let currentUser = null;
+let artworkData = null;
+let workOwnerId = null;
+let state = { liked: false, likeCount: 0, comments: [] };
 
-/* =========================
-   유틸
-========================= */
+async function renderPdfWithPdfJs(url, mountEl) {
+  const pdfjsLib = window.pdfjsLib;
+  if (!pdfjsLib) {
+    mountEl.innerHTML = `
+      <div class="pdf-fallback">
+        <p>PDF 미리보기를 불러오지 못했어요.</p>
+        <a href="${url}" target="_blank" rel="noopener noreferrer">새 창에서 열기</a>
+      </div>
+    `;
+    return;
+  }
+
+  mountEl.innerHTML = `
+    <div class="hero__pdf-wrap">
+      <div class="hero__pdf-stage">
+        <canvas class="hero__pdf-canvas"></canvas>
+      </div>
+
+      <div class="hero__pdf-controls">
+        <button type="button" class="hero__pdf-btn" data-pdf-prev>이전</button>
+        <span class="hero__pdf-page" data-pdf-page>1 / 1</span>
+        <button type="button" class="hero__pdf-btn" data-pdf-next>다음</button>
+      </div>
+    </div>
+  `;
+
+  const canvas = mountEl.querySelector(".hero__pdf-canvas");
+  const ctx = canvas.getContext("2d");
+  const prevBtn = mountEl.querySelector("[data-pdf-prev]");
+  const nextBtn = mountEl.querySelector("[data-pdf-next]");
+  const pageText = mountEl.querySelector("[data-pdf-page]");
+
+  let pdfDoc = null;
+  let pageNum = 1;
+  let rendering = false;
+  let pendingPage = null;
+
+  const getFitScale = (page) => {
+    const stage = mountEl.querySelector(".hero__pdf-stage");
+    const unscaled = page.getViewport({ scale: 1 });
+
+    const stageW = stage.clientWidth || 800;
+    const stageH = stage.clientHeight || 500;
+
+    const scaleX = stageW / unscaled.width;
+    const scaleY = stageH / unscaled.height;
+
+    return Math.min(scaleX, scaleY, 2.2);
+  };
+
+  const renderPage = async (num) => {
+    rendering = true;
+
+    const page = await pdfDoc.getPage(num);
+    const scale = getFitScale(page);
+    const viewport = page.getViewport({ scale });
+
+    const outputScale = window.devicePixelRatio || 1;
+
+    canvas.width = Math.floor(viewport.width * outputScale);
+    canvas.height = Math.floor(viewport.height * outputScale);
+    canvas.style.width = `${viewport.width}px`;
+    canvas.style.height = `${viewport.height}px`;
+
+    const transform =
+      outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+    await page.render({
+      canvasContext: ctx,
+      viewport,
+      transform,
+    }).promise;
+
+    pageText.textContent = `${num} / ${pdfDoc.numPages}`;
+    prevBtn.disabled = num <= 1;
+    nextBtn.disabled = num >= pdfDoc.numPages;
+
+    rendering = false;
+
+    if (pendingPage !== null) {
+      const next = pendingPage;
+      pendingPage = null;
+      renderPage(next);
+    }
+  };
+
+  const queueRenderPage = (num) => {
+    if (rendering) {
+      pendingPage = num;
+    } else {
+      renderPage(num);
+    }
+  };
+
+  pdfDoc = await pdfjsLib.getDocument(url).promise;
+  await renderPage(pageNum);
+
+  prevBtn.addEventListener("click", () => {
+    if (pageNum <= 1) return;
+    pageNum--;
+    queueRenderPage(pageNum);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    queueRenderPage(pageNum);
+  });
+
+  window.addEventListener("resize", () => {
+    queueRenderPage(pageNum);
+  });
+}
+
+function renderArtworkMedia(data) {
+  const hero = document.querySelector(".hero");
+  const oldMedia = document.querySelector(".hero__img");
+  if (!hero || !oldMedia) return;
+  if (!data.work_link) return;
+
+  const url = data.work_link;
+
+  if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+    oldMedia.outerHTML = `<img class="hero__img" src="${url}" alt="">`;
+    return;
+  }
+
+  if (url.match(/\.(mp4|webm)$/i)) {
+    oldMedia.outerHTML = `<video class="hero__img" src="${url}" controls playsinline></video>`;
+    return;
+  }
+
+  if (url.match(/\.pdf$/i)) {
+    const mount = document.createElement("div");
+    mount.className = "hero__img hero__img--pdf";
+    oldMedia.replaceWith(mount);
+
+    renderPdfWithPdfJs(url, mount).catch((err) => {
+      console.error("PDF 렌더 실패:", err);
+      mount.innerHTML = `
+        <div class="pdf-fallback">
+          <p>PDF 미리보기에 실패했어요.</p>
+          <a href="${url}" target="_blank" rel="noopener noreferrer">새 창에서 열기</a>
+        </div>
+      `;
+    });
+    return;
+  }
+
+  oldMedia.outerHTML = `
+    <div class="hero__img hero__img--fallback">
+      미리보기를 지원하지 않는 파일입니다.
+    </div>
+  `;
+}
+
 function formatDate(isoStr) {
   if (!isoStr) return "";
   return new Date(isoStr).toLocaleDateString("ko-KR", {
-    year: "numeric", month: "2-digit", day: "2-digit",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
 }
 
 function timeAgo(isoStr) {
   if (!isoStr) return "방금 전";
   const diff = Date.now() - new Date(isoStr).getTime();
-  const min  = Math.floor(diff / 60000);
-  if (min < 1)  return "방금 전";
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return "방금 전";
   if (min < 60) return `${min}분 전`;
   const hr = Math.floor(min / 60);
-  if (hr < 24)  return `${hr}시간 전`;
+  if (hr < 24) return `${hr}시간 전`;
   return `${Math.floor(hr / 24)}일 전`;
 }
 
-/* =========================
-   알림 생성
-========================= */
 async function insertNotification(toUserId, type, referenceId) {
-  if (!toUserId || toUserId === currentUser?.id) return; // 본인한테는 알림 X
+  if (!toUserId || toUserId === currentUser?.id) return;
+
   await supabase.from("notifications").insert({
     notification_id: crypto.randomUUID(),
-    user_id:         toUserId,
+    user_id: toUserId,
     type,
-    reference_id:    referenceId,
-    is_read:         false,
-    created_at:      new Date().toISOString(),
+    reference_id: referenceId,
+    is_read: false,
+    created_at: new Date().toISOString(),
   });
 }
 
-/* =========================
-   배너 채우기
-========================= */
+async function fetchToolInfo(toolId) {
+  console.log("fetchToolInfo toolId:", toolId);
+
+  if (!toolId) {
+    return {
+      tool_name: "",
+      tool_company: "",
+      tool_icon: "",
+      rating: "0.0",
+    };
+  }
+
+  let tool_name = "";
+  let tool_company = "";
+  let tool_icon = "";
+  let rating = "0.0";
+
+  const { data: toolData, error: toolError } = await supabase
+    .from("tools")
+    .select("tool_ID, tool_name, tool_company, icon")
+    .eq("tool_ID", toolId)
+    .maybeSingle();
+
+  if (toolError) {
+    console.error("tools 조회 실패 raw:", toolError);
+    console.error("tools 조회 실패 message:", toolError.message);
+    console.error("tools 조회 실패 details:", toolError.details);
+    console.error("tools 조회 실패 hint:", toolError.hint);
+    console.error("tools 조회 실패 code:", toolError.code);
+  }
+
+  if (toolData) {
+    tool_name = toolData.tool_name ?? "";
+    tool_company = toolData.tool_company ?? "";
+    tool_icon = toolData.icon ?? "";
+  } else {
+    console.warn("tools에서 일치하는 데이터 없음. toolId =", toolId);
+  }
+
+  const { data: reviewData, error: reviewError } = await supabase
+    .from("tool_reviews")
+    .select("rating")
+    .eq("tool_id", toolId);
+
+  if (reviewError) {
+    console.error("tool_reviews 조회 실패 raw:", reviewError);
+    console.error("tool_reviews 조회 실패 message:", reviewError.message);
+    console.error("tool_reviews 조회 실패 details:", reviewError.details);
+    console.error("tool_reviews 조회 실패 hint:", reviewError.hint);
+    console.error("tool_reviews 조회 실패 code:", reviewError.code);
+  }
+
+  if (Array.isArray(reviewData) && reviewData.length) {
+    const validRatings = reviewData
+      .map((row) => Number(row.rating))
+      .filter((num) => !Number.isNaN(num));
+
+    if (validRatings.length) {
+      const avg =
+        validRatings.reduce((sum, cur) => sum + cur, 0) / validRatings.length;
+      rating = avg.toFixed(1);
+    }
+  }
+
+  return { tool_name, tool_company, tool_icon, rating };
+}
+
 function fillBanner(data) {
-  if (data.work_title)   $("#bannerTitle").textContent    = data.work_title;
-  if (data.tool_cat)     $("#bannerCategory").textContent = data.tool_cat;
-  if (data.user_name)    $("#bannerUsername").textContent = data.user_name;
-  if (data.updated_at)   $("#bannerDate").textContent     = `· ${formatDate(data.updated_at)}`;
+  if (data.work_title) $("#bannerTitle").textContent = data.work_title;
+  if (data.tool_cat) $("#bannerCategory").textContent = data.tool_cat;
+  if (data.user_name) $("#bannerUsername").textContent = data.user_name;
+  if (data.updated_at) {
+    $("#bannerDate").textContent = `· ${formatDate(data.updated_at)}`;
+  }
 
   const descEl = $("#bannerDesc");
   if (descEl) descEl.textContent = data.work_desc || "";
 
-  // 수정/삭제 버튼 — 본인 작업물만 표시
+  const profileImgEl = $("#bannerProfileImg");
+  if (profileImgEl) {
+    profileImgEl.src = data.user_img || "/media/profil.png";
+  }
+
+  const myProfileImgEl = $("#myProfileImg");
+  if (myProfileImgEl) {
+    myProfileImgEl.src = currentUser?.user_img || "/media/profil.png";
+  }
+
+  const toolNameEl = $("#bannerToolName");
+  if (toolNameEl) {
+    toolNameEl.textContent = data.tool_name || "툴 이름 없음";
+  }
+
+  const toolCompanyEl = $("#bannerToolCompany");
+  if (toolCompanyEl) {
+    toolCompanyEl.textContent = data.tool_company
+      ? `@${String(data.tool_company).replace(/^@+/, "")}`
+      : "@회사 정보 없음";
+  }
+
+  const toolRatingEl = $("#bannerToolRating");
+  if (toolRatingEl) {
+    toolRatingEl.textContent = data.rating ?? "0.0";
+  }
+
+  const toolIconEl = $("#bannerToolIcon");
+  if (toolIconEl) {
+    toolIconEl.src = data.tool_icon || "/media/image.png";
+    toolIconEl.alt = data.tool_name || "툴 아이콘";
+  }
+
   const actions = $(".artwork-hero-banner__actions");
   if (actions) actions.style.display = data.isMine ? "flex" : "none";
 
-  // 태그
   if (Array.isArray(data.work_tags) && data.work_tags.length) {
     $("#bannerTags").innerHTML = data.work_tags
-      .map(tag => `<span class="artwork-hero-banner__tag">${esc(tag)}</span>`)
+      .map((tag) => `<span class="artwork-hero-banner__tag">${esc(tag)}</span>`)
       .join("");
+  } else {
+    const tagWrap = $("#bannerTags");
+    if (tagWrap) tagWrap.innerHTML = "";
   }
 }
 
-/* =========================
-   좋아요
-========================= */
 async function initLike() {
-  const likeBtn   = $("#btnLike");
+  const likeBtn = $("#btnLike");
   const likeCount = $("#likeCount");
   if (!likeBtn || !likeCount) return;
 
-  // 현재 유저가 이미 좋아요 눌렀는지 확인
   if (currentUser) {
     const { data: userData } = await supabase
       .from("users")
       .select("liked_works")
       .eq("user_id", currentUser.id)
       .single();
+
     state.liked = (userData?.liked_works || []).includes(workId);
   }
 
@@ -98,7 +348,9 @@ async function initLike() {
   likeCount.textContent = state.likeCount;
 
   const heartImg = likeBtn.querySelector("img");
-  if (heartImg) heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
+  if (heartImg) {
+    heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
+  }
 
   likeBtn.addEventListener("click", async () => {
     if (!currentUser) {
@@ -110,15 +362,16 @@ async function initLike() {
     state.liked = !state.liked;
     state.likeCount += state.liked ? 1 : -1;
     likeCount.textContent = state.likeCount;
-    if (heartImg) heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
 
-    // works 테이블 like_count 업데이트
+    if (heartImg) {
+      heartImg.src = state.liked ? "/media/Heart_fill.png" : "/media/Heart.png";
+    }
+
     await supabase
       .from("works")
       .update({ like_count: state.likeCount })
       .eq("work_id", workId);
 
-    // users 테이블 liked_works 배열 업데이트
     const { data: userData } = await supabase
       .from("users")
       .select("liked_works")
@@ -128,28 +381,24 @@ async function initLike() {
     const likedWorks = userData?.liked_works || [];
     const updated = state.liked
       ? [...new Set([...likedWorks, workId])]
-      : likedWorks.filter(id => id !== workId);
+      : likedWorks.filter((id) => id !== workId);
 
     await supabase
       .from("users")
       .update({ liked_works: updated })
       .eq("user_id", currentUser.id);
 
-    // 알림 — 좋아요 누를 때만
     if (state.liked) {
       await insertNotification(workOwnerId, "like", workId);
     }
   });
 }
 
-/* =========================
-   댓글 렌더
-========================= */
 function syncCommentCount() {
   const count = state.comments.length;
-  const cCount      = $("#commentCount");
+  const cCount = $("#commentCount");
   const cCountTitle = $("#commentCountTitle");
-  if (cCount)      cCount.textContent      = String(count);
+  if (cCount) cCount.textContent = String(count);
   if (cCountTitle) cCountTitle.textContent = String(count);
 }
 
@@ -159,7 +408,7 @@ function replyHTML(r, cid) {
         <textarea class="edit-textarea" id="edit-input-r-${r.id}" rows="2">${esc(r.content || r.text)}</textarea>
         <div class="edit-actions">
           <button class="act" data-act="edit-cancel-r" data-cid="${cid}" data-rid="${r.id}">취소</button>
-          <button class="act" data-act="edit-save-r"   data-cid="${cid}" data-rid="${r.id}">저장</button>
+          <button class="act" data-act="edit-save-r" data-cid="${cid}" data-rid="${r.id}">저장</button>
         </div>
       </div>`
     : `<p class="reply-text">${esc(r.content || r.text)}</p>`;
@@ -194,7 +443,7 @@ function commentHTML(c) {
         <textarea class="edit-textarea" id="edit-input-c-${c.id}" rows="3">${esc(c.content || c.text)}</textarea>
         <div class="edit-actions">
           <button class="act" data-act="edit-cancel-c" data-cid="${c.id}">취소</button>
-          <button class="act" data-act="edit-save-c"   data-cid="${c.id}">저장</button>
+          <button class="act" data-act="edit-save-c" data-cid="${c.id}">저장</button>
         </div>
       </div>`
     : `<p class="text">${esc(c.content || c.text)}</p>`;
@@ -221,7 +470,7 @@ function commentHTML(c) {
       <div class="rin">
         <ul class="reply-list">
           ${rN
-            ? c.replies.map(r => replyHTML(r, c.id)).join("")
+            ? c.replies.map((r) => replyHTML(r, c.id)).join("")
             : `<li class="reply-item reply-item--empty">대댓글이 없습니다.</li>`}
         </ul>
         <div class="comment-write reply-write">
@@ -239,7 +488,7 @@ function commentHTML(c) {
     </div>
     ${c.isMine && !c.editMode
       ? `<div class="actions">
-          <button class="act" data-act="edit-c"   data-cid="${c.id}">수정</button>
+          <button class="act" data-act="edit-c" data-cid="${c.id}">수정</button>
           <button class="act danger" data-act="del-c" data-cid="${c.id}">삭제</button>
         </div>`
       : ""}
@@ -249,13 +498,15 @@ function commentHTML(c) {
 function render() {
   const list = $("#commentList");
   if (!list) return;
-  list.innerHTML = state.comments.map(c => commentHTML(c)).join("");
 
-  state.comments.forEach(c => {
+  list.innerHTML = state.comments.map((c) => commentHTML(c)).join("");
+
+  state.comments.forEach((c) => {
     const panel = $(`#replies-${c.id}`);
-    const pill  = $(`#pill-${c.id}`);
+    const pill = $(`#pill-${c.id}`);
+
     if (panel) panel.classList.toggle("is-open", !!c.isOpen);
-    if (pill)  pill.classList.toggle("is-open",  !!c.isOpen);
+    if (pill) pill.classList.toggle("is-open", !!c.isOpen);
 
     const replyMountId = `#reply-submit-${c.id}`;
     if ($(replyMountId) && typeof loadButton === "function") {
@@ -266,9 +517,6 @@ function render() {
   syncCommentCount();
 }
 
-/* =========================
-   댓글 로드 (Supabase)
-========================= */
 async function loadComments() {
   const { data: comments, error } = await supabase
     .from("comments")
@@ -276,101 +524,110 @@ async function loadComments() {
     .eq("work_id", workId)
     .order("updated_at", { ascending: true });
 
-  if (error) { console.error("댓글 로드 실패:", error); return; }
+  if (error) {
+    console.error("댓글 로드 실패:", error);
+    return;
+  }
 
-  // user_id → user_name, user_img 매핑
-  const userIds = [...new Set((comments || []).map(c => c.user_id).filter(Boolean))];
+  const userIds = [...new Set((comments || []).map((c) => c.user_id).filter(Boolean))];
   let userMap = {};
+
   if (userIds.length) {
     const { data: users } = await supabase
       .from("users")
       .select("user_id, user_name, user_img")
       .in("user_id", userIds);
-    userMap = Object.fromEntries((users || []).map(u => [u.user_id, u]));
+
+    userMap = Object.fromEntries((users || []).map((u) => [u.user_id, u]));
   }
 
-  const enriched = (comments || []).map(c => ({
-    id:              c.comment_id,
-    user_id:         c.user_id,
-    user_name:       userMap[c.user_id]?.user_name ?? "user",
-    user_img:        userMap[c.user_id]?.user_img  ?? null,
-    content:         c.content,
-    updated_at:      c.updated_at,
+  const enriched = (comments || []).map((c) => ({
+    id: c.comment_id,
+    user_id: c.user_id,
+    user_name: userMap[c.user_id]?.user_name ?? "user",
+    user_img: userMap[c.user_id]?.user_img ?? null,
+    content: c.content,
+    updated_at: c.updated_at,
     parent_comment_id: c.parent_comment_id,
-    isMine:          currentUser?.id === c.user_id,
-    isOpen:          false,
-    editMode:        false,
+    isMine: currentUser?.id === c.user_id,
+    isOpen: false,
+    editMode: false,
   }));
 
-  // 부모/대댓글 트리 구성
-  const roots   = enriched.filter(c => !c.parent_comment_id);
-  const replies = enriched.filter(c =>  c.parent_comment_id);
-  state.comments = roots.map(c => ({
+  const roots = enriched.filter((c) => !c.parent_comment_id);
+  const replies = enriched.filter((c) => c.parent_comment_id);
+
+  state.comments = roots.map((c) => ({
     ...c,
-    replies: replies.filter(r => r.parent_comment_id === c.id),
+    replies: replies.filter((r) => r.parent_comment_id === c.id),
   }));
 
   render();
 }
 
-/* =========================
-   댓글 추가
-========================= */
 async function addComment() {
   const commentInput = $("#commentInput");
   const text = (commentInput?.value || "").trim();
+
   if (!text) return;
-  if (!currentUser) { alert("로그인이 필요합니다."); return; }
+  if (!currentUser) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
 
   const newComment = {
-    comment_id:        crypto.randomUUID(),
-    work_id:           workId,
-    user_id:           currentUser.id,
-    content:           text,
-    updated_at:        new Date().toISOString(),
+    comment_id: crypto.randomUUID(),
+    work_id: workId,
+    user_id: currentUser.id,
+    content: text,
+    updated_at: new Date().toISOString(),
     parent_comment_id: null,
   };
 
   const { error } = await supabase.from("comments").insert(newComment);
-  if (error) { console.error("댓글 등록 실패:", error); return; }
+  if (error) {
+    console.error("댓글 등록 실패:", error);
+    return;
+  }
 
-  // works comment_count 증가
   await supabase
     .from("works")
     .update({ comment_count: (artworkData.comment_count ?? 0) + 1 })
     .eq("work_id", workId);
-  artworkData.comment_count = (artworkData.comment_count ?? 0) + 1;
 
-  // 알림
+  artworkData.comment_count = (artworkData.comment_count ?? 0) + 1;
   await insertNotification(workOwnerId, "comment", newComment.comment_id);
 
   if (commentInput) commentInput.value = "";
   await loadComments();
 }
 
-/* =========================
-   대댓글 추가
-========================= */
 async function addReply(parentCommentId) {
-  const ta   = $(`#rin-${parentCommentId}`);
+  const ta = $(`#rin-${parentCommentId}`);
   const text = (ta?.value || "").trim();
+
   if (!text) return;
-  if (!currentUser) { alert("로그인이 필요합니다."); return; }
+  if (!currentUser) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
 
   const newReply = {
-    comment_id:        crypto.randomUUID(),
-    work_id:           workId,
-    user_id:           currentUser.id,
-    content:           text,
-    updated_at:        new Date().toISOString(),
+    comment_id: crypto.randomUUID(),
+    work_id: workId,
+    user_id: currentUser.id,
+    content: text,
+    updated_at: new Date().toISOString(),
     parent_comment_id: parentCommentId,
   };
 
   const { error } = await supabase.from("comments").insert(newReply);
-  if (error) { console.error("대댓글 등록 실패:", error); return; }
+  if (error) {
+    console.error("대댓글 등록 실패:", error);
+    return;
+  }
 
-  // 알림 — 부모 댓글 작성자한테
-  const parentComment = state.comments.find(c => c.id === parentCommentId);
+  const parentComment = state.comments.find((c) => c.id === parentCommentId);
   if (parentComment) {
     await insertNotification(parentComment.user_id, "reply", newReply.comment_id);
   }
@@ -379,9 +636,6 @@ async function addReply(parentCommentId) {
   await loadComments();
 }
 
-/* =========================
-   수정/삭제
-========================= */
 async function editArtwork() {
   window.location.href = `/artwork/artwork_upload/artwork_upload.html?mode=edit&id=${workId}`;
 }
@@ -389,29 +643,27 @@ async function editArtwork() {
 async function deleteArtwork() {
   if (!confirm("작업물을 삭제할까요?")) return;
 
-  // 스토리지 파일 삭제
   if (artworkData.work_path) {
     await supabase.storage.from("works").remove([artworkData.work_path]);
   }
 
   const { error } = await supabase.from("works").delete().eq("work_id", workId);
-  if (error) { console.error("삭제 실패:", error); return; }
+  if (error) {
+    console.error("삭제 실패:", error);
+    return;
+  }
 
   alert("작업물이 삭제되었습니다.");
   history.back();
+  window.location.href = "/artwork/artwork.html";
 }
 
-/* =========================
-   이벤트 위임
-========================= */
 document.addEventListener("click", async (e) => {
-  // 댓글 등록
   if (e.target.closest("#commentSubmitMount button")) {
     await addComment();
     return;
   }
 
-  // 대댓글 등록
   const rBtnArea = e.target.closest("[id^='reply-submit-']");
   if (rBtnArea && e.target.tagName === "BUTTON") {
     await addReply(rBtnArea.id.replace("reply-submit-", ""));
@@ -420,63 +672,89 @@ document.addEventListener("click", async (e) => {
 
   const t = e.target.closest("[data-act]");
   if (!t) return;
+
   const { act, cid, rid } = t.dataset;
 
   if (act === "toggle") {
-    const c = state.comments.find(x => x.id === cid);
-    if (c) { c.isOpen = !c.isOpen; render(); }
+    const c = state.comments.find((x) => x.id === cid);
+    if (c) {
+      c.isOpen = !c.isOpen;
+      render();
+    }
   }
 
-  // 댓글 수정
   if (act === "edit-c") {
-    const c = state.comments.find(x => x.id === cid);
-    if (c) { c.editMode = true; render(); $(`#edit-input-c-${cid}`)?.focus(); }
+    const c = state.comments.find((x) => x.id === cid);
+    if (c) {
+      c.editMode = true;
+      render();
+      $(`#edit-input-c-${cid}`)?.focus();
+    }
   }
+
   if (act === "edit-cancel-c") {
-    const c = state.comments.find(x => x.id === cid);
-    if (c) { c.editMode = false; render(); }
+    const c = state.comments.find((x) => x.id === cid);
+    if (c) {
+      c.editMode = false;
+      render();
+    }
   }
+
   if (act === "edit-save-c") {
-    const ta   = $(`#edit-input-c-${cid}`);
+    const ta = $(`#edit-input-c-${cid}`);
     const text = (ta?.value || "").trim();
     if (!text) return;
-    await supabase.from("comments")
+
+    await supabase
+      .from("comments")
       .update({ content: text, updated_at: new Date().toISOString() })
       .eq("comment_id", cid);
+
     await loadComments();
   }
 
-  // 댓글 삭제
   if (act === "del-c") {
     if (!confirm("댓글을 삭제할까요?")) return;
     await supabase.from("comments").delete().eq("comment_id", cid);
     await loadComments();
   }
 
-  // 대댓글 수정
   if (act === "edit-r") {
     for (const c of state.comments) {
-      const r = c.replies?.find(x => x.id === rid);
-      if (r) { r.editMode = true; render(); $(`#edit-input-r-${rid}`)?.focus(); break; }
+      const r = c.replies?.find((x) => x.id === rid);
+      if (r) {
+        r.editMode = true;
+        render();
+        $(`#edit-input-r-${rid}`)?.focus();
+        break;
+      }
     }
   }
+
   if (act === "edit-cancel-r") {
     for (const c of state.comments) {
-      const r = c.replies?.find(x => x.id === rid);
-      if (r) { r.editMode = false; render(); break; }
+      const r = c.replies?.find((x) => x.id === rid);
+      if (r) {
+        r.editMode = false;
+        render();
+        break;
+      }
     }
   }
+
   if (act === "edit-save-r") {
-    const ta   = $(`#edit-input-r-${rid}`);
+    const ta = $(`#edit-input-r-${rid}`);
     const text = (ta?.value || "").trim();
     if (!text) return;
-    await supabase.from("comments")
+
+    await supabase
+      .from("comments")
       .update({ content: text, updated_at: new Date().toISOString() })
       .eq("comment_id", rid);
+
     await loadComments();
   }
 
-  // 대댓글 삭제
   if (act === "del-r") {
     if (!confirm("대댓글을 삭제할까요?")) return;
     await supabase.from("comments").delete().eq("comment_id", rid);
@@ -484,43 +762,48 @@ document.addEventListener("click", async (e) => {
   }
 
   if (act === "edit-artwork") editArtwork();
-  if (act === "del-artwork")  deleteArtwork();
+  if (act === "del-artwork") deleteArtwork();
 });
 
-/* =========================
-   초기화
-========================= */
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!workId) { alert("잘못된 접근입니다."); history.back(); return; }
+  if (!workId) {
+    alert("잘못된 접근입니다.");
+    history.back();
+    return;
+  }
 
-  // 로그인 유저 확인
   const { data: { session } } = await supabase.auth.getSession();
+
   if (session?.user) {
     currentUser = { id: session.user.id };
+
     const { data: userData } = await supabase
       .from("users")
       .select("user_name, user_img")
       .eq("user_id", session.user.id)
       .single();
+
     if (userData) {
       currentUser.user_name = userData.user_name;
-      currentUser.user_img  = userData.user_img;
+      currentUser.user_img = userData.user_img;
     }
   }
 
-  // 작업물 로드
   const { data: work, error } = await supabase
     .from("works")
     .select("*")
     .eq("work_id", workId)
     .single();
 
-  if (error || !work) { alert("작업물을 찾을 수 없습니다."); history.back(); return; }
+  if (error || !work) {
+    alert("작업물을 찾을 수 없습니다.");
+    history.back();
+    return;
+  }
 
-  artworkData  = work;
-  workOwnerId  = work.user_id;
+  artworkData = work;
+  workOwnerId = work.user_id;
 
-  // 작성자 정보 보완
   const { data: ownerData } = await supabase
     .from("users")
     .select("user_name, user_img")
@@ -528,11 +811,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     .single();
 
   artworkData.user_name = ownerData?.user_name ?? "unknown";
-  artworkData.isMine    = currentUser?.id === work.user_id;
+  artworkData.user_img = ownerData?.user_img ?? "/media/profil.png";
+  artworkData.isMine = currentUser?.id === work.user_id;
+
+  const toolInfo = await fetchToolInfo(work.tool_id);
+  artworkData.tool_name = toolInfo.tool_name;
+  artworkData.tool_company = toolInfo.tool_company;
+  artworkData.tool_icon = toolInfo.tool_icon;
+  artworkData.rating = toolInfo.rating;
 
   fillBanner(artworkData);
+  renderArtworkMedia(artworkData);
 
-  // 버튼 마운트
   if (typeof loadButton === "function") {
     loadButton({ target: "#commentSubmitMount", text: "등록", variant: "primary" });
   }

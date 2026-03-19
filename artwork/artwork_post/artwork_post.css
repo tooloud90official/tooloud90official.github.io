@@ -1,4 +1,18 @@
+/* ═══════════════════════════════════════════
+   artwork_post.css
+   상세 페이지 — 업로드 프리뷰 스타일과 통일 버전
+═══════════════════════════════════════════ */
+
 /* 1. 배경 및 기본 설정 */
+[hidden] { display: none !important; }
+
+#top-banner {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -10,6 +24,7 @@ body {
 }
 
 * { box-sizing: border-box; }
+
 .inquiry-banner-root { width: 100%; }
 
 .post-page {
@@ -145,32 +160,254 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   히어로 이미지
+   히어로 미디어
+   업로드 preview-card 스타일 기준으로 통일
 ═══════════════════════════════════════════ */
 
 .hero {
   position: relative;
+  min-height: 500px;
   height: clamp(320px, 42vw, 520px);
   border-radius: 24px 24px 0 0;
-  overflow: hidden;
+  background: linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.hero__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.hero__overlay {
+/* 미디어 전체 루트 */
+.hero__media,
+.preview-card,
+.preview-card__body {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.1);
-  z-index: 1;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
 }
 
+.preview-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.preview-card__header { display: none; }
+
+.preview-card__body {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+
+.preview-image-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero__img,
+.hero__image,
+.preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  margin: 0;
+  background: transparent;
+}
+
+/* 영상 */
+.hero__video-wrap,
+.preview-video-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.hero__video,
+.preview-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+
+/* 오디오 */
+.hero__audio-wrap,
+.preview-audio-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.hero__audio-wrap audio,
+.preview-audio-wrap audio {
+  width: min(100%, 560px);
+}
+
+/* 텍스트 */
+.hero__text-wrap,
+.preview-text-wrap {
+  width: 100%;
+  max-width: 680px;
+  text-align: left;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+.preview-text-title,
+.hero__text-title {
+  font-weight: 900;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.preview-text-content,
+.hero__text-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.7;
+  max-height: 320px;
+  overflow: auto;
+  color: rgba(255,255,255,0.92);
+}
+
+/* PDF */
+.hero__pdf-wrap,
+.preview-pdf-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.hero__pdf-stage,
+.preview-pdf-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.hero__pdf-canvas,
+.preview-pdf-canvas {
+  display: block;
+  background: #fff;
+  border-radius: 0 !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* PDF 컨트롤 */
+.hero__pdf-controls,
+.preview-pdf-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin: 0 auto 16px;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.7);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.hero__pdf-btn,
+.preview-pdf-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 18px;
+  background: rgba(125,149,176,0.18);
+  color: #3d5a7a;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.hero__pdf-btn:hover,
+.preview-pdf-btn:hover {
+  background: rgba(125,149,176,0.32);
+}
+
+.hero__pdf-page,
+.preview-pdf-page {
+  color: #3d5a7a;
+  font-size: 12px;
+  font-weight: 800;
+  min-width: 52px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* fallback */
+.hero__fallback,
+.preview-fallback {
+  width: 100%;
+  max-width: 540px;
+  padding: 24px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.24);
+  color: #fff;
+}
+
+.hero__fallback__icon,
+.preview-fallback__icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.hero__fallback__title,
+.preview-fallback__title {
+  font-weight: 900;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.hero__fallback__desc,
+.preview-fallback__desc {
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* 불필요한 어두운 오버레이 제거 */
+.hero__overlay {
+  display: none;
+}
+
+/* 툴 카드 */
 .artwork-post__tool {
   min-width: 300px;
   position: absolute;
@@ -181,12 +418,12 @@ body {
   gap: 12px;
   padding: 14px 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255,255,255,0.65);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
-  z-index: 10;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 16px 35px rgba(0,0,0,0.15);
+  z-index: 30;
 }
 
 .artwork-post__tool-ic {
@@ -195,13 +432,39 @@ body {
   border-radius: 15px;
   flex: 0 0 70px;
   background-color: #374151;
+  object-fit: cover;
 }
 
-.artwork-post__tool-meta { display: grid; gap: 4px; }
-.artwork-post__tool-top { display: flex; align-items: center; gap: 10px; }
-.artwork-post__tool-name { font-size: 17px; font-weight: 900; color: #111; line-height: 1; }
-.artwork-post__tool-stars { font-size: 13px; color: #f5a524; line-height: 1; }
-.artwork-post__tool-brand { font-size: 12px; font-weight: 800; color: rgba(0, 0, 0, 0.55); line-height: 1; }
+.artwork-post__tool-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.artwork-post__tool-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.artwork-post__tool-name {
+  font-size: 17px;
+  font-weight: 900;
+  color: #111;
+  line-height: 1;
+}
+
+.artwork-post__tool-stars {
+  font-size: 13px;
+  color: #f5a524;
+  line-height: 1;
+}
+
+.artwork-post__tool-brand {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.55);
+  line-height: 1;
+}
 
 /* ═══════════════════════════════════════════
    본문 카드
@@ -560,43 +823,105 @@ textarea {
   line-height: 1.6;
 }
 
-.reply-write { margin-top: 4px; }
-.reply-write textarea { min-height: 50px; }
+/* ═══════════════════════════════════════════
+   반응형
+═══════════════════════════════════════════ */
 
-.actions {
-  margin-top: 8px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
+@media (max-width: 900px) {
+  .artwork-post__tool {
+    min-width: auto;
+    max-width: calc(100% - 40px);
+  }
 }
 
-.act {
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.05);
-  background: transparent;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 11px;
-  color: #6b7280;
-  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-}
+@media (max-width: 768px) {
+  .post-page {
+    padding: 10px 12px 64px;
+  }
 
-.act.danger { color: #ef4444; }
-
-/* 반응형 */
-@media (max-width: 640px) {
   .artwork-hero-banner {
-    padding: 20px 20px 16px;
-    border-radius: 16px;
-    gap: 12px;
+    padding: 20px 20px 18px;
+  }
+
+  .artwork-hero-banner__title {
+    font-size: 22px;
   }
 
   .artwork-hero-banner__profile {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
   }
 
-  .artwork-hero-banner__title { font-size: 22px; }
+  .hero {
+    min-height: 360px;
+    height: 62vw;
+  }
+
+  .artwork-post__tool {
+    left: 14px;
+    top: 14px;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .artwork-post__tool-ic {
+    width: 56px !important;
+    height: 56px !important;
+    flex-basis: 56px;
+    border-radius: 12px;
+  }
+
+  .artwork-post__tool-name {
+    font-size: 15px;
+  }
+
+  .artwork-post__tool-brand {
+    font-size: 11px;
+  }
+
+  .hero__pdf-controls,
+  .preview-pdf-controls {
+    bottom: 14px;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .hero__pdf-btn,
+  .preview-pdf-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+  }
+
+  .comment-write {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .artwork-hero-banner__actions {
+    top: 14px;
+    right: 14px;
+  }
+
+  .artwork-hero-banner__title {
+    padding-right: 68px;
+  }
+
+  .hero {
+    min-height: 300px;
+    height: 72vw;
+  }
+
+  .artwork-post__tool {
+    max-width: calc(100% - 28px);
+  }
+
+  .artwork-post__tool-stars {
+    display: none;
+  }
+
+  .card {
+    padding: 18px;
+  }
 }
