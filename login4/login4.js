@@ -14,9 +14,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedTools = [];
   let TOOLS = [];
 
-  // =============================
-  // Supabase에서 툴 전체 로드
-  // =============================
   const { data, error } = await supabase
     .from("tools")
     .select("tool_ID, tool_name, icon")
@@ -33,9 +30,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     img:  t.icon,
   }));
 
-  // =============================
-  // 툴 그리드 렌더링
-  // =============================
   function renderGrid() {
     toolGrid.innerHTML = '';
     TOOLS.forEach(tool => {
@@ -97,9 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     progressFill.style.width = `${(count / MAX_SELECT) * 100}%`;
   }
 
-  // =============================
-  // 완료 버튼 → users 테이블 insert
-  // =============================
   finishBtn.addEventListener('click', async () => {
     if (selectedTools.length === 0) {
       alert('최소 1개 이상의 툴을 선택해주세요.');
@@ -128,10 +119,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      // ✅ avatar 랜덤 선택
+      const avatarNum = Math.floor(Math.random() * 4) + 1;
+      const { data: avatarData } = supabase.storage
+        .from("user_img")
+        .getPublicUrl(`avatar${avatarNum}`);
+      const avatarUrl = avatarData?.publicUrl ?? "/media/profil.png";
+
       const { error } = await supabase.from('users').insert({
         user_id        : session.user.id,
         user_name      : nickname,
-        user_img       : '시스템 지정 이미지',
+        user_img       : avatarUrl,
         user_country   : country,
         user_age       : age,
         user_job       : job,
@@ -154,9 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // =============================
-  // 초기 렌더
-  // =============================
   renderGrid();
   renderSelected();
   updateCount();

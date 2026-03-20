@@ -7,9 +7,6 @@ const TOOL_ID = decodeURIComponent(
 
 let currentUser = null;
 
-/* =========================================================
-   작업물 미디어 타입 유틸 + 렌더러
-========================================================= */
 function getWorkExt(path = "") {
   const idx = path.lastIndexOf(".");
   return idx >= 0 ? path.slice(idx + 1).toLowerCase() : "";
@@ -53,7 +50,6 @@ async function renderWorkPdf(container, url) {
       const page  = await pdfState.doc.getPage(pdfState.page);
       const vp    = page.getViewport({ scale: 1 });
       const stage = canvas.parentElement;
-      // ✅ stage의 실제 높이 기준으로 꽉 차게 scale 계산
       const stageW = stage.clientWidth  || 300;
       const stageH = stage.clientHeight || 220;
       const scale  = Math.min(stageW / vp.width, stageH / vp.height);
@@ -68,10 +64,12 @@ async function renderWorkPdf(container, url) {
     pdfState.total = pdfState.doc.numPages;
     await drawPage();
 
-    prevBtn?.addEventListener("click", async () => {
+    prevBtn?.addEventListener("click", async (e) => {
+      e.stopPropagation();
       if (pdfState.page > 1) { pdfState.page--; await drawPage(); }
     });
-    nextBtn?.addEventListener("click", async () => {
+    nextBtn?.addEventListener("click", async (e) => {
+      e.stopPropagation();
       if (pdfState.page < pdfState.total) { pdfState.page++; await drawPage(); }
     });
   } catch (e) {
@@ -96,8 +94,8 @@ async function renderWorkMedia(container, work) {
     container.innerHTML = `<img class="work-img" src="${url}" alt="작업물" />`;
     return;
   }
+
   if (kind === "video") {
-    // ✅ upload처럼 썸네일 + 재생버튼 오버레이
     container.innerHTML = `
       <div class="work-video-wrap">
         <video class="work-video" playsinline preload="metadata" id="workVideoEl">
@@ -110,76 +108,119 @@ async function renderWorkMedia(container, work) {
             <path d="M8 5v14l11-7z"></path>
           </svg>
         </button>
+        <div class="work-video-controls">
+          <span class="work-video-time">0:00 / 0:00</span>
+          <div class="work-video-seekbar">
+            <div class="work-video-seekbar__fill"></div>
+          </div>
+        </div>
       </div>`;
 
-    const video   = container.querySelector("#workVideoEl");
-    const canvas  = container.querySelector("#workVideoThumb");
-    const playBtn = container.querySelector("#workVideoPlayBtn");
+    const video    = container.querySelector("#workVideoEl");
+    const canvas   = container.querySelector("#workVideoThumb");
+    const playBtn  = container.querySelector("#workVideoPlayBtn");
+    const controls = container.querySelector(".work-video-controls");
+    const timeEl   = container.querySelector(".work-video-time");
+    const seekbar  = container.querySelector(".work-video-seekbar");
+    const fill     = container.querySelector(".work-video-seekbar__fill");
 
-    // 썸네일 생성
-    video.addEventListener("loadeddata", () => {
-      video.currentTime = 0.5;
-    });
+    const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
+    const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M8 5v14l11-7z"></path></svg>`;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
     video.addEventListener("seeked", () => {
-      const ctx = canvas.getContext("2d");
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.style.display = "block";
-      video.style.display  = "none";
+      if (video.paused) {
+        const ctx = canvas.getContext("2d");
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.style.display = "block";
+        video.style.display  = "none";
+      }
     });
 
-    // 재생 토글
-    playBtn.addEventListener("click", () => {
+    video.addEventListener("loadedmetadata", () => {
+      timeEl.textContent = `0:00 / ${formatTime(video.duration)}`;
+    });
+
+    video.addEventListener("timeupdate", () => {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      fill.style.width = `${pct}%`;
+      timeEl.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+    });
+
+    playBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (video.paused) {
         canvas.style.display = "none";
         video.style.display  = "block";
         video.play();
-        playBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="white" width="36" height="36"
-            style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
-          </svg>`;
+        playBtn.innerHTML = pauseSvg;
       } else {
         video.pause();
-        playBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
-            style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))">
-            <path d="M8 5v14l11-7z"></path>
-          </svg>`;
+        playBtn.innerHTML = playSvg;
       }
     });
+
+    seekbar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!video.duration) return;
+      const rect = seekbar.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      video.currentTime = pct * video.duration;
+    });
+
+    controls.addEventListener("click", (e) => e.stopPropagation());
+
     video.addEventListener("ended", () => {
       canvas.style.display = "block";
       video.style.display  = "none";
-      playBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
-          style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))">
-          <path d="M8 5v14l11-7z"></path>
-        </svg>`;
+      playBtn.innerHTML = playSvg;
+    });
+
+    // ✅ 비디오 자체(썸네일/영상) 클릭 → 이동
+    video.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+    canvas.addEventListener("click", (e) => {
+      e.stopPropagation();
     });
     return;
   }
 
   if (kind === "audio") {
-    // ✅ upload처럼 그라데이션 배경 + 음표 아이콘 + 재생버튼
     const audioId = `workAudio_${Date.now()}`;
     container.innerHTML = `
       <div class="work-audio-wrap">
-        <div class="work-audio-thumb">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"></path>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="16" r="3"></circle>
-          </svg>
-          <button class="work-audio-playbtn" id="workAudioPlayBtn" aria-label="재생">
-            <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
-              style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
-              <path d="M8 5v14l11-7z"></path>
+        <div class="work-audio-card">
+          <div class="work-audio-thumb">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
             </svg>
-          </button>
+            <button class="work-audio-playbtn" id="${audioId}_btn" aria-label="재생">
+              <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
+                style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="work-audio-controls">
+            <span class="work-audio-time" id="${audioId}_time">0:00 / 0:00</span>
+            <div class="work-audio-seekbar" id="${audioId}_seekbar">
+              <div class="work-audio-seekbar__fill" id="${audioId}_fill"></div>
+            </div>
+          </div>
         </div>
         <audio id="${audioId}" preload="metadata">
           <source src="${url}" />
@@ -187,31 +228,52 @@ async function renderWorkMedia(container, work) {
       </div>`;
 
     const audio   = container.querySelector(`#${audioId}`);
-    const playBtn = container.querySelector("#workAudioPlayBtn");
+    const playBtn = container.querySelector(`#${audioId}_btn`);
+    const timeEl  = container.querySelector(`#${audioId}_time`);
+    const seekbar = container.querySelector(`#${audioId}_seekbar`);
+    const fill    = container.querySelector(`#${audioId}_fill`);
 
-    playBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        playBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="white" width="36" height="36">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
-          </svg>`;
-      } else {
-        audio.pause();
-        playBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="white" width="52" height="52">
-            <path d="M8 5v14l11-7z"></path>
-          </svg>`;
-      }
+    const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
+    const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M8 5v14l11-7z"></path></svg>`;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    playBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (audio.paused) { audio.play(); playBtn.innerHTML = pauseSvg; }
+      else              { audio.pause(); playBtn.innerHTML = playSvg; }
     });
-    audio.addEventListener("ended", () => {
-      playBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="white" width="52" height="52">
-          <path d="M8 5v14l11-7z"></path>
-        </svg>`;
+
+    seekbar?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!audio.duration) return;
+      const rect = seekbar.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audio.currentTime = pct * audio.duration;
     });
+
+    // ✅ 컨트롤 영역 전체 버블링 차단
+    container.querySelector(".work-audio-controls")?.addEventListener("click", (e) => e.stopPropagation());
+
+    audio?.addEventListener("loadedmetadata", () => {
+      timeEl.textContent = `0:00 / ${formatTime(audio.duration)}`;
+    });
+
+    audio?.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      fill.style.width = `${pct}%`;
+      timeEl.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    });
+
+    audio?.addEventListener("ended", () => { playBtn.innerHTML = playSvg; });
     return;
   }
+
   if (kind === "pdf") {
     await renderWorkPdf(container, url);
     return;
@@ -224,35 +286,22 @@ async function renderWorkMedia(container, work) {
 }
 
 async function loadCurrentUser() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    currentUser = null;
-    return;
-  }
+  if (!user) { currentUser = null; return; }
 
-  // ✅ users 테이블에서 user_name, user_img 조회
   let displayName   = user.email ?? "나";
   let displayAvatar = "/media/profil.png";
   try {
     const { data: userData } = await supabase
-      .from("users")
-      .select("user_name, user_img")
-      .eq("user_id", user.id)
-      .single();
+      .from("users").select("user_name, user_img").eq("user_id", user.id).single();
     if (userData?.user_name) displayName   = userData.user_name;
     if (userData?.user_img)  displayAvatar = userData.user_img;
   } catch (e) {
     console.warn("user 정보 조회 실패, 기본값 사용:", e);
   }
 
-  currentUser = {
-    id:     user.id,
-    name:   displayName,
-    avatar: displayAvatar,
-  };
+  currentUser = { id: user.id, name: displayName, avatar: displayAvatar };
 }
 
 function applyToolIcon(mountSelector, iconUrl) {
@@ -266,36 +315,22 @@ let selectedScore = 0;
 let editingId     = null;
 let currentSort   = "none";
 
-// ✅ recent_tools 저장
 async function saveRecentTool() {
   if (!currentUser || !TOOL_ID) return;
   try {
-    const { data } = await supabase
-      .from("users")
-      .select("recent_tools")
-      .eq("user_id", currentUser.id)
-      .single();
-
+    const { data } = await supabase.from("users").select("recent_tools").eq("user_id", currentUser.id).single();
     const current = data?.recent_tools ?? [];
     const updated = [TOOL_ID, ...current.filter(id => id !== TOOL_ID)].slice(0, 8);
-
-    await supabase
-      .from("users")
-      .update({ recent_tools: updated })
-      .eq("user_id", currentUser.id);
+    await supabase.from("users").update({ recent_tools: updated }).eq("user_id", currentUser.id);
   } catch (e) {
     console.error("recent_tools 저장 실패:", e);
   }
 }
 
-// ✅ user_id(UUID) 배열로 user_name, user_img 일괄 조회
 async function fetchUserInfo(userIds) {
   if (!userIds.length) return {};
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("user_id, user_name, user_img")
-      .in("user_id", userIds);
+    const { data, error } = await supabase.from("users").select("user_id, user_name, user_img").in("user_id", userIds);
     if (error) throw error;
     return Object.fromEntries(
       (data ?? []).map(u => [u.user_id, {
@@ -312,36 +347,20 @@ async function fetchUserInfo(userIds) {
 document.addEventListener("DOMContentLoaded", async () => {
   await loadCurrentUser();
 
-  if (currentUser) await saveRecentTool();
-
   updateAvgScore();
   updateCardStars(0);
 
   await Promise.all([
-    window.loadButton({
-      target: "#visitSiteBtn",
-      text: "사이트 바로가기",
-      variant: "primary",
-      onClick: () => {},
-    }),
+    window.loadButton({ target: "#visitSiteBtn", text: "사이트 바로가기", variant: "primary", onClick: () => {} }),
 
-    window.loadButton({
-      target: "#wishlistBtn",
-      text: "관심 목록에 추가",
-      variant: "outline",
-      onClick: () => {},
-    }).then(async () => {
+    window.loadButton({ target: "#wishlistBtn", text: "관심 목록에 추가", variant: "outline", onClick: () => {} }).then(async () => {
       const btn = document.querySelector("#wishlistBtn .btn");
       if (!btn) return;
 
       let pinned = false;
 
       if (currentUser) {
-        const { data } = await supabase
-          .from("users")
-          .select("favorite_tools")
-          .eq("user_id", currentUser.id)
-          .single();
+        const { data } = await supabase.from("users").select("favorite_tools").eq("user_id", currentUser.id).single();
         pinned = (data?.favorite_tools ?? []).includes(TOOL_ID);
       }
 
@@ -356,17 +375,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       updateBtnUI(pinned);
 
       btn.addEventListener("click", async () => {
-        if (!currentUser) {
-          window.location.href = "/login1/login.html";
-          return;
-        }
+        if (!currentUser) { window.location.href = "/login1/login.html"; return; }
 
-        const { data } = await supabase
-          .from("users")
-          .select("favorite_tools")
-          .eq("user_id", currentUser.id)
-          .single();
-
+        const { data } = await supabase.from("users").select("favorite_tools").eq("user_id", currentUser.id).single();
         const current = data?.favorite_tools ?? [];
         let updated;
         if (pinned) {
@@ -375,11 +386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           updated = current.includes(TOOL_ID) ? current : [...current, TOOL_ID];
         }
 
-        const { error } = await supabase
-          .from("users")
-          .update({ favorite_tools: updated })
-          .eq("user_id", currentUser.id);
-
+        const { error } = await supabase.from("users").update({ favorite_tools: updated }).eq("user_id", currentUser.id);
         if (error) { console.error("관심 목록 업데이트 실패:", error); return; }
 
         pinned = !pinned;
@@ -405,10 +412,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const toolUrl = toolRow?.tool_link ?? "#";
   ["#visitSiteBtn", "#planBtn1", "#planBtn2", "#planBtn3", "#promoBtn"].forEach((sel) => {
-    document.querySelector(`${sel} .btn`)?.addEventListener("click", () => {
-      if (toolUrl && toolUrl !== "#") window.open(toolUrl, "_blank");
+    document.querySelector(`${sel} .btn`)?.addEventListener("click", async () => {
+      if (toolUrl && toolUrl !== "#") {
+        await saveRecentTool();
+        window.open(toolUrl, "_blank");
+      }
     });
   });
+
+  const uploadLink = document.querySelector(".detail_AI__work-link");
+  if (uploadLink) {
+    const dest = `/artwork/artwork_upload/artwork_upload.html${TOOL_ID ? `?tool_ID=${encodeURIComponent(TOOL_ID)}` : ""}`;
+    uploadLink.href = dest;
+  }
 
   initReviewSort();
   initSectionTabs();
@@ -419,30 +435,16 @@ async function loadToolInfo() {
   try {
     if (!TOOL_ID) throw new Error("URL에 tool_ID 파라미터가 없음");
 
-    const { data, error } = await supabase
-      .from("tools")
-      .select("*")
-      .eq("tool_ID", TOOL_ID)
-      .single();
-
+    const { data, error } = await supabase.from("tools").select("*").eq("tool_ID", TOOL_ID).single();
     if (error || !data) throw error ?? new Error("툴 없음");
 
-    await window.loadToolIconCard("#toolIconMount", {
-      toolName: data.tool_name ?? "",
-      url: data.tool_link ?? "#",
-    });
+    await window.loadToolIconCard("#toolIconMount", { toolName: data.tool_name ?? "", url: data.tool_link ?? "#" });
     applyToolIcon("#toolIconMount", data.icon);
 
     setTextEl("toolBrand", data.tool_company ? `@ ${data.tool_company}` : "");
     setTextEl("toolDesc", data.tool_des ?? "");
 
-    setSitePreview({
-      name: data.tool_name,
-      url: data.tool_link,
-      icon: data.icon,
-      iframeEnabled: data.iframe ?? false,
-    });
-
+    setSitePreview({ name: data.tool_name, url: data.tool_link, icon: data.icon, iframeEnabled: data.iframe ?? false });
     renderPlanCards(data);
     renderPromo(data.tool_name, data.tool_prom);
     await loadSimilarTools(data.tool_cat, data.tool_ID);
@@ -519,9 +521,7 @@ function renderPlanCards(tool) {
     if (listEl) {
       const raw   = tool[desKey] ?? "";
       const lines = raw.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
-      listEl.innerHTML = lines
-        .map(line => `<li><span class="plan-item-emoji">${getEmoji(line)}</span>${line}</li>`)
-        .join("");
+      listEl.innerHTML = lines.map(line => `<li><span class="plan-item-emoji">${getEmoji(line)}</span>${line}</li>`).join("");
     }
   });
 }
@@ -535,11 +535,7 @@ function renderPromo(toolName, toolProm) {
 
   if (titleEl) titleEl.textContent = toolName ? `${toolName} 에서 진행 중인 프로모션` : "";
 
-  if (!toolProm) {
-    if (section) section.style.display = "none";
-    return;
-  }
-
+  if (!toolProm) { if (section) section.style.display = "none"; return; }
   if (section) section.style.display = "";
 
   const lines = toolProm.split(/[\/,\n]/).map(s => s.trim()).filter(Boolean);
@@ -579,12 +575,8 @@ async function loadSimilarTools(toolCat, currentToolId) {
   if (!rowEl || !toolCat) { if (rowEl) renderSimEmpty(rowEl); return; }
 
   try {
-    const { data, error } = await supabase
-      .from("tools")
-      .select("tool_ID, tool_name, tool_link, icon")
-      .eq("tool_cat", toolCat)
-      .neq("tool_ID", currentToolId)
-      .limit(8);
+    const { data, error } = await supabase.from("tools").select("tool_ID, tool_name, tool_link, icon")
+      .eq("tool_cat", toolCat).neq("tool_ID", currentToolId).limit(8);
 
     if (error) throw error;
     if (!data?.length) { renderSimEmpty(rowEl); return; }
@@ -595,8 +587,7 @@ async function loadSimilarTools(toolCat, currentToolId) {
     if (dotsEl && totalPages >= 2) {
       dotsEl.style.display = "flex";
       dotsEl.innerHTML = Array.from({ length: totalPages })
-        .map((_, i) => `<span class="sdot${i === 0 ? " is-active" : ""}"></span>`)
-        .join("");
+        .map((_, i) => `<span class="sdot${i === 0 ? " is-active" : ""}"></span>`).join("");
 
       dotsEl.querySelectorAll(".sdot").forEach((dot, i) => {
         dot.addEventListener("click", async () => {
@@ -621,12 +612,11 @@ function renderSimEmpty(rowEl) {
 async function renderSimPage(rows, pageIndex, pageSize, rowEl) {
   const pageTools = rows.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
 
-  rowEl.innerHTML = pageTools
-    .map((_, i) => `
-      <div class="similar-tools__item">
-        <div class="similar-tools__mount" id="simTool${i + 1}"></div>
-      </div>
-    `).join("");
+  rowEl.innerHTML = pageTools.map((_, i) => `
+    <div class="similar-tools__item">
+      <div class="similar-tools__mount" id="simTool${i + 1}"></div>
+    </div>
+  `).join("");
 
   await Promise.all(
     pageTools.map(async (tool, i) => {
@@ -643,18 +633,16 @@ async function loadWorks() {
   try {
     if (!TOOL_ID) { renderEmptyWorks(); return; }
 
-    const { data, error } = await supabase
-      .from("works")
-      .select("work_id, work_path, work_link, like_count, user_id") // ✅ work_link 추가
+    const { data, error } = await supabase.from("works")
+      .select("work_id, work_path, work_link, like_count, user_id")
       .eq("tool_id", TOOL_ID)
       .order("like_count", { ascending: false })
-      .order("updated_at", { ascending: false }) // 좋아요 같으면 최신순
+      .order("updated_at", { ascending: false })
       .limit(10);
 
     if (error) throw error;
     if (!data?.length) { renderEmptyWorks(); return; }
 
-    // ✅ user_id(UUID) → user_name, user_img 일괄 조회
     const userIds = [...new Set(data.map(w => w.user_id).filter(Boolean))];
     const infoMap = await fetchUserInfo(userIds);
 
@@ -696,22 +684,19 @@ async function renderWorksCarousel(works) {
   const nameEl    = document.getElementById("profileName");
   const avatarImg = document.getElementById("profileImg");
 
+  const workMoreBtn = document.getElementById("workMoreBtn");
+if (workMoreBtn) {
+  workMoreBtn.onclick = () => {
+    window.location.href = `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(works[0].work_id)}`;
+  };
+}
+
   if (profile)  profile.style.display = "";
   if (showcase) showcase.style.gridTemplateColumns = "";
 
-  // ✅ 현재 보고 있는 work_id 추적
   let currentWorkId = works[0].work_id;
 
   await renderWorkMedia(container, works[0]);
-
-  // ✅ 컨테이너 클릭 → artwork_post로 이동
-  if (container) {
-    container.style.cursor = "pointer";
-    container.addEventListener("click", () => {
-      window.location.href =
-        `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(currentWorkId)}`;
-    });
-  }
 
   if (nameEl) nameEl.textContent = works[0].display_name ? `by. ${works[0].display_name}` : "";
   if (avatarImg) {
@@ -727,10 +712,10 @@ async function renderWorksCarousel(works) {
 
     dotsEl.querySelectorAll(".dot").forEach((dot, i) => {
       dot.addEventListener("click", async (e) => {
-        e.stopPropagation(); // ✅ 버블링 방지
+        e.stopPropagation();
         dotsEl.querySelectorAll(".dot").forEach(d => d.classList.remove("is-active"));
         dot.classList.add("is-active");
-        currentWorkId = works[i].work_id; // ✅ work_id 업데이트
+        currentWorkId = works[i].work_id;
         await renderWorkMedia(container, works[i]);
         if (nameEl) nameEl.textContent = works[i].display_name ? `by. ${works[i].display_name}` : "";
         if (avatarImg) {
@@ -746,9 +731,7 @@ async function loadReviews() {
   try {
     if (!TOOL_ID) { reviewData = []; updateAvgScore(); return; }
 
-    // ✅ 테이블명 tool_reviews
-    const { data, error } = await supabase
-      .from("tool_reviews")
+    const { data, error } = await supabase.from("tool_reviews")
       .select("review_id, user_id, rating, review_content, created_at")
       .eq("tool_id", TOOL_ID)
       .order("created_at", { ascending: false });
@@ -756,8 +739,6 @@ async function loadReviews() {
     if (error) throw error;
 
     const rows = data ?? [];
-
-    // ✅ user_id(UUID) → user_name, user_img 일괄 조회
     const userIds = [...new Set(rows.map(r => r.user_id).filter(Boolean))];
     const infoMap = await fetchUserInfo(userIds);
 
@@ -769,7 +750,6 @@ async function loadReviews() {
       date:   r.created_at?.slice(0, 10).replace(/-/g, ".") ?? "",
       score:  r.rating ?? 0,
       text:   r.review_content ?? "",
-      // ✅ UUID 기준 isMine 판별
       isMine: currentUser ? r.user_id === currentUser.id : false,
     }));
 
@@ -907,12 +887,7 @@ function renderMyReviewArea() {
     <div class="review-write__submit" id="reviewSubmitBtn"></div>
   `;
 
-  window.loadButton({
-    target: "#reviewSubmitBtn",
-    text: "등록",
-    variant: "primary",
-    onClick: () => submitReview(),
-  });
+  window.loadButton({ target: "#reviewSubmitBtn", text: "등록", variant: "primary", onClick: () => submitReview() });
 
   selectedScore = 0;
   initWriteStars();
@@ -947,14 +922,9 @@ async function submitReview() {
 
   try {
     if (editingId !== null) {
-      const { error } = await supabase
-        .from("tool_reviews")
-        .update({
-          rating:         selectedScore,
-          review_content: text,
-          created_at:     new Date().toISOString(),
-        })
-        .eq("review_id", editingId);
+      const { error } = await supabase.from("tool_reviews").update({
+        rating: selectedScore, review_content: text, created_at: new Date().toISOString(),
+      }).eq("review_id", editingId);
 
       if (error) throw error;
 
@@ -969,37 +939,21 @@ async function submitReview() {
       const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,"0")}.${String(today.getDate()).padStart(2,"0")}`;
 
       const newReviewId = crypto.randomUUID();
-      const { data: inserted, error } = await supabase
-        .from("tool_reviews")
-        .insert({
-          review_id:      newReviewId,
-          tool_id:        TOOL_ID,
-          user_id:        currentUser.id,
-          rating:         selectedScore,
-          review_content: text,
-          created_at:     new Date().toISOString(),
-        })
-        .select("review_id")
-        .single();
+      const { data: inserted, error } = await supabase.from("tool_reviews").insert({
+        review_id: newReviewId, tool_id: TOOL_ID, user_id: currentUser.id,
+        rating: selectedScore, review_content: text, created_at: new Date().toISOString(),
+      }).select("review_id").single();
 
       if (error) throw error;
 
       reviewData.unshift({
-        id:     inserted?.review_id ?? newReviewId,
-        userId: currentUser.id,
-        name:   currentUser.name,
-        avatar: currentUser.avatar,
-        date:   dateStr,
-        score:  selectedScore,
-        text,
-        isMine: true,
+        id: inserted?.review_id ?? newReviewId,
+        userId: currentUser.id, name: currentUser.name, avatar: currentUser.avatar,
+        date: dateStr, score: selectedScore, text, isMine: true,
       });
     }
   } catch (e) {
-    console.error("리뷰 저장 실패 code:",    e?.code);
-    console.error("리뷰 저장 실패 message:", e?.message);
-    console.error("리뷰 저장 실패 details:", e?.details);
-    console.error("리뷰 저장 실패 hint:",    e?.hint);
+    console.error("리뷰 저장 실패:", e?.message);
     alert("리뷰 저장 중 오류가 발생했습니다.");
     return;
   }
@@ -1035,12 +989,7 @@ function startEditMyReview() {
     <div class="review-write__submit" id="reviewSubmitBtn"></div>
   `;
 
-  window.loadButton({
-    target: "#reviewSubmitBtn",
-    text: "수정 완료",
-    variant: "primary",
-    onClick: () => submitReview(),
-  });
+  window.loadButton({ target: "#reviewSubmitBtn", text: "수정 완료", variant: "primary", onClick: () => submitReview() });
 
   initWriteStars();
   document.querySelectorAll(".rstar-input").forEach(s => {
@@ -1083,8 +1032,7 @@ function updateAvgScore() {
 
   if (numEl)   numEl.textContent = `${rounded} 점`;
   if (starsEl) starsEl.innerHTML = [1,2,3,4,5]
-    .map(n => `<span class="rstar ${n <= Math.round(avg) ? "is-on" : "is-off"}">★</span>`)
-    .join("");
+    .map(n => `<span class="rstar ${n <= Math.round(avg) ? "is-on" : "is-off"}">★</span>`).join("");
 
   updateCardStars(Math.round(avg));
 }
@@ -1093,8 +1041,7 @@ function updateCardStars(roundedAvg = 0) {
   const cardStarsEl = document.getElementById("toolStars");
   if (!cardStarsEl) return;
   cardStarsEl.innerHTML = [1,2,3,4,5]
-    .map(n => `<span class="star ${n <= roundedAvg ? "is-on" : "is-off"}">★</span>`)
-    .join("");
+    .map(n => `<span class="star ${n <= roundedAvg ? "is-on" : "is-off"}">★</span>`).join("");
 }
 
 window.startEditMyReview = startEditMyReview;

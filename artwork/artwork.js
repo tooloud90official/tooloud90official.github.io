@@ -201,19 +201,22 @@ function getSortedWorks() {
   }
 
   // ✅ Groq 검색 필터
-  if (searchFilter.active) {
-    filtered = filtered.filter((w) => {
-      const toolCat    = w.tools?.tool_cat    ?? w.tool_cat ?? "";
-      const toolSubcat = w.tools?.tool_subcat ?? "";
-      const title      = (w.work_title ?? "").toLowerCase();
+// ✅ Groq 검색 필터
+if (searchFilter.active) {
+  filtered = filtered.filter((w) => {
+    const toolCat    = w.tools?.tool_cat    ?? w.tool_cat ?? "";
+    const toolSubcat = w.tools?.tool_subcat ?? "";
+    const toolName   = (w.tools?.tool_name  ?? "").toLowerCase();
+    const title      = (w.work_title ?? "").toLowerCase();
 
-      const catMatch    = searchFilter.cats.includes(toolCat);
-      const subcatMatch = searchFilter.subcats.includes(toolSubcat);
-      const keyMatch    = searchFilter.keywords.some((kw) => title.includes(kw.toLowerCase()));
+    const catMatch    = searchFilter.cats.includes(toolCat);
+    const subcatMatch = searchFilter.subcats.includes(toolSubcat);
+    const keyMatch    = searchFilter.keywords.some((kw) => title.includes(kw.toLowerCase()));
+    const toolMatch   = searchFilter.keywords.some((kw) => toolName.includes(kw.toLowerCase())); // ✅ 추가
 
-      return catMatch || subcatMatch || keyMatch;
-    });
-  }
+    return catMatch || subcatMatch || keyMatch || toolMatch;
+  });
+}
 
   // 정렬
   if (currentSort === "like") {

@@ -436,7 +436,6 @@ function renderImagePreview(file) {
     </div>`;
 }
 
-// ✅ 영상 — 썸네일 + 재생버튼 (신규 파일)
 function renderVideoPreview(file) {
   cleanupObjectUrl();
   currentObjectUrl = URL.createObjectURL(file);
@@ -453,55 +452,120 @@ function renderVideoPreview(file) {
           <path d="M8 5v14l11-7z"></path>
         </svg>
       </button>
+      <div class="preview-video-controls" id="newVideoControls">
+        <span class="preview-video-time" id="newVideoTime">0:00 / 0:00</span>
+        <div class="preview-video-seekbar" id="newVideoSeekbar">
+          <div class="preview-video-seekbar__fill" id="newVideoFill"></div>
+        </div>
+      </div>
     </div>`;
 
-  const body    = $("#previewBody");
-  const video   = body.querySelector("#newVideoEl");
-  const canvas  = body.querySelector("#newVideoThumb");
-  const playBtn = body.querySelector("#newVideoPlayBtn");
-
-  video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
-  video.addEventListener("seeked", () => {
-    const ctx = canvas.getContext("2d");
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.style.display = "block";
-    video.style.display  = "none";
-  });
+  const body     = $("#previewBody");
+  const video    = body.querySelector("#newVideoEl");
+  const canvas   = body.querySelector("#newVideoThumb");
+  const playBtn  = body.querySelector("#newVideoPlayBtn");
+  const controls = body.querySelector("#newVideoControls");
+  const timeEl   = body.querySelector("#newVideoTime");
+  const seekbar  = body.querySelector("#newVideoSeekbar");
+  const fill     = body.querySelector("#newVideoFill");
 
   const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
   const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M8 5v14l11-7z"></path></svg>`;
 
-  playBtn.addEventListener("click", () => {
-    if (video.paused) { canvas.style.display = "none"; video.style.display = "block"; video.play(); playBtn.innerHTML = pauseSvg; }
-    else              { video.pause(); playBtn.innerHTML = playSvg; }
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
+
+  video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
+  video.addEventListener("seeked", () => {
+    if (video.paused) {
+      const ctx = canvas.getContext("2d");
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.style.display = "block";
+      video.style.display  = "none";
+    }
   });
-  video.addEventListener("ended", () => { canvas.style.display = "block"; video.style.display = "none"; playBtn.innerHTML = playSvg; });
+
+  video.addEventListener("loadedmetadata", () => {
+    timeEl.textContent = `0:00 / ${formatTime(video.duration)}`;
+  });
+
+  video.addEventListener("timeupdate", () => {
+    if (!video.duration) return;
+    const pct = (video.currentTime / video.duration) * 100;
+    fill.style.width = `${pct}%`;
+    timeEl.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+  });
+
+  playBtn?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+  
+    try {
+      if (video.paused) {
+        canvas.style.display = "none";
+        video.style.display = "block";
+        await video.play();
+        playBtn.innerHTML = pauseSvg;
+      } else {
+        video.pause();
+        playBtn.innerHTML = playSvg;
+      }
+    } catch (err) {
+      console.error("비디오 재생 실패:", err);
+    }
+  });
+
+  // ✅ seekbar + controls 클릭 → 버블링 차단
+  seekbar.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!video.duration) return;
+    const rect = seekbar.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    video.currentTime = pct * video.duration;
+  });
+
+  controls.addEventListener("click", (e) => e.stopPropagation());
+
+  video.addEventListener("ended", () => {
+    canvas.style.display = "block";
+    video.style.display  = "none";
+    playBtn.innerHTML = playSvg;
+  });
 }
 
-// ✅ 오디오 — 그라데이션 + 재생버튼 (신규 파일)
 function renderAudioPreview(file) {
   cleanupObjectUrl();
   currentObjectUrl = URL.createObjectURL(file);
 
   const audioId = `audioPlayer_${Date.now()}`;
   $("#previewBody").innerHTML = `
-    <div class="preview-audio-wrap" style="display:flex;align-items:center;justify-content:center;padding:24px;">
-      <div style="position:relative;width:220px;height:220px;flex-shrink:0;border-radius:24px;overflow:hidden;">
-        <div style="width:220px;height:220px;border-radius:24px;background:linear-gradient(135deg,#dce8f8 0%,#c8d9f5 100%);display:flex;align-items:center;justify-content:center;color:#2a7cff;">
-          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <div class="preview-audio-wrap">
+      <div class="preview-audio-card">
+        <div class="preview-audio-bg">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18V5l12-2v13"></path>
             <circle cx="6" cy="18" r="3"></circle>
             <circle cx="18" cy="16" r="3"></circle>
           </svg>
+          <button class="preview-audio-playbtn" id="${audioId}_btn" aria-label="재생">
+            <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
+              style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
         </div>
-        <button id="${audioId}_btn" aria-label="재생"
-          style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;border-radius:24px;">
-          <svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
-            <path d="M8 5v14l11-7z"></path>
-          </svg>
-        </button>
+        <div class="preview-audio-controls" id="${audioId}_controls">
+          <span class="preview-audio-time" id="${audioId}_time">0:00 / 0:00</span>
+          <div class="preview-audio-seekbar" id="${audioId}_seekbar">
+            <div class="preview-audio-seekbar__fill" id="${audioId}_fill"></div>
+          </div>
+        </div>
       </div>
       <audio id="${audioId}" preload="metadata">
         <source src="${currentObjectUrl}" type="${esc(file.type || "audio/mpeg")}" />
@@ -510,13 +574,55 @@ function renderAudioPreview(file) {
 
   const audio   = document.getElementById(audioId);
   const playBtn = document.getElementById(`${audioId}_btn`);
+  const timeEl  = document.getElementById(`${audioId}_time`);
+  const seekbar = document.getElementById(`${audioId}_seekbar`);
+  const fill    = document.getElementById(`${audioId}_fill`);
+
   const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
   const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M8 5v14l11-7z"></path></svg>`;
 
-  playBtn?.addEventListener("click", () => {
-    if (audio.paused) { audio.play(); playBtn.innerHTML = pauseSvg; }
-    else              { audio.pause(); playBtn.innerHTML = playSvg; }
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
+
+  playBtn?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+  
+    try {
+      if (audio.paused) {
+        await audio.play();
+        playBtn.innerHTML = pauseSvg;
+      } else {
+        audio.pause();
+        playBtn.innerHTML = playSvg;
+      }
+    } catch (err) {
+      console.error("오디오 재생 실패:", err);
+    }
   });
+
+  // ✅ 재생바 영역 클릭도 버블링 차단
+  seekbar?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!audio.duration) return;
+    const rect = seekbar.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audio.currentTime = pct * audio.duration;
+  });
+
+  audio?.addEventListener("loadedmetadata", () => {
+    timeEl.textContent = `0:00 / ${formatTime(audio.duration)}`;
+  });
+
+  audio?.addEventListener("timeupdate", () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    fill.style.width = `${pct}%`;
+    timeEl.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+  });
+
   audio?.addEventListener("ended", () => { playBtn.innerHTML = playSvg; });
 }
 
@@ -631,7 +737,6 @@ async function renderRemotePreview({ name, path, url }) {
     return;
   }
 
-  // ✅ 영상 — 썸네일 + 재생버튼 (기존 파일)
   if (kind === "video") {
     body.innerHTML = `
       <div class="preview-video-wrap">
@@ -645,50 +750,120 @@ async function renderRemotePreview({ name, path, url }) {
             <path d="M8 5v14l11-7z"></path>
           </svg>
         </button>
+        <div class="preview-video-controls" id="remoteVideoControls">
+          <span class="preview-video-time" id="remoteVideoTime">0:00 / 0:00</span>
+          <div class="preview-video-seekbar" id="remoteVideoSeekbar">
+            <div class="preview-video-seekbar__fill" id="remoteVideoFill"></div>
+          </div>
+        </div>
       </div>`;
-
-    const video   = body.querySelector("#remoteVideoEl");
-    const canvas  = body.querySelector("#remoteVideoThumb");
-    const playBtn = body.querySelector("#remoteVideoPlayBtn");
+  
+    const video    = body.querySelector("#remoteVideoEl");
+    const canvas   = body.querySelector("#remoteVideoThumb");
+    const playBtn  = body.querySelector("#remoteVideoPlayBtn");
+    const controls = body.querySelector("#remoteVideoControls");
+    const timeEl   = body.querySelector("#remoteVideoTime");
+    const seekbar  = body.querySelector("#remoteVideoSeekbar");
+    const fill     = body.querySelector("#remoteVideoFill");
+  
     const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
     const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))"><path d="M8 5v14l11-7z"></path></svg>`;
-
-    video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
+  
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+  
+    video.addEventListener("loadeddata", () => {
+      video.currentTime = 0.5;
+    });
+  
     video.addEventListener("seeked", () => {
-      const ctx = canvas.getContext("2d");
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      if (video.paused) {
+        const ctx = canvas.getContext("2d");
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.style.display = "block";
+        video.style.display  = "none";
+      }
+    });
+  
+    video.addEventListener("loadedmetadata", () => {
+      timeEl.textContent = `0:00 / ${formatTime(video.duration)}`;
+    });
+  
+    video.addEventListener("timeupdate", () => {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      fill.style.width = `${pct}%`;
+      timeEl.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+    });
+  
+    playBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+  
+      try {
+        if (video.paused) {
+          canvas.style.display = "none";
+          video.style.display  = "block";
+          await video.play();
+          playBtn.innerHTML = pauseSvg;
+        } else {
+          video.pause();
+          playBtn.innerHTML = playSvg;
+        }
+      } catch (err) {
+        console.error("기존 영상 재생 실패:", err);
+      }
+    });
+  
+    seekbar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!video.duration) return;
+      const rect = seekbar.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      video.currentTime = pct * video.duration;
+    });
+  
+    controls.addEventListener("click", (e) => e.stopPropagation());
+  
+    video.addEventListener("ended", () => {
       canvas.style.display = "block";
       video.style.display  = "none";
+      playBtn.innerHTML = playSvg;
     });
-    playBtn.addEventListener("click", () => {
-      if (video.paused) { canvas.style.display = "none"; video.style.display = "block"; video.play(); playBtn.innerHTML = pauseSvg; }
-      else              { video.pause(); playBtn.innerHTML = playSvg; }
-    });
-    video.addEventListener("ended", () => { canvas.style.display = "block"; video.style.display = "none"; playBtn.innerHTML = playSvg; });
+  
     return;
   }
 
-  // ✅ 오디오 — 그라데이션 + 재생버튼 (기존 파일)
   if (kind === "audio") {
     const audioId = `remoteAudio_${Date.now()}`;
     body.innerHTML = `
-      <div class="preview-audio-wrap" style="display:flex;align-items:center;justify-content:center;padding:24px;">
-        <div style="position:relative;width:220px;height:220px;flex-shrink:0;border-radius:24px;overflow:hidden;">
-          <div style="width:220px;height:220px;border-radius:24px;background:linear-gradient(135deg,#dce8f8 0%,#c8d9f5 100%);display:flex;align-items:center;justify-content:center;color:#2a7cff;">
-            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <div class="preview-audio-wrap">
+        <div class="preview-audio-card">
+          <div class="preview-audio-bg">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18V5l12-2v13"></path>
               <circle cx="6" cy="18" r="3"></circle>
               <circle cx="18" cy="16" r="3"></circle>
             </svg>
+            <button class="preview-audio-playbtn" id="${audioId}_btn" aria-label="재생">
+              <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
+                style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+            </button>
           </div>
-          <button id="${audioId}_btn" aria-label="재생"
-            style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;border-radius:24px;">
-            <svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
-              <path d="M8 5v14l11-7z"></path>
-            </svg>
-          </button>
+          <div class="preview-audio-controls" id="${audioId}_controls">
+            <span class="preview-audio-time" id="${audioId}_time">0:00 / 0:00</span>
+            <div class="preview-audio-seekbar" id="${audioId}_seekbar">
+              <div class="preview-audio-seekbar__fill" id="${audioId}_fill"></div>
+            </div>
+          </div>
         </div>
         <audio id="${audioId}" preload="metadata">
           <source src="${esc(url)}" type="${esc(getMimeFromPath(path) || "audio/mpeg")}" />
@@ -697,13 +872,44 @@ async function renderRemotePreview({ name, path, url }) {
 
     const audio   = body.querySelector(`#${audioId}`);
     const playBtn = body.querySelector(`#${audioId}_btn`);
+    const timeEl  = body.querySelector(`#${audioId}_time`);
+    const seekbar = body.querySelector(`#${audioId}_seekbar`);
+    const fill    = body.querySelector(`#${audioId}_fill`);
+
     const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
     const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M8 5v14l11-7z"></path></svg>`;
 
-    playBtn?.addEventListener("click", () => {
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    playBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (audio.paused) { audio.play(); playBtn.innerHTML = pauseSvg; }
       else              { audio.pause(); playBtn.innerHTML = playSvg; }
     });
+
+    seekbar?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!audio.duration) return;
+      const rect = seekbar.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audio.currentTime = pct * audio.duration;
+    });
+
+    audio?.addEventListener("loadedmetadata", () => {
+      timeEl.textContent = `0:00 / ${formatTime(audio.duration)}`;
+    });
+
+    audio?.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      fill.style.width = `${pct}%`;
+      timeEl.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    });
+
     audio?.addEventListener("ended", () => { playBtn.innerHTML = playSvg; });
     return;
   }
@@ -1005,6 +1211,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadCurrentUser();
   renderCurrentUserProfile();
   await loadToolsFromDB();
+
+  if (!isEditMode) {
+    const preToolId = new URLSearchParams(window.location.search).get("tool_ID");
+    if (preToolId) {
+      selectedToolId = String(preToolId);
+      const found = getSelectedTool();
+      if (found) renderToolCard(found);
+    }
+  }
 
   const picker = $("#toolPicker");
   if (picker) {

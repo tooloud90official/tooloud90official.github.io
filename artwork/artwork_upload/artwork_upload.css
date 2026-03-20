@@ -718,13 +718,11 @@ body {
 }
 
 .tool-modal__body {
-  padding: 12px;
+  padding: 16px 12px 12px;
   max-height: calc(min(70vh, 520px) - 110px);
   min-height: 300px;
   overflow: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
 }
 
 .tool-grid {
@@ -885,3 +883,107 @@ body {
 .tool-star { line-height: 1; }
 .tool-star.is-on  { color: #f5a524; }
 .tool-star.is-off { color: rgba(0,0,0,0.18); }
+
+.preview-audio-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.preview-audio-card {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.preview-audio-bg {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a7cff;
+}
+
+.preview-audio-playbtn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.preview-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.preview-audio-time {
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 72px;
+}
+
+.preview-audio-seekbar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.preview-audio-seekbar__fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  width: 0%;
+  pointer-events: none;
+}
+
+.preview-video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 3;
+}
+
+.preview-video-time {
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 72px;
+}
+
+.preview-video-seekbar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.preview-video-seekbar__fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  width: 0%;
+  pointer-events: none;
+}
