@@ -118,3 +118,41 @@
 .bell-badge.hidden {
   display: none;
 }
+
+.alert-item {
+  position: relative;
+}
+
+.alert-item__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.alert-item__close:hover {
+  color: #555;
+}
+
+/* 기존 코드 그대로 유지하고 아래만 추가 */
+
+.alert-item {
+  transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+  max-height: 300px;
+}
+
+.alert-item.is-removing {
+  opacity: 0;
+  transform: translateX(40px);
+  max-height: 0;
+  margin-bottom: 0;
+  padding: 0;
+  pointer-events: none;
+}

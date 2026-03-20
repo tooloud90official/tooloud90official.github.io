@@ -270,7 +270,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       recommendedTools = recommendedTools.slice(0, 8);
     }
 
-    // ✅ 수정: tool_ID 배열로 저장
     try {
       const toolsToSave = recommendedTools.map(tool => tool.tool_ID);
 

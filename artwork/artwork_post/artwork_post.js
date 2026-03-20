@@ -593,8 +593,9 @@ async function addComment() {
 
   await supabase.from("works").update({ comment_count: (artworkData.comment_count ?? 0) + 1 }).eq("work_id", workId);
   artworkData.comment_count = (artworkData.comment_count ?? 0) + 1;
-  await insertNotification(workOwnerId, "reply", newComment.comment_id);
+  await insertNotification(workOwnerId, "reply", workId);
   if (commentInput) commentInput.value = "";
+  alert("댓글이 등록되었습니다."); 
   await loadComments();
 }
 
@@ -617,7 +618,7 @@ async function addReply(parentCommentId) {
   if (error) { console.error("대댓글 등록 실패:", error); return; }
 
   const parentComment = state.comments.find((c) => c.id === parentCommentId);
-  if (parentComment) await insertNotification(parentComment.user_id, "reply", newReply.comment_id);
+  if (parentComment) await insertNotification(parentComment.user_id, "reply", workId);
   if (ta) ta.value = "";
   await loadComments();
 }

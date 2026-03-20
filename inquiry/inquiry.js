@@ -267,22 +267,25 @@ async function submitInquiry() {
     return;
   }
 
-  // ✅ 관리자 계정 user_id 조회 후 알림 전송
-  const { data: adminUser } = await supabase
-    .from("users")
-    .select("user_id")
-    .eq("email", ADMIN_EMAIL)
-    .single();
+  // ✅ RPC로 auth.users에서 관리자 user_id 조회 후 알림 전송
+  const { data: adminUserId, error: rpcError } = await supabase
+    .rpc('get_admin_user_id');
 
-  if (adminUser) {
-    await supabase.from("notifications").insert({
-      notification_id: crypto.randomUUID(),
-      user_id:         adminUser.user_id,
-      type:            "inquiry",
-      reference_id:    inquiryId,
-      is_read:         false,
-      sender_id:       currentUser.id,
-    });
+  if (rpcError) {
+    console.error('관리자 user_id 조회 실패:', rpcError);
+  } else if (adminUserId) {
+    const { error: notiError } = await supabase
+      .from("notifications")
+      .insert({
+        notification_id: crypto.randomUUID(),
+        user_id:         adminUserId,
+        type:            "inquiry",
+        reference_id:    inquiryId,
+        is_read:         false,
+        sender_id:       currentUser.id,
+      });
+
+    if (notiError) console.error("관리자 알림 저장 실패:", notiError);
   }
 
   alert("문의가 등록되었습니다.");

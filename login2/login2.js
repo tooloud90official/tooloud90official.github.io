@@ -346,24 +346,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
 
-  // ===== 11. confirm 모달 초기화 =====
-  if (!document.getElementById('modal-root')) {
-    const root = document.createElement('div');
-    root.id = 'modal-root';
-    document.body.appendChild(root);
-  }
-
-  await window.includeHTML('#modal-root', '/_common/confirm/confirm.html');
-
-
-  // ===== 12. 이전으로 돌아가기 =====
-  document.getElementById('backBtn')?.addEventListener('click', async () => {
-    const result = await window.showConfirm({
-      title      : '페이지를 나가시겠습니까?',
-      desc       : '입력한 내용이 저장되지 않습니다.',
-      confirmText: '확인',
-      cancelText : '취소',
-    });
+  // ===== 11. 이전으로 돌아가기 =====
+  document.getElementById('backBtn')?.addEventListener('click', () => {
+    const result = confirm('페이지를 나가시겠습니까?\n입력한 내용이 저장되지 않습니다.');
     if (result) {
       clearInterval(timerInterval);
       window.location.href = '/login1/login1.html';

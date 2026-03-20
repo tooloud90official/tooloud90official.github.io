@@ -1,3 +1,4 @@
+// login4.js
 import { supabase } from '/_ignore/supabase.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -10,19 +11,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const progressFill  = document.getElementById('progressFill');
   const finishBtn     = document.getElementById('finishBtn');
 
-  let selectedTools = []; // tool_ID 배열
+  let selectedTools = [];
   let TOOLS = [];
 
   // =============================
-  // Supabase에서 툴 로드
+  // Supabase에서 툴 전체 로드
   // =============================
   const { data, error } = await supabase
     .from("tools")
     .select("tool_ID, tool_name, icon")
-    .in("tool_name", [
-      "Descript", "Adobe", "Midjourney", "Lilys",
-      "Cursor", "Pitch", "Notion", "Figma", "ChatGPT"
-    ]);
+    .order("tool_ID", { ascending: true });
 
   if (error || !data) {
     console.error("툴 로드 실패:", error);
@@ -137,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         user_country   : country,
         user_age       : age,
         user_job       : job,
-        favorite_tools : selectedTools, // ✅ ["tool_002", "tool_007", ...]
+        favorite_tools : selectedTools,
       });
 
       if (error) throw error;

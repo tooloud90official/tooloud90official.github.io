@@ -68,8 +68,8 @@ async function fetchAvgRatings(toolIDs) {
 
   const { data, error } = await supabase
     .from('tool_reviews')
-    .select('tool_ID, rating')
-    .in('tool_ID', toolIDs);
+    .select('tool_id, rating')
+    .in('tool_id', toolIDs);
 
   if (error) {
     console.error('평점 조회 오류:', error);
@@ -79,9 +79,9 @@ async function fetchAvgRatings(toolIDs) {
   const map = {};
   const counts = {};
   (data || []).forEach(row => {
-    if (!map[row.tool_ID]) { map[row.tool_ID] = 0; counts[row.tool_ID] = 0; }
-    map[row.tool_ID] += row.rating;
-    counts[row.tool_ID] += 1;
+    if (!map[row.tool_id]) { map[row.tool_id] = 0; counts[row.tool_id] = 0; }
+    map[row.tool_id] += row.rating;
+    counts[row.tool_id] += 1;
   });
 
   const avgMap = {};

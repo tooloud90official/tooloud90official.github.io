@@ -8,20 +8,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { data: { session } } = await supabase.auth.getSession();
 
   if (session?.user) {
-    // users 테이블에 이미 있는지 확인
     const { data: existingUser } = await supabase
       .from('users')
       .select('user_id')
       .eq('user_id', session.user.id)
       .maybeSingle();
 
-    // 이미 가입 완료된 유저면 main으로
     if (existingUser) {
       window.location.href = '/main1/main1.html';
       return;
     }
 
-    // 신규 유저면 계속 진행
     sessionStorage.setItem('signup_email', session.user.email);
   }
 
@@ -219,24 +216,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
 
-  // ===== 5. confirm 모달 초기화 =====
-  if (!document.getElementById('modal-root')) {
-    const root = document.createElement('div');
-    root.id = 'modal-root';
-    document.body.appendChild(root);
-  }
-
-  await window.includeHTML('#modal-root', '/_common/confirm/confirm.html');
-
-
-  // ===== 6. 이전으로 돌아가기 =====
-  document.getElementById('backBtn')?.addEventListener('click', async () => {
-    const result = await window.showConfirm({
-      title      : '페이지를 나가시겠습니까?',
-      desc       : '입력한 내용이 저장되지 않습니다.',
-      confirmText: '확인',
-      cancelText : '취소',
-    });
+  // ===== 5. 이전으로 돌아가기 =====
+  document.getElementById('backBtn')?.addEventListener('click', () => {
+    const result = confirm('페이지를 나가시겠습니까?\n입력한 내용이 저장되지 않습니다.');
     if (result) window.location.href = '/login2/login2.html';
   });
 
