@@ -647,7 +647,8 @@ async function loadWorks() {
       .from("works")
       .select("work_id, work_path, work_link, like_count, user_id") // ✅ work_link 추가
       .eq("tool_id", TOOL_ID)
-      .order("updated_at", { ascending: false })
+      .order("like_count", { ascending: false })
+      .order("updated_at", { ascending: false }) // 좋아요 같으면 최신순
       .limit(10);
 
     if (error) throw error;
