@@ -1,7 +1,7 @@
 import { initFaqItems } from "/_common/drop_down/drop_down.js";
 import { supabase } from "/_ignore/supabase.js";
 
-const ADMIN_EMAIL = "admin@example.com"; // ← 이메일 바꿔서 쓰세요
+const ADMIN_EMAIL = "tooloud90official@gmail.com"; // ← 이메일 바꿔서 쓰세요
 
 let currentUser = null;
 let isAdmin = false;

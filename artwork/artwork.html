@@ -13,8 +13,12 @@
 <link rel="stylesheet" href="/artwork/artwork.css">
 <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
 
-
- <!-- PDF.js --> <script type="module"> import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js'; pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs"; window.pdfjsLib = pdfjsLib; </script>
+<!-- PDF.js -->
+<script type="module">
+  import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+  window.pdfjsLib = pdfjsLib;
+</script>
 </head>
 
 <body class="artwork-page">
@@ -42,196 +46,90 @@
 </div>
 
 <div class="artwork-hero__right">
-
-<img
-class="artwork-hero__img"
-src="/media/wave5.png"
-alt=""
->
-
+<img class="artwork-hero__img" src="/media/wave5.png" alt="">
 <div class="artwork-hero__img-overlay"></div>
 <div class="artwork-hero__img-fade"></div>
-
 <div class="artwork-hero__caption">
-<div class="artwork-hero__caption-num">24</div>
-<div class="artwork-hero__caption-label">WORKS</div>
+  <div class="artwork-hero__caption-num">24</div>
+  <div class="artwork-hero__caption-label">WORKS</div>
 </div>
-
 </div>
 
 </div>
 </header>
 
 <main class="artwork-main">
-
 <section class="artwork-section">
-
 <div class="artwork-section__head">
-
-<div class="artwork-section__head-left">
-
-<div class="artwork-section__title">
-💙 좋아요 많은 작업물
+  <div class="artwork-section__head-left">
+    <div class="artwork-section__title">💙 좋아요 많은 작업물</div>
+    <div class="artwork-section__desc">지금 인기있는 작업물들을 감상해보세요.</div>
+  </div>
+  <div id="select-root"></div>
 </div>
-
-<div class="artwork-section__desc">
-지금 인기있는 작업물들을 감상해보세요.
-</div>
-
-</div>
-
-<div id="select-root"></div>
-
-</div>
-
 <div class="artwork-grid" id="artworkGrid"></div>
-
 </section>
-
 </main>
 
 </div>
 
 <div id="bottom-banner"></div>
 
-
 <!-- =========================
-   카드 템플릿 (필수)
+   카드 템플릿
 ========================= -->
-
 <template id="artworkCardTpl">
+  <article class="artwork-card">
+    <div class="artwork-card__media">
 
-<article class="artwork-card">
+      <div class="artwork-card__preview" data-art-preview></div>
 
-<div class="artwork-card__media">
+      <div class="artwork-card__tool">
+        <a class="artwork-card__tool-icLink">
+          <img class="artwork-card__tool-ic" data-art-tool-icon>
+        </a>
 
-<div class="artwork-card__preview" data-art-preview></div>
+        <div class="artwork-card__tool-meta">
+          <div class="artwork-card__tool-top">
+            <span class="artwork-card__tool-name" data-tool-name></span>
+          </div>
+          <!-- ✅ 개발사 → 별점 순서 -->
+          <div class="artwork-card__tool-brand" data-tool-brand></div>
+          <span class="artwork-card__tool-stars" data-tool-stars></span>
+        </div>
+      </div>
 
-<div class="artwork-card__tool">
+      <div class="artwork-card__actions">
+        <button class="artwork-card__action artwork-card__action--icon" data-art-like>
+          <img class="artwork-card__action-img" src="/media/heart.png" alt="">
+          <span class="artwork-card__action-count" data-art-like-count></span>
+        </button>
+        <button class="artwork-card__action artwork-card__action--icon" data-art-comment>
+          <img class="artwork-card__action-img" src="/media/comment.png" alt="">
+          <span class="artwork-card__action-count" data-art-comment-count></span>
+        </button>
+      </div>
 
-<a class="artwork-card__tool-icLink">
+    </div>
 
-<img
-class="artwork-card__tool-ic"
-data-art-tool-icon
->
-
-</a>
-
-<div class="artwork-card__tool-meta">
-
-<div class="artwork-card__tool-top">
-
-<span
-class="artwork-card__tool-name"
-data-tool-name
-></span>
-
-</div>
-
-<span
-class="artwork-card__tool-stars"
-data-tool-stars
-></span>
-
-<div
-class="artwork-card__tool-brand"
-data-tool-brand
-></div>
-
-</div>
-
-</div>
-
-<div class="artwork-card__actions">
-
-<button
-class="artwork-card__action artwork-card__action--icon"
-data-art-like
->
-
-<img
-class="artwork-card__action-img"
-src="/media/heart.png"
-alt=""
->
-
-<span
-class="artwork-card__action-count"
-data-art-like-count
-></span>
-
-</button>
-
-<button
-class="artwork-card__action artwork-card__action--icon"
-data-art-comment
->
-
-<img
-class="artwork-card__action-img"
-src="/media/comment.png"
-alt=""
->
-
-<span
-class="artwork-card__action-count"
-data-art-comment-count
-></span>
-
-</button>
-
-</div>
-
-</div>
-
-<div class="artwork-card__panel">
-
-<div class="artwork-card__profile">
-
-<div class="artwork-card__avatar-ring">
-
-<img
-class="artwork-card__avatar"
-data-art-avatar
->
-
-</div>
-
-<div
-class="artwork-card__user"
-data-art-user
-></div>
-
-</div>
-
-<div class="artwork-card__content">
-
-<div
-class="artwork-card__date"
-data-art-date
-></div>
-
-<p
-class="artwork-card__text"
-data-art-text
-></p>
-
-</div>
-
-</div>
-
-</article>
-
+    <div class="artwork-card__panel">
+      <div class="artwork-card__profile">
+        <div class="artwork-card__avatar-ring">
+          <img class="artwork-card__avatar" data-art-avatar>
+        </div>
+        <div class="artwork-card__user" data-art-user></div>
+      </div>
+      <div class="artwork-card__content">
+        <div class="artwork-card__date" data-art-date></div>
+        <p class="artwork-card__text" data-art-text></p>
+      </div>
+    </div>
+  </article>
 </template>
 
-
 <script src="/_common/searchBar/searchBar.js"></script>
-
 <script type="module" src="/_common/top-banner/include.js"></script>
-
 <script type="module" src="/artwork/artwork.js"></script>
-
 <script src="/_common/bottom-banner/include.js"></script>
 
 </body>

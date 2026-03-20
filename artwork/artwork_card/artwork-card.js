@@ -35,7 +35,7 @@ export function renderArtworkCards(targetSelector, items = []) {
       cardElement.style.cursor = "pointer";
       cardElement.onclick = () => {
         window.location.href =
-          `/artwork/artwork_post/artwork_post.html?id=${encodeURIComponent(artworkId)}`;
+          `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(artworkId)}`;
       };
     }
 
@@ -53,10 +53,24 @@ export function renderArtworkCards(targetSelector, items = []) {
       avatar.onerror = () => avatar.style.visibility = "hidden";
     }
 
-    /* 툴 정보 */
-    if (toolNameEl)  toolNameEl.textContent  = item.tool_name || "Tool";
-    if (toolStarsEl) toolStarsEl.textContent = item.stars || "";
-    if (toolBrandEl) toolBrandEl.textContent = item.tool_brand || "";
+    /* 툴 이름 */
+    if (toolNameEl) toolNameEl.textContent = item.tool_name || "Tool";
+
+    /* ✅ 툴 개발사 — @ 앞에 붙이기 */
+    if (toolBrandEl) {
+      const brand = item.tool_brand || "";
+      toolBrandEl.textContent = brand ? `@${brand.replace(/^@+/, "")}` : "";
+      toolBrandEl.style.display = brand ? "" : "none";
+    }
+
+    /* ✅ 툴 별점 — 개발사 아래, 별 아이콘으로 렌더링 */
+    if (toolStarsEl) {
+      const rating  = parseFloat(item.tool_stars ?? item.stars ?? 0) || 0;
+      const rounded = Math.round(rating);
+      toolStarsEl.innerHTML = [1,2,3,4,5]
+        .map(n => `<span class="tool-star ${n <= rounded ? "is-on" : "is-off"}">★</span>`)
+        .join("");
+    }
 
     if (toolIconEl) {
       toolIconEl.src = item.icon || "/media/tool-default.png";
@@ -73,12 +87,10 @@ export function renderArtworkCards(targetSelector, items = []) {
     if (titleEl) titleEl.textContent = item.work_title || "";
 
     /* 좋아요 */
-    if (likeCountEl)
-      likeCountEl.textContent = item.like_count ?? 0;
+    if (likeCountEl) likeCountEl.textContent = item.like_count ?? 0;
 
     /* 댓글 */
-    if (commentCountEl)
-      commentCountEl.textContent = item.comment_count ?? 0;
+    if (commentCountEl) commentCountEl.textContent = item.comment_count ?? 0;
 
     likeBtn?.addEventListener("click", e => {
       e.stopPropagation();
@@ -105,75 +117,93 @@ export function renderArtworkCards(targetSelector, items = []) {
 
 
 /* ===============================
-   미리보기 렌더 (이미지 / 영상 / PDF)
+   미리보기 렌더 (이미지 / 영상 / PDF / 오디오)
 ================================ */
 function renderArtworkPreview(root, item) {
-
   if (!root) return;
 
   const src = item.previewSrc;
   if (!src) return;
 
-  const ext = src.split(".").pop().toLowerCase();
+  const ext = src.split(".").pop().toLowerCase().split("?")[0];
 
   /* 이미지 */
   if (["png","jpg","jpeg","webp","gif"].includes(ext)) {
-
-    root.innerHTML =
-      `<img src="${src}" class="artwork-card__img">`;
-
+    root.innerHTML = `<img src="${src}" class="artwork-card__img">`;
     return;
   }
 
-  /* 영상 */
+  /* 영상 — 썸네일 캡처 + 재생버튼 */
   if (["mp4","webm","mov"].includes(ext)) {
-
     root.innerHTML = `
-      <video class="artwork-card__img"
-        muted
-        autoplay
-        loop
-        playsinline>
-        <source src="${src}">
-      </video>
-    `;
+      <div class="artwork-card__video-wrap">
+        <video class="artwork-card__video" muted playsinline preload="metadata">
+          <source src="${src}">
+        </video>
+        <canvas class="artwork-card__video-thumb"></canvas>
+        <div class="artwork-card__video-play">
+          <svg viewBox="0 0 24 24" fill="white" width="36" height="36"
+            style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </div>
+      </div>`;
 
+    const video  = root.querySelector(".artwork-card__video");
+    const canvas = root.querySelector(".artwork-card__video-thumb");
+
+    video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
+    video.addEventListener("seeked", () => {
+      const ctx = canvas.getContext("2d");
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.style.display = "block";
+      video.style.display  = "none";
+    });
+    return;
+  }
+
+  /* 오디오 */
+  if (["mp3","wav","ogg","m4a"].includes(ext)) {
+    root.innerHTML = `
+      <div class="artwork-card__audio-wrap">
+        <div class="artwork-card__audio-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+        </div>
+      </div>`;
     return;
   }
 
   /* PDF */
   if (ext === "pdf" && window.pdfjsLib) {
-
-    root.innerHTML =
-      `<div class="artwork-card__pdf">
+    root.innerHTML = `
+      <div class="artwork-card__pdf">
         <canvas class="artwork-card__pdf-canvas"></canvas>
       </div>`;
 
     const canvas = root.querySelector("canvas");
 
     pdfjsLib.getDocument(src).promise.then(pdf => {
-
       pdf.getPage(1).then(page => {
-
-        const viewport = page.getViewport({ scale: 0.6 });
-
-        canvas.width  = viewport.width;
-        canvas.height = viewport.height;
-
-        const ctx = canvas.getContext("2d");
-
-        page.render({
-          canvasContext: ctx,
-          viewport
-        });
-
+        const vp  = page.getViewport({ scale: 1 });
+        const w   = root.clientWidth  || 300;
+        const h   = root.clientHeight || 200;
+        const scale = Math.min(w / vp.width, h / vp.height);
+        const svp = page.getViewport({ scale });
+        canvas.width  = svp.width;
+        canvas.height = svp.height;
+        page.render({ canvasContext: canvas.getContext("2d"), viewport: svp });
       });
-
     });
-
     return;
   }
-
 }
 
 

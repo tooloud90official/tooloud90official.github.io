@@ -762,7 +762,7 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: rgba(0,0,0,0.85);
+  background: rgba(255, 255, 255, 1);
   object-fit: cover;
   display: block;
 }
@@ -814,3 +814,74 @@ body {
     min-height: 220px;
   }
 }
+
+/* =========================================================
+   ✅ artwork_upload.css 맨 아래에 추가
+   영상 썸네일 + 재생버튼 스타일
+========================================================= */
+
+.preview-video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.preview-video-playbtn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  transition: opacity .15s;
+}
+
+.preview-video-playbtn:hover { opacity: .85; }
+
+/* =========================================================
+   ✅ artwork_upload.css 맨 아래에 추가
+   영상 썸네일 + 재생버튼 스타일
+========================================================= */
+
+.preview-video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.preview-video-playbtn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  transition: opacity .15s;
+}
+
+.preview-video-playbtn:hover { opacity: .85; }
+
+/* ✅ 툴 카드 별점 */
+#toolStars {
+  display: flex;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1;
+  margin-top: 3px;
+}
+
+.tool-star { line-height: 1; }
+.tool-star.is-on  { color: #f5a524; }
+.tool-star.is-off { color: rgba(0,0,0,0.18); }

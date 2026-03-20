@@ -22,7 +22,7 @@
   box-shadow: 0 20px 52px rgba(0,80,200,0.15);
 }
 
-/* ===== 이미지 영역 — 카드 꽉 채움 ===== */
+/* ===== 이미지 영역 ===== */
 .artwork-card__media {
   position: absolute;
   inset: 0;
@@ -62,17 +62,15 @@
   gap: 12px;
   padding: 14px 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255,255,255,0.65);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 16px 35px rgba(0,0,0,0.15);
   z-index: 10;
 }
 
-.artwork-card__tool-icLink {
-  flex-shrink: 0;
-}
+.artwork-card__tool-icLink { flex-shrink: 0; }
 
 .artwork-card__tool-ic {
   width: 70px !important;
@@ -81,6 +79,7 @@
   flex: 0 0 70px;
   background-color: #374151;
 }
+
 .artwork-card__tool-meta {
   display: grid;
   gap: 3px;
@@ -93,18 +92,35 @@
 }
 
 .artwork-card__tool-name {
-  font-size: 17px; font-weight: 900; color: #111; line-height: 1; 
+  font-size: 17px;
+  font-weight: 900;
+  color: #111;
+  line-height: 1;
 }
 
+/* ✅ 별점 — 툴 이름 바로 아래 */
 .artwork-card__tool-stars {
-  font-size: 13px; color: #f5a524; line-height: 1;
+  display: flex;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1;
+  margin-top: 3px;
 }
 
+.tool-star { line-height: 1; }
+.tool-star.is-on  { color: #f5a524; }
+.tool-star.is-off { color: rgba(0,0,0,0.18); }
+
+/* ✅ 개발사 — 별점 아래 */
 .artwork-card__tool-brand {
-  font-size: 12px; font-weight: 800; color: rgba(0, 0, 0, 0.55); line-height: 1; 
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0,0,0,0.55);
+  line-height: 1;
+  margin-top: 2px;
 }
 
-/* ===== 좋아요/댓글 — 패널 바로 위 오른쪽 ===== */
+/* ===== 좋아요/댓글 ===== */
 .artwork-card__actions {
   position: absolute;
   right: 14px;
@@ -192,7 +208,6 @@
   border: 2px solid #fff;
 }
 
-
 .artwork-card__user {
   font-size: 10px;
   font-weight: 900;
@@ -202,10 +217,7 @@
 }
 
 /* ===== 본문 ===== */
-.artwork-card__content {
-  display: grid;
-  gap: 2px;
-}
+.artwork-card__content { display: grid; gap: 2px; }
 
 .artwork-card__date {
   font-size: 10px;
@@ -225,6 +237,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .artwork-card__preview {
   position: absolute;
   inset: 0;
@@ -234,13 +247,13 @@
   background: linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%);
 }
 
+/* ===== PDF ===== */
 .artwork-card__pdf {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
   overflow: hidden;
   background: linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%);
 }
@@ -251,3 +264,50 @@
   max-height: 100%;
   background: #fff;
 }
+
+/* ✅ 영상 — 썸네일 + 재생버튼 */
+.artwork-card__video-wrap {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
+.artwork-card__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.artwork-card__video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.artwork-card__video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ✅ 오디오 */
+.artwork-card__audio-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
+  color: #2a7cff;
+}
+
+.artwork-card__audio-icon { opacity: 0.7; }
