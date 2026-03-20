@@ -5,16 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tool Hero Section</title>
 
-  <!-- 공용 컴포넌트 CSS -->
   <link rel="stylesheet" href="/_common/background.css">
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css" />
   <link rel="stylesheet" href="/_common/select/select.css" />
   <link rel="stylesheet" href="/_common/icon/icon.css" />
   <link rel="stylesheet" href="/_common/button/button.css" />
-
-  <!-- 섹션 전용 CSS -->
   <link rel="stylesheet" href="/detail_AI/detail_AI.css" />
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
+
+  <!-- ✅ pdf.js -->
+  <script type="module">
+    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs';
+    window.pdfjsLib = pdfjsLib;
+  </script>
 </head>
 
 <body>
@@ -35,20 +39,15 @@
       <section class="detail_AI">
         <!-- LEFT: 툴 정보 -->
         <article class="detail_AI__tool-card">
-          <!-- 아이콘 컴포넌트 mount 자리 -->
           <div id="toolIconMount"></div>
 
           <div class="detail_AI__meta">
             <p class="detail_AI__tool-brand" id="toolBrand"></p>
-
             <div class="detail_AI__stars" aria-label="별점" id="toolStars"></div>
-
             <div class="detail_AI__divider"></div>
-
             <p class="detail_AI__tool-desc" id="toolDesc"></p>
           </div>
 
-          <!-- 버튼 컴포넌트 mount 자리 -->
           <div class="detail_AI__btns">
             <div id="visitSiteBtn"></div>
             <div id="wishlistBtn"></div>
@@ -61,7 +60,6 @@
             <div class="detail_AI__avatar">
               <img id="profileImg" src="" alt="프로필" style="display:none" />
             </div>
-
             <div class="detail_AI__profile-meta">
               <div class="detail_AI__profile-name" id="profileName"></div>
             </div>
@@ -76,19 +74,10 @@
             </div>
 
             <div class="detail_AI__carousel-wrapper">
-              <a 
-                class="detail_AI__carousel-frame detail_AI__work-button"
-                href="/artwork/artwork.html"
-                aria-label="작업물 페이지로 이동"
-              >
-                <img id="workImage" src="" alt="작업물" style="display:none" />
-              </a>
+              <!-- ✅ JS가 타입별로 미디어를 여기에 삽입 -->
+              <div class="detail_AI__work-media" id="workMediaContainer"></div>
 
-              <!-- 우측 하단 좋아요 -->
-              <div class="detail_AI__like-overlay">
-                <img src="/media/Heart.png" class="detail_AI__heart-icon" alt="">
-                <span class="detail_AI__like-count" id="likeCount"></span>
-              </div>
+
             </div>
 
             <div class="detail_AI__dots" aria-label="캐러셀 페이지" id="workDots"></div>
@@ -108,23 +97,12 @@
 
           <article class="site-preview__card">
             <div class="site-preview__media">
-              <img
-                id="sitePreviewLogo"
-                src=""
-                alt="logo"
-                style="display:none; max-width: 200px; max-height: 120px; object-fit: contain;"
-              >
+              <img id="sitePreviewLogo" src="" alt="logo"
+                style="display:none; max-width: 200px; max-height: 120px; object-fit: contain;">
             </div>
-
             <div class="site-preview__meta">
               <div class="site-preview__name" id="sitePreviewName"></div>
-              <a
-                class="site-preview__url"
-                id="sitePreviewUrl"
-                href=""
-                target="_blank"
-                rel="noopener"
-              ></a>
+              <a class="site-preview__url" id="sitePreviewUrl" href="" target="_blank" rel="noopener"></a>
             </div>
           </article>
         </section>
@@ -139,39 +117,30 @@
         </div>
 
         <div class="plan-compare__grid">
-          <!-- 카드 1 -->
           <article class="plan-card plan-card--active">
             <div class="plan-card__top">
               <div class="plan-card__badge" id="planBadge1"></div>
               <div class="plan-card__name" id="planName1"></div>
             </div>
-
             <ul class="plan-card__list" id="planList1"></ul>
-
             <div class="plan-card__btn" id="planBtn1"></div>
           </article>
 
-          <!-- 카드 2 -->
           <article class="plan-card">
             <div class="plan-card__top">
               <div class="plan-card__badge" id="planBadge2"></div>
               <div class="plan-card__name" id="planName2"></div>
             </div>
-
             <ul class="plan-card__list" id="planList2"></ul>
-
             <div class="plan-card__btn" id="planBtn2"></div>
           </article>
 
-          <!-- 카드 3 -->
           <article class="plan-card">
             <div class="plan-card__top">
               <div class="plan-card__badge" id="planBadge3"></div>
               <div class="plan-card__name" id="planName3"></div>
             </div>
-
             <ul class="plan-card__list" id="planList3"></ul>
-
             <div class="plan-card__btn" id="planBtn3"></div>
           </article>
         </div>
@@ -188,7 +157,6 @@
             <div class="promo-banner__sub" id="promoSub"></div>
             <div class="promo-banner__date" id="promoDate"></div>
           </div>
-
           <div class="promo-banner__right" id="promoBtn"></div>
         </article>
       </section>
@@ -207,14 +175,11 @@
         </div>
 
         <div class="review-panel">
-          <!-- 왼쪽: 리뷰 쓰기 -->
           <aside class="review-write">
             <div class="review-write__head">
               <div class="review-write__title">리뷰 쓰기</div>
             </div>
-
             <div class="review-write__box">
-              <!-- 별점 선택 -->
               <div class="review-write__stars" aria-label="내 별점" id="writeStars">
                 <span class="rstar-input" data-val="1">★</span>
                 <span class="rstar-input" data-val="2">★</span>
@@ -223,28 +188,18 @@
                 <span class="rstar-input" data-val="5">★</span>
                 <span class="review-write__hint" id="writeStarHint">(0점)</span>
               </div>
-
-              <!-- 텍스트 입력창 -->
-              <textarea
-                class="review-write__textarea"
-                id="reviewTextarea"
-                placeholder="리뷰를 작성해주세요."
-                maxlength="300"
-              ></textarea>
+              <textarea class="review-write__textarea" id="reviewTextarea"
+                placeholder="리뷰를 작성해주세요." maxlength="300"></textarea>
             </div>
-
             <div class="review-write__submit" id="reviewSubmitBtn"></div>
           </aside>
 
-          <!-- 오른쪽: 리뷰 리스트 -->
           <div class="review-list">
             <div class="review-list__top">
               <div class="review-list__count" id="reviewCount"></div>
               <div class="review-sort" id="reviewSortSelect"></div>
             </div>
-
             <div class="review-cards" id="reviewCards"></div>
-
             <div class="review-dots" aria-label="리뷰 페이지" id="reviewDots"></div>
           </div>
         </div>
@@ -272,14 +227,10 @@
 
   <div id="bottom-banner"></div>
 
-  <!-- 공용 JS -->
   <script src="/_common/icon/icon.js"></script>
   <script src="/_common/button/button.js"></script>
   <script type="module" src="/_common/top-banner/include.js"></script>
-
-  <!-- 섹션 JS -->
   <script type="module" src="/detail_AI/detail_AI.js"></script>
-
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
 </html>

@@ -10,8 +10,10 @@
   <link rel="stylesheet" href="/artwork/artwork_upload/artwork_upload.css" />
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css" />
 
+  <!-- ✅ /로 시작하는 절대경로로 수정 -->
   <script type="module">
-    import * as pdfjsLib from './pdf.min.js';
+    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs';
     window.pdfjsLib = pdfjsLib;
   </script>
 </head>
@@ -67,7 +69,7 @@
           class="artwork-hero-banner__tag-input"
           id="tagInput"
           type="text"
-          placeholder="#태그 입력 후 Enter"
+          placeholder="태그 입력 후 Enter"
           maxlength="30"
         />
       </div>
@@ -88,8 +90,8 @@
           <div class="artwork-post__tool-top">
             <span class="artwork-post__tool-name" id="toolName"></span>
           </div>
-          <span class="artwork-post__tool-stars" id="toolStars" hidden></span>
           <div class="artwork-post__tool-brand" id="toolBrand"></div>
+          <span class="artwork-post__tool-stars" id="toolStars" hidden></span>
         </div>
       </div>
 
