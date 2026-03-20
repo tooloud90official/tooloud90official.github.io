@@ -47,14 +47,17 @@ const SUBCAT_ORDER = {
 };
 
 // ─── 전역 캐시 ─────────────────────────────────────────────────────
-let allTools = [];
+let allTools   = [];
 let dataLoaded = false;
+
+// ✅ 로그인 유저 + 핀 상태 전역 관리
+let currentUser  = null;
+let pinnedToolIds = new Set(); // 현재 핀된 tool_ID 목록
 
 // ─── tool_des 단답 → 완전한 문장으로 변환 ──────────────────────────
 function formatDesc(raw) {
   if (!raw || !raw.trim()) return '소개가 없습니다.';
   const trimmed = raw.trim();
-  // 이미 문장 부호로 끝나면 그대로
   if (/[.!?。]$/.test(trimmed)) return trimmed;
   return trimmed + '입니다.';
 }
@@ -73,7 +76,6 @@ async function fetchAvgRatings(toolIDs) {
     return {};
   }
 
-  // tool_ID별 평균 계산
   const map = {};
   const counts = {};
   (data || []).forEach(row => {
@@ -84,10 +86,112 @@ async function fetchAvgRatings(toolIDs) {
 
   const avgMap = {};
   Object.keys(map).forEach(id => {
-    avgMap[id] = Math.round(map[id] / counts[id]); // 1~5 반올림
+    avgMap[id] = Math.round(map[id] / counts[id]);
   });
   return avgMap;
 }
+
+
+// ✅ DB에서 현재 favorite_tools 불러오기 (category 핀 상태 초기화)
+async function fetchPinnedTools() {
+  if (!currentUser) return;
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('favorite_tools')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (error) {
+    console.error('[pin] favorite_tools 조회 실패:', error.message);
+    return;
+  }
+
+  const raw = data?.favorite_tools;
+  if (!Array.isArray(raw)) return;
+
+  // 각 항목이 문자열(tool_ID)이면 그대로, 객체이면 tool_ID 추출
+  const parsed = raw.map(item => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) return item.tool_ID ?? item.id ?? null;
+    return null;
+  }).filter(Boolean);
+
+  // tool_ID 기준으로 Set 구성
+  pinnedToolIds = new Set(parsed);
+}
+
+
+// ✅ 핀 토글 → DB 저장
+async function togglePin(tool, pinIconEl) {
+  if (!currentUser) {
+    alert('로그인이 필요합니다.');
+    return;
+  }
+
+  const toolId = tool.tool_ID;
+  const isPinned = pinnedToolIds.has(toolId);
+
+  // 낙관적 UI 업데이트
+  if (isPinned) {
+    pinnedToolIds.delete(toolId);
+    pinIconEl.classList.remove('pinned');
+  } else {
+    pinnedToolIds.add(toolId);
+    pinIconEl.classList.add('pinned');
+  }
+
+  // 현재 DB 전체 favorite_tools 조회
+  const { data, error: fetchError } = await supabase
+    .from('users')
+    .select('favorite_tools')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (fetchError) {
+    console.error('[pin] 조회 실패:', fetchError.message);
+    return;
+  }
+
+  // favorite_tools는 tool_ID 문자열 배열 OR 객체 배열 혼재 가능 → tool_ID 문자열로 정규화
+  const raw = data?.favorite_tools ?? [];
+  let currentIds = raw.map(item => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) return item.tool_ID ?? item.id ?? null;
+    return null;
+  }).filter(Boolean);
+
+  if (isPinned) {
+    // 핀 해제: 해당 tool_ID 제거
+    currentIds = currentIds.filter(id => id !== toolId);
+  } else {
+    // 핀 추가: 중복 방지
+    if (!currentIds.includes(toolId)) {
+      currentIds.push(toolId);
+    }
+  }
+
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ favorite_tools: currentIds })
+    .eq('user_id', currentUser.id);
+
+  if (updateError) {
+    console.error('[pin] 저장 실패:', updateError.message);
+    // 실패 시 UI 롤백
+    if (isPinned) {
+      pinnedToolIds.add(toolId);
+      pinIconEl.classList.add('pinned');
+    } else {
+      pinnedToolIds.delete(toolId);
+      pinIconEl.classList.remove('pinned');
+    }
+    alert('저장 중 오류가 발생했습니다.');
+  } else {
+    console.log('[favorite] 저장 완료. isPinned →', !isPinned, '/ tool:', tool.tool_name);
+  }
+}
+
 
 // ─── Supabase에서 전체 툴 + 평점 로드 ─────────────────────────────
 async function loadAllTools() {
@@ -106,7 +210,6 @@ async function loadAllTools() {
   const toolIDs = tools.map(t => t.tool_ID);
   const avgMap = await fetchAvgRatings(toolIDs);
 
-  // 평점 병합
   allTools = tools.map(t => ({
     ...t,
     rating: avgMap[t.tool_ID] ?? 0
@@ -176,9 +279,10 @@ function renderToolList(tools, sortValue) {
   }
 
   sorted.forEach(tool => {
-    const rating = tool.rating || 0;
-    const stars = '★'.repeat(rating) + '☆'.repeat(Math.max(0, 5 - rating));
-    const desc = formatDesc(tool.tool_des);
+    const rating  = tool.rating || 0;
+    const stars   = '★'.repeat(rating) + '☆'.repeat(Math.max(0, 5 - rating));
+    const desc    = formatDesc(tool.tool_des);
+    const isPinned = pinnedToolIds.has(tool.tool_ID); // ✅ 핀 상태 반영
 
     const item = document.createElement('div');
     item.className = 'list-item';
@@ -190,7 +294,7 @@ function renderToolList(tools, sortValue) {
         }
       </div>
       <div style="flex:1; position:relative;">
-        <img class="pin-icon" src="/media/pin.png" alt="pin" />
+        <img class="pin-icon${isPinned ? ' pinned' : ''}" src="/media/pin.png" alt="pin" title="${isPinned ? '관심 툴 해제' : '관심 툴 추가'}" />
         <div style="display:flex; flex-direction:row; align-items:center; gap:8px;">
           <span class="item-badge">${tool.tool_name}</span>
           <span style="color:#ffcc00; font-size:14px;" title="${rating}점">${stars}</span>
@@ -200,9 +304,11 @@ function renderToolList(tools, sortValue) {
       </div>
     `;
 
-    item.querySelector('.pin-icon').addEventListener('click', (e) => {
+    // ✅ 핀 클릭 이벤트 → DB 저장
+    const pinEl = item.querySelector('.pin-icon');
+    pinEl.addEventListener('click', async (e) => {
       e.stopPropagation();
-      e.currentTarget.classList.toggle('pinned');
+      await togglePin(tool, pinEl);
     });
 
     toolListEl.appendChild(item);
@@ -211,7 +317,7 @@ function renderToolList(tools, sortValue) {
 
 // ─── 모달 열기 ─────────────────────────────────────────────────────
 async function openModal(folderData) {
-  const modal = document.getElementById('modalOverlay');
+  const modal      = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
   const modalCount = document.getElementById('modalTotalCount');
 
@@ -226,8 +332,8 @@ async function openModal(folderData) {
     placeholder: '이름 순',
     value: 'name',
     options: [
-      { label: '이름 순', value: 'name' },
-      { label: '평점 순', value: 'rating' }
+      { label: '이름 순',  value: 'name'   },
+      { label: '평점 순',  value: 'rating' }
     ],
     onChange: (item) => renderToolList(tools, item.value)
   });
@@ -240,8 +346,8 @@ async function openModal(folderData) {
 
 // ─── DOMContentLoaded ──────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
-  const tabs = document.querySelectorAll('.tab-item');
-  const modal = document.getElementById('modalOverlay');
+  const tabs     = document.querySelectorAll('.tab-item');
+  const modal    = document.getElementById('modalOverlay');
   const closeBtn = document.getElementById('closeModal');
 
   const toolGrid = document.getElementById('toolGrid');
@@ -249,7 +355,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     toolGrid.innerHTML = `<p style="color:#aaa; text-align:center; width:100%; padding:40px 0;">툴 데이터를 불러오는 중...</p>`;
   }
 
-  await loadAllTools();
+  // ✅ 로그인 유저 + 핀 목록 병렬 로드
+  const { data: { user } } = await supabase.auth.getUser();
+  currentUser = user ?? null;
+
+  await Promise.all([
+    loadAllTools(),
+    fetchPinnedTools(),
+  ]);
 
   tabs.forEach(tab => {
     tab.addEventListener('click', function () {
@@ -272,8 +385,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const tabParam = urlParams.get('tab');
+  const urlParams  = new URLSearchParams(window.location.search);
+  const tabParam   = urlParams.get('tab');
 
   let initialTab = "이미지·오디오·영상";
   if (tabParam) {

@@ -24,16 +24,22 @@
     <section class="profile-section">
       <h1 class="page-title">마이페이지</h1>
       <div class="profile-avatar-ring">
-        <div class="profile-avatar">...</div>
-      </div>
-        <img src="./media/profile.png" alt="프로필" onerror="this.style.display='none'">
+        <div class="profile-avatar" id="profileAvatarBtn" title="프로필 이미지 변경">
+          <img id="profileAvatarImg" src="./media/profile.png" alt="프로필" onerror="this.style.display='none'">
+          <div class="profile-avatar-edit-overlay">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </div>
+        </div>
       </div>
       <span class="profile-email-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="4" width="20" height="16" rx="2"/>
           <polyline points="2,4 12,13 22,4"/>
         </svg>
-        kmj88200&#64;naver.com
+        
       </span>
     </section>
 
@@ -54,10 +60,10 @@
         <div class="dashboard-card card-info">
           <h3 class="card-title">내 정보</h3>
           <ul class="info-list">
-            <li><span class="info-label">이름</span><span class="info-tag">민주강</span></li>
-            <li><span class="info-label">직군</span><span class="info-tag">마케터</span></li>
-            <li><span class="info-label">연령대</span><span class="info-tag">20대</span></li>
-            <li><span class="info-label">국가</span><span class="info-tag">대한민국</span></li>
+            <li><span class="info-label">이름</span><span class="info-tag"></span></li>
+            <li><span class="info-label">직군</span><span class="info-tag"></span></li>
+            <li><span class="info-label">연령대</span><span class="info-tag"></span></li>
+            <li><span class="info-label">국가</span><span class="info-tag"></span></li>
           </ul>
           <div class="card-footer">
             <button type="button" class="btn-text" data-scroll-to="section-faq-info">정보 수정하기</button>
@@ -107,7 +113,6 @@
     <section class="works-section" id="section-works">
       <h2 class="section-title">
         <img src="/media/upload1.png" width="20" height="20" style="object-fit:contain;">
-
         업로드한 작업물
       </h2>
       <div class="works-card">
@@ -147,7 +152,7 @@
               <div class="edit-row">
                 <span class="edit-label">닉네임</span>
                 <div class="edit-input-wrap">
-                  <input type="text" class="edit-input" id="editNickname" value="민주강" placeholder="닉네임">
+                  <input type="text" class="edit-input" id="editNickname" value="" placeholder="닉네임">
                   <div id="nicknameCheckContainer"></div>
                 </div>
               </div>
@@ -197,6 +202,28 @@
     </section>
 
   </main>
+
+  <!-- ===== 아바타 선택 모달 ===== -->
+  <div class="avatar-modal-backdrop" id="avatarModalBackdrop" aria-hidden="true">
+    <div class="avatar-modal" role="dialog" aria-modal="true" aria-label="프로필 이미지 선택">
+      <div class="avatar-modal__header">
+        <h3 class="avatar-modal__title">프로필 이미지 선택</h3>
+        <button class="avatar-modal__close" id="avatarModalClose" aria-label="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="avatar-modal__desc">사용할 프로필 이미지를 선택해주세요.</p>
+      <div class="avatar-grid" id="avatarGrid"></div>
+      <div class="avatar-modal__footer">
+        <div id="avatarCancelContainer"></div>
+        <div id="avatarConfirmContainer"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="bottom-banner"></div>
   <div id="alert-root"></div>
 
@@ -205,7 +232,7 @@
   <script src="/_common/alert/alert.js"></script>
   <script src="/_common/select/select.js"></script>
   <script src="/_common/button/button.js"></script>
-  <script src="/mypage/mypage.js"></script>
+  <script type="module" src="/mypage/mypage.js"></script>
   <script src="/_common/bottom-banner/include.js"></script>
 </body>
 </html>

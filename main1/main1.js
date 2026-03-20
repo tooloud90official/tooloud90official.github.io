@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const { data: worksData, error: worksError } = await supabase
       .from('works')
-      .select('work_id, tool_id, work_link, user_id');  // user_id 추가
+      .select('work_id, tool_id, work_link, user_id');
 
     if (worksError) {
       console.error('[works] Supabase 에러:', worksError.message);
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           tool:   { id: tool.tool_ID, name: tool.tool_name, img: iconUrl },
           stars,
           rating,
-          userId: work.user_id,  // user_id 저장
+          userId: work.user_id,
         };
       });
 
@@ -270,6 +270,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       recommendedTools = recommendedTools.slice(0, 8);
     }
 
+    // ===== ✅ recommended_tools DB 저장 =====
+    try {
+      const toolsToSave = recommendedTools.map(tool => {
+        let iconUrl = tool.icon;
+        if (!iconUrl && tool.tool_link) {
+          try {
+            const domain = new URL(tool.tool_link).hostname.replace('www.', '');
+            iconUrl = `https://logo.clearbit.com/${domain}`;
+          } catch { /* 무시 */ }
+        }
+        if (!iconUrl) {
+          iconUrl = `https://logo.clearbit.com/${tool.tool_name.toLowerCase().replace(/\s/g, '')}.com`;
+        }
+        return { name: tool.tool_name, img: iconUrl };
+      });
+
+      const { error: saveError } = await supabase
+        .from('users')
+        .update({ recommended_tools: toolsToSave })
+        .eq('user_id', user.id);
+
+      if (saveError) console.error('[groq] recommended_tools 저장 실패:', saveError.message);
+      else console.log('[groq] recommended_tools 저장 완료:', toolsToSave);
+    } catch (e) {
+      console.error('[groq] recommended_tools 저장 중 예외:', e.message);
+    }
+    // ===== 저장 끝 =====
+
     grid.innerHTML = '';
     grid.className = 'tool-grid';
 
@@ -319,7 +347,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // 작성자 이름 표시 (로그인 여부 무관)
     if (nameEl) {
       nameEl.textContent = data.userName ? `${data.userName} 님의 작업물` : '님의 작업물';
     }
