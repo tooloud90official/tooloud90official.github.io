@@ -567,9 +567,9 @@ body {
 }
 
 .stat:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-.stat img { width: 25px; height: 25px; object-fit: contain; filter: invert(1); }
+.stat img { width: 20px; height: 20px; object-fit: contain; filter: invert(1); }
 
-.stat--comment img { width: 23px; height: 23px; }
+.stat--comment img { width: 20px; height: 20px; }
 
 .post-body { padding: 4px 4px 10px; }
 .post-body:empty,
