@@ -15,8 +15,11 @@
 
 <!-- PDF.js -->
 <script type="module">
-  import * as pdfjsLib from '/artwork/artwork_upload/pdf.min.js';
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+  import * as pdfjsLib from "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.mjs";
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+
   window.pdfjsLib = pdfjsLib;
 </script>
 </head>
@@ -46,7 +49,7 @@
 </div>
 
 <div class="artwork-hero__right">
-<img class="artwork-hero__img" src="/media/wave5.png" alt="">
+<img class="artwork-hero__img" src="/media/artwork_banner.png" alt="">
 <div class="artwork-hero__img-overlay"></div>
 <div class="artwork-hero__img-fade"></div>
 <div class="artwork-hero__caption">

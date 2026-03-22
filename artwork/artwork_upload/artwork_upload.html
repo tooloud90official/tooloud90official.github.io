@@ -10,10 +10,12 @@
   <link rel="stylesheet" href="/artwork/artwork_upload/artwork_upload.css" />
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css" />
 
-  <!-- ✅ /로 시작하는 절대경로로 수정 -->
   <script type="module">
-    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs';
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs';
+    import * as pdfjsLib from "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.mjs";
+  
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+  
     window.pdfjsLib = pdfjsLib;
   </script>
 </head>

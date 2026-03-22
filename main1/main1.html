@@ -12,11 +12,16 @@
   <link rel="stylesheet" href="/_common/alert/alert.css">
   <link rel="stylesheet" href="/main1/main1.css">
   <link rel="stylesheet" href="/_common/bottom-banner/bottom-banner.css">
+
   <script type="module">
-    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs';
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs';
+    import * as pdfjsLib from "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.mjs";
+  
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+  
     window.pdfjsLib = pdfjsLib;
   </script>
+  
 </head>
 
 <body>
