@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         .from("user_img")
         .getPublicUrl(`avatar${avatarNum}.jpg`);  // .jpg 추가
         
-      const avatarUrl = avatarData?.publicUrl ?? "/media/profil.png";
+      const avatarUrl = avatarData?.publicUrl ?? null;
 
       const { error } = await supabase.from('users').insert({
         user_id        : session.user.id,
