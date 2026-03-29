@@ -2,11 +2,6 @@
 
 > AI 소음 속, 나만의 도구
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
-
 ## 📌 프로젝트 소개
 
 수많은 AI 툴 중에서 **나에게 맞는 툴을 찾는 데 너무 많은 시간이 걸리지 않으셨나요?**
@@ -40,6 +35,12 @@ Frontend	HTML, CSS, JavaScript
 Database	Supabase
 AI	Groq API
 협업	GitHub, VS Code
+
+
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
 
 --- 
 
