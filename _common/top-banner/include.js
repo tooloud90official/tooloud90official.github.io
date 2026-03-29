@@ -95,17 +95,34 @@ function formatAlert(n, senderNameMap = {}, currentUserId = null) {
   if (n.type === 'reply') {
     return { ...base, type: 'reply', title: '댓글 알림', desc: `${sender}님이 회원님의 작업물에 댓글을 달았어요.` };
   }
+
   if (n.type === 'like') {
     return { ...base, type: 'like', title: '좋아요 알림', desc: `${sender}님이 회원님의 작업물에 좋아요를 눌렀어요.` };
   }
+
   if (n.type === 'inquiry') {
-    // sender_id !== currentUserId → 다른 사람이 보낸 알림 → 관리자가 받는 새 문의
-    // sender_id === currentUserId → 내가 보낸 것에 대한 답변 알림 (있을 수 없으므로 사실상 항상 아래)
-    const desc = n.sender_id !== currentUserId
-      ? `${sender}님이 새로운 문의사항을 등록했어요.`
-      : '회원님의 문의사항에 답글이 달렸어요.';
-    return { ...base, type: 'inquiry', title: '문의 알림', desc };
+
+    // 🔥 관리자 판별 (현재는 이름 기준)
+    const isAdmin = sender.includes('툴라우드 오피셜');
+
+    let desc;
+
+    if (isAdmin) {
+      // ✅ 유저 입장 (관리자가 답변)
+      desc = '관리자님이 문의사항에 답변을 했어요.';
+    } else {
+      // ✅ 관리자 입장 (유저가 문의 등록)
+      desc = `${sender}님이 문의사항을 등록했어요.`;
+    }
+
+    return {
+      ...base,
+      type: 'inquiry',
+      title: '문의 알림',
+      desc
+    };
   }
+
   return { ...base, type: n.type, title: '알림', desc: '새로운 알림이 있어요.' };
 }
 
@@ -154,7 +171,6 @@ async function initLogout() {
   const { data: { session } } = await supabase.auth.getSession();
   const isLoggedIn = !!session?.user;
 
-  // HTML 로드
   try {
     const res  = await fetch('/_common/top-banner/top-banner.html');
     const html = await res.text();
@@ -165,10 +181,8 @@ async function initLogout() {
     return;
   }
 
-  // CSS 로드
   loadStyle('/_common/top-banner/top-banner.css');
 
-  // authArea 렌더링
   const authArea = document.getElementById('authArea');
   if (!authArea) return;
 
@@ -178,14 +192,12 @@ async function initLogout() {
     renderLoggedOut(authArea);
   }
 
-  // index.js 로드
   try {
     await loadScript('/_common/top-banner/index.js');
   } catch (e) {
     console.error('[include.js] index.js 로드 실패:', e);
   }
 
-  // 로그인 후 전용 초기화
   if (isLoggedIn) {
 
     try {
@@ -208,7 +220,6 @@ async function initLogout() {
 
     await initLogout();
 
-    // 알림 목록 Supabase에서 가져오기
     try {
       await loadScript('/_common/alert/alert.js');
 
@@ -219,21 +230,23 @@ async function initLogout() {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      // sender_id로 users 테이블에서 이름 일괄 조회
       const senderIds = [...new Set((notiData || []).map(n => n.sender_id).filter(Boolean))];
       let senderNameMap = {};
+
       if (senderIds.length > 0) {
         const { data: senderUsers } = await supabase
           .from('users')
           .select('user_id, user_name')
           .in('user_id', senderIds);
+
         (senderUsers || []).forEach(u => {
           senderNameMap[u.user_id] = u.user_name;
         });
       }
 
-      // ✅ currentUserId 전달 — inquiry 문구 분기용
-      const alerts = (notiData || []).map(n => formatAlert(n, senderNameMap, session.user.id));
+      const alerts = (notiData || []).map(n =>
+        formatAlert(n, senderNameMap, session.user.id)
+      );
 
       if (!document.getElementById('alert-root')) {
         const alertRoot = document.createElement('div');
@@ -246,7 +259,6 @@ async function initLogout() {
           triggerSelector: '#bellBtn',
           mountSelector:   '#alert-root',
           alerts,
-          // ✅ X버튼 / 바로가기 클릭 시 DB에서도 삭제
           onRemove: async (item) => {
             if (!item.notification_id) return;
             try {

@@ -26,7 +26,7 @@ body {
 .mypage-icon {
   display: block;
   flex-shrink: 0;
-  background-color: #f0f4fa;
+  background-color: #ffffff;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -36,7 +36,8 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 7px;
-  border:1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12); /* 그림자 추가 */
+
 }
 
 .mypage-icon--md {
@@ -120,7 +121,6 @@ body {
   margin: 0;
 }
 
-/* 프로필 아바타 – 클릭 가능하도록 cursor pointer 추가 */
 .profile-avatar {
   width: 80px;
   height: 80px;
@@ -138,7 +138,6 @@ body {
   display: block;
 }
 
-/* 호버 시 나타나는 편집 오버레이 */
 .profile-avatar-edit-overlay {
   position: absolute;
   inset: 0;
@@ -475,13 +474,42 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid #d0daf0;
+
 }
+
+/* =====================================================
+   ✅ 문서 썸네일 (PDF canvas / 기타 플레이스홀더)
+   ===================================================== */
 
 .work-thumb--doc {
   background: #eef2fa;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+  /* overflow:hidden은 .work-thumb에서 이미 상속 */
+}
+
+/* ✅ PDF.js로 렌더링되는 canvas
+   - border-radius가 자연스럽게 적용됨 (iframe과 달리 일반 DOM 요소)
+   - 부모의 overflow:hidden + border-radius로 모서리가 정확히 잘림 */
+.work-thumb-pdf-canvas {
+  display: block;
+  width: 96px;
+  height: 60px;
+  border-radius: 0; /* 부모 overflow:hidden이 처리하므로 불필요 */
+}
+
+/* ✅ PDF가 아닌 문서 (DOCX 등) 플레이스홀더 */
+.work-thumb--doc-placeholder {
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 8px;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
 }
 
@@ -875,7 +903,7 @@ body {
 
 .btn-submit:hover { background: #1a6be0; }
 
-.edit-submit-row { display: flex; justify-content: flex-end; }
+.edit-submit-row { display: flex; justify-content: center; }
 
 /* =====================================================
    scroll-margin
@@ -887,7 +915,6 @@ body {
    아바타 선택 모달
    ===================================================== */
 
-/* 배경 딤 처리 */
 .avatar-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -900,20 +927,16 @@ body {
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
-
-  /* 기본: 숨김 */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
 }
 
-/* 열림 상태 */
 .avatar-modal-backdrop.is-open {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* 모달 패널 */
 .avatar-modal {
   background: #fff;
   border-radius: 24px;
@@ -922,8 +945,6 @@ body {
   max-width: 420px;
   box-shadow: 0 24px 64px rgba(26, 26, 46, 0.22);
   box-sizing: border-box;
-
-  /* 진입 애니메이션 */
   transform: translateY(12px) scale(0.97);
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -932,7 +953,6 @@ body {
   transform: translateY(0) scale(1);
 }
 
-/* 헤더 */
 .avatar-modal__header {
   display: flex;
   align-items: center;
@@ -967,14 +987,12 @@ body {
   color: #1a1a2e;
 }
 
-/* 설명 텍스트 */
 .avatar-modal__desc {
   font-size: 13px;
   color: #999;
   margin: 0 0 20px;
 }
 
-/* 아바타 4×2 그리드 */
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -982,7 +1000,6 @@ body {
   margin-bottom: 24px;
 }
 
-/* 개별 아바타 선택 버튼 */
 .avatar-option {
   position: relative;
   aspect-ratio: 1;
@@ -1004,7 +1021,6 @@ body {
   border-radius: 13px;
 }
 
-/* 로드 실패 시 회색 배경 유지 */
 .avatar-option--error {
   background: #dce8f8;
 }
@@ -1013,14 +1029,12 @@ body {
   display: none;
 }
 
-/* 호버 */
 .avatar-option:hover {
   border-color: rgba(42, 124, 255, 0.4);
   transform: scale(1.04);
   box-shadow: 0 6px 18px rgba(42, 124, 255, 0.18);
 }
 
-/* 선택됨 */
 .avatar-option.is-selected {
   border-color: #2a7cff;
   box-shadow: 0 0 0 3px rgba(42, 124, 255, 0.18);
@@ -1030,7 +1044,6 @@ body {
   transform: scale(1.04);
 }
 
-/* 체크 뱃지 */
 .avatar-option__check {
   position: absolute;
   top: 5px;
@@ -1055,7 +1068,6 @@ body {
   transform: scale(1);
 }
 
-/* 푸터 버튼 영역 */
 .avatar-modal__footer {
   display: flex;
   gap: 10px;

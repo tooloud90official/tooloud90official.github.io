@@ -67,6 +67,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   /* =====================================================
+     ✅ [PDF.js] PDF 첫 페이지를 canvas로 렌더링
+     ===================================================== */
+  let pdfJsLoaded = false;
+
+  async function loadPdfJs() {
+    if (pdfJsLoaded) return;
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfJsLoaded = true;
+        resolve();
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  async function renderPdfThumbnail(canvas, pdfUrl) {
+    try {
+      await loadPdfJs();
+      const pdf = await pdfjsLib.getDocument({ url: pdfUrl, withCredentials: false }).promise;
+      const page = await pdf.getPage(1);
+
+      const containerW = 96;
+      const containerH = 60;
+
+      const viewport0 = page.getViewport({ scale: 1 });
+      const scale = Math.max(containerW / viewport0.width, containerH / viewport0.height);
+      const viewport = page.getViewport({ scale });
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = containerW * dpr;
+      canvas.height = containerH * dpr;
+      canvas.style.width  = containerW + 'px';
+      canvas.style.height = containerH + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // 가운데 정렬 오프셋
+      const offsetX = (containerW - viewport.width)  / 2;
+      const offsetY = (containerH - viewport.height) / 2;
+
+      await page.render({
+        canvasContext: ctx,
+        viewport,
+        transform: [1, 0, 0, 1, offsetX, offsetY],
+      }).promise;
+
+    } catch (e) {
+      console.warn('PDF 썸네일 렌더링 실패:', e);
+      // 실패 시 canvas 숨기고 플레이스홀더 표시
+      canvas.style.display = 'none';
+      const placeholder = canvas.nextElementSibling;
+      if (placeholder) placeholder.style.display = 'flex';
+    }
+  }
+
+
+  /* =====================================================
      ✅ [EMAIL] 프로필 이메일 버튼 렌더링
      ===================================================== */
   function renderProfileEmail() {
@@ -484,19 +547,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function assignRandomAvatarIfNeeded() {
     if (!user) return null;
 
-    // 이미 저장된 아바타가 있으면 그대로 반환
     const current = await fetchCurrentAvatar();
     if (current) return current;
 
-    // 스토리지 목록 가져오기
     const avatarList = await fetchAvatarList();
     if (avatarList.length === 0) return null;
 
-    // 랜덤 선택
     const randomItem = avatarList[Math.floor(Math.random() * avatarList.length)];
     const randomUrl  = randomItem.url;
 
-    // DB에 저장
     const { error } = await supabase
       .from('users')
       .update({ user_img: randomUrl })
@@ -1055,17 +1114,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       let infoHtml  = '';
 
       if (filter === '문서') {
+        const isPdf = item.ext?.toUpperCase() === 'PDF';
+
+        // ✅ PDF → canvas(pdf.js) 렌더링 / 그 외 → 플레이스홀더
         thumbHtml = `
           <div class="work-thumb work-thumb--doc work-thumb--clickable"
                data-work-id="${item.workId}"
                style="cursor:pointer;">
-            <span class="doc-ext">${item.ext}</span>
-            <div class="doc-lines">
-              <div class="doc-line"></div>
-              <div class="doc-line"></div>
-              <div class="doc-line" style="width:70%;"></div>
-            </div>
+            ${isPdf && item.workPath
+              ? `<canvas class="work-thumb-pdf-canvas"></canvas>
+                 <div class="work-thumb--doc-placeholder" style="display:none;">
+                   <span class="doc-ext">${item.ext}</span>
+                   <div class="doc-lines">
+                     <div class="doc-line"></div>
+                     <div class="doc-line"></div>
+                     <div class="doc-line" style="width:70%;"></div>
+                   </div>
+                 </div>`
+              : `<div class="work-thumb--doc-placeholder">
+                   <span class="doc-ext">${item.ext}</span>
+                   <div class="doc-lines">
+                     <div class="doc-line"></div>
+                     <div class="doc-line"></div>
+                     <div class="doc-line" style="width:70%;"></div>
+                   </div>
+                 </div>`
+            }
           </div>`;
+
         infoHtml = `
           <div class="work-info">
             <span class="work-name">${item.name}</span>
@@ -1144,6 +1220,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       div.innerHTML = thumbHtml + infoHtml;
       list.appendChild(div);
+
+      // ✅ PDF canvas 렌더링 (DOM에 추가된 직후 실행)
+      if (filter === '문서' && item.ext?.toUpperCase() === 'PDF' && item.workPath) {
+        const canvas = div.querySelector('.work-thumb-pdf-canvas');
+        if (canvas) {
+          requestAnimationFrame(() => renderPdfThumbnail(canvas, item.workPath));
+        }
+      }
 
       const clickable = div.querySelector('.work-thumb--clickable');
       if (clickable) {
@@ -1380,7 +1464,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderReviewManage();
   renderWorks();
 
-  // ✅ 저장된 아바타 없으면 랜덤 배정, 있으면 그대로 사용
   const savedAvatarUrl = await assignRandomAvatarIfNeeded();
   if (savedAvatarUrl) applyAvatarToProfile(savedAvatarUrl);
 
