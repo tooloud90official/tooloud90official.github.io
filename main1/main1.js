@@ -13,8 +13,26 @@ function renderMainWorkMedia(container, data) {
     const img = document.createElement("img");
     img.src = url;
     img.alt = "작업물";
-    img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
-    img.onerror = () => { container.style.background = "#e8eef5"; };
+  
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+    container.style.justifyContent = "center";
+    container.style.overflow = "hidden";
+    container.style.background = "linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%)";
+  
+    img.style.cssText = `
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    `;
+  
+    img.onerror = () => {
+      container.style.background = "#e8eef5";
+    };
+  
     container.appendChild(img);
     return;
   }

@@ -120,8 +120,8 @@ async function initPersonalAIPage() {
       ? userProfile.recommended_tools
       : [];
 
-    const recentIds = Array.isArray(userProfile?.recent_tools)
-      ? userProfile.recent_tools
+      const recentIds = Array.isArray(userProfile?.recent_tools)
+      ? userProfile.recent_tools.slice(0, 8)
       : [];
 
     const favoriteIds = Array.isArray(userProfile?.favorite_tools)

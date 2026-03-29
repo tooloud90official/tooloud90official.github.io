@@ -90,34 +90,47 @@ async function renderWorkMedia(container, work) {
 
   container.innerHTML = "";
 
+  // ✅ 1. 이미지: 컨테이너를 꽉 채우되 비율 유지 (contain + 배경 처리)
   if (kind === "image") {
-    container.innerHTML = `<img class="work-img" src="${url}" alt="작업물" />`;
+    container.style.display         = "flex";
+    container.style.alignItems      = "center";
+    container.style.justifyContent  = "center";
+    container.style.overflow        = "hidden";
+    container.style.background      = "linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%)";
+    container.innerHTML = `<img class="work-img" src="${url}" alt="작업물"
+      style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;object-fit:contain;" />`;
     return;
   }
 
+  // ✅ 2. 비디오: 썸네일 정방형 제거, 배경처럼 처리
   if (kind === "video") {
     container.innerHTML = `
-      <div class="work-video-wrap">
-        <video class="work-video" playsinline preload="metadata" id="workVideoEl">
+      <div class="work-video-wrap" style="position:relative;width:100%;height:100%;background:#000;overflow:hidden;">
+        <video class="work-video" playsinline preload="metadata" id="workVideoEl"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
           <source src="${url}" />
         </video>
-        <canvas class="work-video-thumb" id="workVideoThumb"></canvas>
-        <button class="work-video-playbtn" id="workVideoPlayBtn" aria-label="재생">
+        <canvas class="work-video-thumb" id="workVideoThumb"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;"></canvas>
+        <div id="workVideoBg" style="position:absolute;inset:0;background:#111;"></div>
+        <button class="work-video-playbtn" id="workVideoPlayBtn" aria-label="재생"
+          style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:none;border:none;cursor:pointer;z-index:2;">
           <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
             style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))">
             <path d="M8 5v14l11-7z"></path>
           </svg>
         </button>
-        <div class="work-video-controls">
-          <span class="work-video-time">0:00 / 0:00</span>
-          <div class="work-video-seekbar">
-            <div class="work-video-seekbar__fill"></div>
+        <div class="work-video-controls" style="position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,0.6));z-index:2;">
+          <span class="work-video-time" style="color:#fff;font-size:12px;">0:00 / 0:00</span>
+          <div class="work-video-seekbar" style="margin-top:4px;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;cursor:pointer;">
+            <div class="work-video-seekbar__fill" style="height:100%;width:0%;background:#fff;border-radius:2px;"></div>
           </div>
         </div>
       </div>`;
 
     const video    = container.querySelector("#workVideoEl");
     const canvas   = container.querySelector("#workVideoThumb");
+    const bg       = container.querySelector("#workVideoBg");
     const playBtn  = container.querySelector("#workVideoPlayBtn");
     const controls = container.querySelector(".work-video-controls");
     const timeEl   = container.querySelector(".work-video-time");
@@ -133,6 +146,7 @@ async function renderWorkMedia(container, work) {
       return `${m}:${String(s).padStart(2, "0")}`;
     }
 
+    // 썸네일: canvas에 첫 프레임 배경으로
     video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
     video.addEventListener("seeked", () => {
       if (video.paused) {
@@ -141,7 +155,8 @@ async function renderWorkMedia(container, work) {
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         canvas.style.display = "block";
-        video.style.display  = "none";
+        if (bg) bg.style.display = "none";
+        video.style.display = "none";
       }
     });
 
@@ -160,7 +175,8 @@ async function renderWorkMedia(container, work) {
       e.stopPropagation();
       if (video.paused) {
         canvas.style.display = "none";
-        video.style.display  = "block";
+        if (bg) bg.style.display = "none";
+        video.style.display = "block";
         video.play();
         playBtn.innerHTML = pauseSvg;
       } else {
@@ -185,36 +201,32 @@ async function renderWorkMedia(container, work) {
       playBtn.innerHTML = playSvg;
     });
 
-    // ✅ 비디오 자체(썸네일/영상) 클릭 → 이동
-    video.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-    canvas.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
+    video.addEventListener("click", (e) => { e.stopPropagation(); });
+    canvas.addEventListener("click", (e) => { e.stopPropagation(); });
     return;
   }
 
+  // ✅ 2. 오디오: 비디오와 동일한 구조로
   if (kind === "audio") {
     const audioId = `workAudio_${Date.now()}`;
     container.innerHTML = `
       <div class="work-audio-wrap">
         <div class="work-audio-card">
           <div class="work-audio-thumb">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="1.8"
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18V5l12-2v13"></path>
               <circle cx="6" cy="18" r="3"></circle>
               <circle cx="18" cy="16" r="3"></circle>
             </svg>
-            <button class="work-audio-playbtn" id="${audioId}_btn" aria-label="재생">
-              <svg viewBox="0 0 24 24" fill="white" width="52" height="52"
-                style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
-                <path d="M8 5v14l11-7z"></path>
-              </svg>
-            </button>
           </div>
+          <button class="work-audio-playbtn" id="${audioId}_btn" aria-label="재생">
+            <svg viewBox="0 0 24 24" fill="white" width="32" height="32"
+              style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
           <div class="work-audio-controls">
             <span class="work-audio-time" id="${audioId}_time">0:00 / 0:00</span>
             <div class="work-audio-seekbar" id="${audioId}_seekbar">
@@ -233,8 +245,8 @@ async function renderWorkMedia(container, work) {
     const seekbar = container.querySelector(`#${audioId}_seekbar`);
     const fill    = container.querySelector(`#${audioId}_fill`);
 
-    const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="36" height="36"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
-    const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="52" height="52" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M8 5v14l11-7z"></path></svg>`;
+    const pauseSvg = `<svg viewBox="0 0 24 24" fill="white" width="28" height="28" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>`;
+    const playSvg  = `<svg viewBox="0 0 24 24" fill="white" width="32" height="32" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"><path d="M8 5v14l11-7z"></path></svg>`;
 
     function formatTime(sec) {
       const m = Math.floor(sec / 60);
@@ -256,7 +268,6 @@ async function renderWorkMedia(container, work) {
       audio.currentTime = pct * audio.duration;
     });
 
-    // ✅ 컨트롤 영역 전체 버블링 차단
     container.querySelector(".work-audio-controls")?.addEventListener("click", (e) => e.stopPropagation());
 
     audio?.addEventListener("loadedmetadata", () => {
@@ -304,6 +315,7 @@ async function loadCurrentUser() {
   currentUser = { id: user.id, name: displayName, avatar: displayAvatar };
 }
 
+// ✅ 9. 사이트 미리보기 아이콘 흰 배경 + 정사각형 처리
 function applyToolIcon(mountSelector, iconUrl) {
   if (!iconUrl) return;
   const iconEl = document.querySelector(`${mountSelector} .tool-icon-card__icon`);
@@ -320,6 +332,7 @@ async function saveRecentTool() {
   try {
     const { data } = await supabase.from("users").select("recent_tools").eq("user_id", currentUser.id).single();
     const current = data?.recent_tools ?? [];
+    // ✅ 8. 최대 8개 슬라이스 (중복 제거 후 추가, 최대 8개 유지)
     const updated = [TOOL_ID, ...current.filter(id => id !== TOOL_ID)].slice(0, 8);
     await supabase.from("users").update({ recent_tools: updated }).eq("user_id", currentUser.id);
   } catch (e) {
@@ -350,6 +363,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateAvgScore();
   updateCardStars(0);
 
+  // ✅ 3. 플랜/프로모션 사이트 바로가기 버튼 제거 — planBtn1~3, promoBtn loadButton 호출 삭제
   await Promise.all([
     window.loadButton({ target: "#visitSiteBtn", text: "사이트 바로가기", variant: "primary", onClick: () => {} }),
 
@@ -393,11 +407,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateBtnUI(pinned);
       });
     }),
-
-    window.loadButton({ target: "#planBtn1", text: "사이트 바로가기", variant: "outline",  onClick: () => {} }),
-    window.loadButton({ target: "#planBtn2", text: "사이트 바로가기", variant: "primary", onClick: () => {} }),
-    window.loadButton({ target: "#planBtn3", text: "사이트 바로가기", variant: "primary", onClick: () => {} }),
-    window.loadButton({ target: "#promoBtn", text: "사이트 바로가기", variant: "outline",  onClick: () => {} }),
   ]);
 
   const toolRow = await loadToolInfo();
@@ -411,7 +420,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const toolUrl = toolRow?.tool_link ?? "#";
-  ["#visitSiteBtn", "#planBtn1", "#planBtn2", "#planBtn3", "#promoBtn"].forEach((sel) => {
+  // ✅ 3. visitSiteBtn만 남기고 planBtn/promoBtn 제거
+  ["#visitSiteBtn"].forEach((sel) => {
     document.querySelector(`${sel} .btn`)?.addEventListener("click", async () => {
       if (toolUrl && toolUrl !== "#") {
         await saveRecentTool();
@@ -479,6 +489,7 @@ async function loadToolInfo() {
 }
 
 function renderPlanCards(tool) {
+  // ✅ 10. 기본 이모지 ✅ → /media/checkbox.png 이미지로 교체
   function getEmoji(text) {
     if (/무제한|unlimited/i.test(text)) return "♾️";
     if (/무료|free/i.test(text))        return "🆓";
@@ -492,7 +503,8 @@ function renderPlanCards(tool) {
     if (/비디오|영상|video/i.test(text)) return "🎬";
     if (/클라우드|저장|storage/i.test(text)) return "☁️";
     if (/크레딧|credit/i.test(text))    return "💳";
-    return "✅";
+    // ✅ 기본값: 이미지 태그로 반환 (이모지 대신 checkbox.png)
+    return `<img src="/media/checkbox.png" style="width:1em;height:1em;object-fit:contain;vertical-align:middle;" alt="✅">`;
   }
 
   const plans = [
@@ -509,15 +521,13 @@ function renderPlanCards(tool) {
     const listEl  = card.querySelector(".plan-card__list");
     const topEl   = card.querySelector(".plan-card__top");
     const badgeEl = card.querySelector(".plan-card__badge");
-    const btnEl   = card.querySelector(".plan-card__btn"); // ✅ 추가
+    const btnEl   = card.querySelector(".plan-card__btn");
 
     if (!tool[nameKey]) {
       if (badgeEl) badgeEl.textContent = `플랜 #${i + 1}`;
       if (nameEl)  nameEl.textContent  = "";
       if (listEl) listEl.innerHTML = `<li class="plan-card__empty">해당 플랜이 없습니다.</li>`;
-      // 가격 있으면 제거
-      if (btnEl)   btnEl.innerHTML     = ""; // ✅ 버튼 영역 완전히 비우기
-      
+      if (btnEl)   btnEl.innerHTML     = "";
       topEl?.querySelector(".plan-card__price")?.remove();
       return;
     }
@@ -528,6 +538,7 @@ function renderPlanCards(tool) {
     const price = tool[priceKey];
     let priceEl = topEl?.querySelector(".plan-card__price");
 
+    // ✅ 6. 가격 표시: ₩ → $, 원화값을 달러로 표기 (표시만 변경)
     if (price !== undefined && price !== null && price !== "") {
       if (!priceEl && topEl) {
         priceEl = document.createElement("div");
@@ -535,7 +546,14 @@ function renderPlanCards(tool) {
         topEl.appendChild(priceEl);
       }
       if (priceEl) {
-        priceEl.textContent = Number(price) === 0 ? "무료" : `₩${Number(price).toLocaleString()} / 월`;
+        const numPrice = Number(price);
+        if (numPrice === 0) {
+          priceEl.textContent = "무료";
+        } else {
+          // KRW → USD 환산 (1300원 기준) 후 소수 둘째자리로 표시
+          const usd = (numPrice / 1300).toFixed(2);
+          priceEl.textContent = `$${usd} / mo`;
+        }
       }
     } else if (priceEl) {
       priceEl.remove();
@@ -549,6 +567,8 @@ function renderPlanCards(tool) {
   });
 }
 
+// ✅ 4. 프로모션 제목 크게 + 중앙 정렬
+// ✅ 7. 프로모션 방어: tool_prom이 없으면 섹션 완전히 숨김 (플랜 정보 혼입 방지)
 function renderPromo(toolName, toolProm) {
   const section    = document.getElementById("promoSection");
   const titleEl    = document.querySelector(".promo__title");
@@ -558,10 +578,15 @@ function renderPromo(toolName, toolProm) {
 
   if (titleEl) titleEl.textContent = toolName ? `${toolName} 에서 진행 중인 프로모션` : "";
 
-  if (!toolProm) { if (section) section.style.display = "none"; return; }
+  // ✅ 방어: 빈 문자열, null, undefined, 공백만 있는 경우 모두 숨김
+  const cleanProm = (toolProm ?? "").trim();
+  if (!cleanProm) {
+    if (section) section.style.display = "none";
+    return;
+  }
   if (section) section.style.display = "";
 
-  const lines = toolProm.split(/[\/,\n]/).map(s => s.trim()).filter(Boolean);
+  const lines = cleanProm.split(/[\/,\n]/).map(s => s.trim()).filter(Boolean);
 
   function getPromoEmoji(text) {
     if (/할인|%|dc/i.test(text))     return "🎉";
@@ -575,15 +600,26 @@ function renderPromo(toolName, toolProm) {
     return "✨";
   }
 
-  if (headlineEl) headlineEl.textContent = lines[0] ? `${getPromoEmoji(lines[0])} ${lines[0]}` : "";
+  // ✅ 4. 헤드라인: 크고 중앙 정렬
+  if (headlineEl) {
+    headlineEl.textContent = lines[0] ? `${getPromoEmoji(lines[0])} ${lines[0]}` : "";
+    headlineEl.style.fontSize    = "1.4em";
+    headlineEl.style.fontWeight  = "700";
+    headlineEl.style.textAlign   = "center";
+    headlineEl.style.display     = "block";
+  }
 
   if (subEl) {
     if (lines.length > 1) {
-      subEl.style.display = "";
-      subEl.innerHTML = lines.slice(1).map(l => `<span>${getPromoEmoji(l)} ${l}</span>`).join("<br>");
+      subEl.style.display   = "";
+      subEl.style.textAlign = "center";
+      // ✅ <br> 대신 block span으로 공백 없이 붙여서 렌더
+      subEl.innerHTML = lines.slice(1).map(l =>
+        `<span style="display:block;line-height:1.6;">${getPromoEmoji(l)} ${l}</span>`
+      ).join("");
     } else {
-      subEl.innerHTML = "";
-      subEl.style.display = "none";
+      subEl.innerHTML      = "";
+      subEl.style.display  = "none";
     }
   }
 
@@ -711,11 +747,11 @@ async function renderWorksCarousel(works) {
   const avatarImg = document.getElementById("profileImg");
 
   const workMoreBtn = document.getElementById("workMoreBtn");
-if (workMoreBtn) {
-  workMoreBtn.onclick = () => {
-    window.location.href = `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(works[0].work_id)}`;
-  };
-}
+  if (workMoreBtn) {
+    workMoreBtn.onclick = () => {
+      window.location.href = `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(works[0].work_id)}`;
+    };
+  }
 
   if (profile)  profile.style.display = "";
   if (showcase) showcase.style.gridTemplateColumns = "";
@@ -862,7 +898,8 @@ function renderMyReviewArea() {
           <div class="review-write__overlay-inner">
             <span class="review-write__lock-icon">🔒</span>
             <p class="review-write__lock-msg">로그인 후 리뷰를 남길 수 있어요</p>
-            <a class="review-write__login-btn" href="/login">로그인하기</a>
+            <!-- ✅ 5. 로그인 페이지 경로 수정 -->
+            <a class="review-write__login-btn" href="/login1/login1.html">로그인하기</a>
           </div>
         </div>
       </div>
@@ -1091,6 +1128,7 @@ function initReviewSort() {
   });
 }
 
+// ✅ 9. 사이트 미리보기: 아이콘 정사각형 + 아이프레임 배경 흰색
 function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   const nameEl = document.getElementById("sitePreviewName");
   const urlEl  = document.getElementById("sitePreviewUrl");
@@ -1109,6 +1147,8 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   if (iframeEnabled && url) {
     cardEl?.classList.add("has-iframe");
     mediaEl.classList.add("has-iframe");
+    // ✅ 아이프레임일 때만 배경 흰색 (iframe 뒤가 비어보이지 않게)
+    mediaEl.style.background = "#fff";
 
     const iframe = document.createElement("iframe");
     iframe.src = url;
@@ -1119,10 +1159,23 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
     const logo = mediaEl.querySelector(".site-preview__fallback-logo, img");
     if (logo) logo.style.display = "none";
   } else {
+    // ✅ 비아이프레임: 원래 CSS 그라데이션 유지 (인라인 background 제거)
+    mediaEl.style.background = "";
+
     const imgEl = mediaEl.querySelector("img");
     if (imgEl) {
-      if (icon) { imgEl.src = icon; imgEl.style.display = ""; }
-      else      { imgEl.removeAttribute("src"); imgEl.style.display = "none"; }
+      if (icon) {
+        imgEl.src = icon;
+        imgEl.style.display      = "block";
+        // ✅ 정사각형 + object-fit contain으로 아이콘 온전히 표시
+        imgEl.style.width        = "72px";
+        imgEl.style.height       = "72px";
+        imgEl.style.objectFit    = "contain";
+        imgEl.style.borderRadius = "12px";
+      } else {
+        imgEl.removeAttribute("src");
+        imgEl.style.display = "none";
+      }
     }
 
     if (imgEl && !imgEl.closest(".site-preview__fallback-logo")) {

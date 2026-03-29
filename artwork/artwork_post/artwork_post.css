@@ -268,52 +268,6 @@ body {
 
 .hero__video-playbtn:hover { opacity: .85; }
 
-/* ✅ 오디오 — 그라데이션 + 음표 + 재생버튼 */
-.hero__img--audio {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hero__audio-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.hero__audio-thumb {
-  position: relative;
-  width: 220px;
-  height: 220px;
-  flex-shrink: 0;
-  border-radius: 24px 24px 0 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
-  color: #2a7cff;
-}
-
-.hero__audio-playbtn {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 24px;
-  transition: opacity .15s;
-}
-
-.hero__audio-playbtn:hover { opacity: .85; }
-
 /* 텍스트 */
 .hero__text-wrap,
 .preview-text-wrap {
@@ -861,57 +815,89 @@ textarea {
 .tool-star.is-on  { color: #f5a524; }
 .tool-star.is-off { color: rgba(0,0,0,0.18); }
 
-.hero__audio-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hero__img--audio {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.hero__audio-card {
-  display: flex;
-  flex-direction: column;
-  width: 280px;
-  border-radius: 24px;
+.hero__audio-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
   overflow: hidden;
+  padding: 0;
+}
+
+.hero__audio-card {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .hero__audio-thumb {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
+  height: 100%;
+  border-radius: 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
   color: #2a7cff;
 }
 
 .hero__audio-playbtn {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.35);
   border: none;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   cursor: pointer;
+  z-index: 4;
+  padding: 0;
 }
 
 .hero__audio-controls {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 10px 14px 20px; /* ✅ 마지막 숫자 키울수록 아래 공간 늘어나요 */
   background: rgba(0, 0, 0, 0.55);
+
+  z-index: 3;
+}
+
+.preview-audio-bg svg,
+.hero__audio-thumb svg {
+  width: 120px;
+  height: 120px;
 }
 
 .hero__audio-time {
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
-  min-width: 80px;
+  min-width: 72px;
 }
 
 .hero__audio-seekbar {

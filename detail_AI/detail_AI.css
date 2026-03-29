@@ -181,7 +181,8 @@ body{
 .site-preview__media.has-iframe .site-preview__fallback-logo{display:none}
 .site-preview__media iframe{width:100%;height:100%;border:none;display:block}
 .site-preview__media .site-preview__fallback-logo img{
-  max-width:160px;max-height:120px;width:auto;height:auto;
+  background-color: #ffffff;
+  width:72px;height:72px;
   object-fit:contain;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.18);
 }
 .site-preview__meta{padding:16px 18px 18px}
@@ -398,10 +399,8 @@ body{
 
 /* =========================================================
    ✅ 작업물 미디어 타입별 스타일
-   — upload 페이지 preview 스타일 기반
 ========================================================= */
 
-/* carousel-wrapper — upload-hero처럼 그라데이션 배경 */
 .detail_AI__carousel-wrapper {
   position: relative;
   width: 100%;
@@ -411,24 +410,28 @@ body{
   overflow: hidden;
 }
 
-/* 미디어 컨테이너 — inset 꽉 채우기 */
 .detail_AI__work-media {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-/* 이미지 */
-.detail_AI__work-media .work-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  min-height: 0;   /* 이게 핵심 */
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.detail_AI__work-media .work-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
 
-/* 영상 — 썸네일 + 재생버튼 오버레이 */
+
+/* ===== 비디오 ===== */
 .work-video-wrap {
   position: absolute;
   inset: 0;
@@ -455,51 +458,147 @@ body{
 }
 .work-video-playbtn {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.35);
   border: none;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   cursor: pointer;
   z-index: 2;
+  padding: 0;
+}
+.work-video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 3;
+}
+.work-video-time {
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 72px;
+}
+.work-video-seekbar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.work-video-seekbar__fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  width: 0%;
+  pointer-events: none;
 }
 
-/* 오디오 — upload 스타일 */
+/* ===== 오디오 — 비디오와 동일한 구조 ===== */
 .work-audio-wrap {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+/* 배경 전체 채우는 썸네일 영역 — 음표 아이콘 중앙 배치 */
+.work-audio-thumb {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-}
-.work-audio-thumb {
-  position: relative;
-  width: 180px;
-  height: 160px;
-  flex-shrink: 0;
-  border-radius: 24px 24px 0px 0px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* ✅ 비디오의 첫 프레임 배경처럼, 오디오는 연한 파란 그라데이션 */
   background: linear-gradient(135deg, #dce8f8 0%, #c8d9f5 100%);
-  color: #2a7cff;
-}
-.work-audio-playbtn {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 24px;
+  color: #2a7cff; /* ✅ 음표 아이콘 색상 */
 }
 
-/* PDF — upload preview-pdf-wrap 스타일 */
+.work-audio-thumb svg {
+  width: 120px;
+  height: 120px;
+}
+
+
+/* 재생버튼 — 비디오 playbtn과 완전 동일 */
+.work-audio-playbtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+  z-index: 3;
+  padding: 0;
+}
+
+.work-audio-card {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 하단 컨트롤바 — 비디오와 완전 동일 */
+.work-audio-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 3;
+}
+.work-audio-time {
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 72px;
+}
+.work-audio-seekbar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.work-audio-seekbar__fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  width: 0%;
+  pointer-events: none;
+}
+
+/* ===== PDF ===== */
 .work-pdf-wrap {
   position: absolute;
   inset: 0;
@@ -521,7 +620,6 @@ body{
   max-height: 100%;
   object-fit: contain;
 }
-/* 컨트롤 — upload처럼 하단 절대 위치 frosted glass */
 .work-pdf-controls {
   display: flex;
   justify-content: center;
@@ -575,79 +673,6 @@ body{
 .work-fallback__icon { font-size: 40px; line-height: 1; }
 .work-fallback__text { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8); margin: 0; }
 
-.work-audio-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 24px;
-  overflow: hidden;
-}
-
-.work-audio-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.55);
-}
-
-.work-audio-time {
-  color: #fff;
-  font-size: 11px;
-  white-space: nowrap;
-  min-width: 72px;
-}
-
-.work-audio-seekbar {
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.work-audio-seekbar__fill {
-  height: 100%;
-  background: #fff;
-  border-radius: 2px;
-  width: 0%;
-  pointer-events: none;
-}
-
-.work-video-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 3;
-}
-
-.work-video-time {
-  color: #fff;
-  font-size: 11px;
-  white-space: nowrap;
-  min-width: 72px;
-}
-
-.work-video-seekbar {
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.work-video-seekbar__fill {
-  height: 100%;
-  background: #fff;
-  border-radius: 2px;
-  width: 0%;
-  pointer-events: none;
-}
 .detail_AI__more-btn {
   position: absolute;
   top: 50px;
@@ -667,14 +692,12 @@ body{
   gap: 4px;
   transition: background 0.2s;
 }
-
 .detail_AI__more-btn:hover {
   background: rgba(0, 0, 0, 0.55);
 }
 
-
 .detail_AI__carousel {
-  position: relative; /* ✅ 추가 */
+  position: relative;
 }
 
 .more-btn__dot {
