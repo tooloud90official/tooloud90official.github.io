@@ -1,4 +1,4 @@
-import { supabase } from '../_ignore/supabase.js';
+import { supabase } from './_ignore/supabase.js';
 
 function renderMainWorkMedia(container, data) {
   if (!container) return;
@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       placeholder: '검색어를 입력하세요',
       onSearch: (value) => {
         const keyword = encodeURIComponent(value.trim());
-        window.location.href = `../searchResult/searchResult.html?keyword=${keyword}`;
+        window.location.href = `./searchResult/searchResult.html?keyword=${keyword}`;
       }
     });
   } catch (e) {
@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="tool-icon-card__title">${tool.tool_name}</span>
       `;
       card.addEventListener('click', () => {
-        window.location.href = `/detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`;
+        window.location.href = `./detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`;
       });
       grid.appendChild(card);
     });
@@ -584,7 +584,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       moreBtn.style.display = "flex";
       moreBtn.onclick = (e) => {
         e.stopPropagation();
-        window.location.href = `../artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(data.workId)}`;
+        window.location.href = `./artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(data.workId)}`;
       };
     }
 
@@ -600,7 +600,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <button type="button" class="btn-more">툴 더 알아보기</button>
       `;
       toolEl.querySelector('.btn-more').addEventListener('click', () => {
-        window.location.href = `../detail_AI/detail_AI.html?tool_ID=${data.tool.id}`;
+        window.location.href = `./detail_AI/detail_AI.html?tool_ID=${data.tool.id}`;
       });
     }
   }
@@ -653,7 +653,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="tool-icon-card__title">${tool.tool_name}</span>
         `;
         card.addEventListener('click', () => {
-          window.location.href = `/detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`;
+          window.location.href = `./detail_AI/detail_AI.html?tool_ID=${tool.tool_ID}`;
         });
         grid.appendChild(card);
       });
