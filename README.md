@@ -2,6 +2,8 @@
 
 > AI 소음 속, 나만의 도구
 
+🌐 **Live Demo**: [https://your-site-url.com](https://your-site-url.com/)
+
 ## 📌 프로젝트 소개
 
 수많은 AI 툴 중에서 **나에게 맞는 툴을 찾는 데 너무 많은 시간이 걸리지 않으셨나요?**
@@ -30,11 +32,12 @@ AI 툴로 만든 창작물을 공유하고, 다른 사용자들의 작품에서 
 
 ## 🛠️ 기술 스택
 
-분류	기술
-Frontend	HTML, CSS, JavaScript
-Database	Supabase
-AI	Groq API
-협업	GitHub, VS Code
+| 분류 | 기술 |
+|---|---|
+| Frontend | HTML, CSS, JavaScript |
+| Database | Supabase |
+| AI | Groq API |
+| 협업 | GitHub, VS Code |
 
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
@@ -46,9 +49,10 @@ AI	Groq API
 
 ## 👥 팀원
 
-이름	역할
-강민주	기획
-남유진	개발 
+| 이름 | 역할 |
+|---|---|
+| 강민주 | 기획 및 개발 |
+| 남유진 | 기획 및 개발 |
 
 ---
 
