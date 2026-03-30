@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>비밀번호 재설정</title>
+
   <link rel="stylesheet" href="/_common/background.css">
   <link rel="stylesheet" href="/_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="/_common/button/button.css">
@@ -13,20 +14,36 @@
 </head>
 
 <body>
-
   <div id="top-banner"></div>
 
   <main class="reset-page">
-
     <h1 class="title">비밀번호를 재설정하세요.</h1>
 
     <!-- 이메일 입력 -->
     <div class="form-group">
       <label class="label">이메일 주소 입력</label>
+
       <div class="email-row">
-        <input type="text" id="emailId" class="email-input" placeholder="이메일 입력창">
+        <input
+          type="text"
+          id="emailId"
+          class="email-input"
+          placeholder="이메일 아이디 입력"
+          autocomplete="username"
+        >
         <span class="at">@</span>
-        <div id="emailDomain"></div>
+
+        <!-- JS에서 loadNativeSelect 붙이는 자리 -->
+        <div id="emailDomainSelect"></div>
+
+        <!-- 직접 입력 선택 시 노출 -->
+        <input
+          type="text"
+          id="emailCustom"
+          class="email-input"
+          placeholder="도메인 직접 입력"
+          style="display:none;"
+        >
       </div>
 
       <!-- 코드 전송 버튼 -->
@@ -38,40 +55,62 @@
       <div class="verify-code-wrap" id="verifyCodeWrap" style="display:none;">
         <div class="verify-input-row">
           <div class="verify-input-wrap">
-            <input type="text" class="verify-input" id="verifyCodeInput"
-                   placeholder="인증코드 8자리" maxlength="8" inputmode="numeric">
+            <input
+              type="text"
+              class="verify-input"
+              id="verifyCodeInput"
+              placeholder="인증코드 입력"
+              maxlength="8"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+            >
             <span class="verify-timer" id="verifyTimer"></span>
           </div>
+
           <button type="button" class="btn-verify" id="verifyBtn">확인</button>
         </div>
+
         <button type="button" class="btn-resend" id="resendBtn">인증코드 재전송</button>
       </div>
 
       <p class="field-msg" id="email-msg"></p>
     </div>
 
-    <!-- 새 비밀번호 입력 (코드 인증 후 노출) -->
+    <!-- 새 비밀번호 입력 -->
     <div id="newPwWrap" style="display:none;">
       <div class="form-group">
-        <label class="label">새 비밀번호</label>
-        <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
+        <label class="label" for="newPassword">새 비밀번호</label>
+        <input
+          type="password"
+          id="newPassword"
+          class="password-input"
+          placeholder="새 비밀번호 입력"
+          autocomplete="new-password"
+        >
         <p class="field-msg" id="pw-msg"></p>
       </div>
+
       <div class="form-group">
-        <label class="label">새 비밀번호 확인</label>
-        <input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 재입력">
+        <label class="label" for="newPasswordConfirm">새 비밀번호 확인</label>
+        <input
+          type="password"
+          id="newPasswordConfirm"
+          class="password-input"
+          placeholder="새 비밀번호 재입력"
+          autocomplete="new-password"
+        >
         <p class="field-msg" id="pw-confirm-msg"></p>
       </div>
+
+      <!-- JS에서 loadButton 붙이는 자리 -->
       <div id="resetBtnContainer"></div>
     </div>
 
     <div class="back-link" id="goBack">← 이전으로 돌아가기</div>
-
   </main>
 
   <script type="module" src="/_common/top-banner/include.js"></script>
   <script src="/_common/button/button.js"></script>
   <script type="module" src="/reset/reset.js"></script>
-
 </body>
 </html>

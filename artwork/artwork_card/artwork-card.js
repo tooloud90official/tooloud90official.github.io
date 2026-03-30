@@ -91,7 +91,7 @@ export function renderArtworkCards(targetSelector, items = []) {
 
     /* ✅ 좋아요 하트 아이콘 — is_liked 여부에 따라 분기 */
     const heartImg = likeBtn?.querySelector(".artwork-card__action-img");
-    if (heartImg) heartImg.src = item.is_liked ? "/media/Heart_fill.png" : "/media/heart.png";
+    if (heartImg) heartImg.src = item.is_liked ? "/media/Heart_fill.png" : "/media/Heart.png";
 
     /* 댓글 */
     if (commentCountEl) commentCountEl.textContent = item.comment_count ?? 0;
