@@ -31,7 +31,7 @@ let ALL_WORKS = [];
 let currentUser = null;
 let currentSort = "like";
 let currentTab = "좋아요 많은 작업물";
-let currentKeyword = ""; // ✅ 검색어 상태
+let currentKeyword = "";
 
 // ✅ 검색 필터 상태
 let searchFilter = {
@@ -46,9 +46,17 @@ let searchFilter = {
 ========================= */
 async function requireLogin() {
   const supabase = window._supabase;
-  if (!supabase) { window.location.href = "/login1/login1.html"; return false; }
+  if (!supabase) {
+    window.location.href = "/login1/login1.html";
+    return false;
+  }
+
   const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.user) { window.location.href = "/login1/login1.html"; return false; }
+  if (error || !session?.user) {
+    window.location.href = "/login1/login1.html";
+    return false;
+  }
+
   return true;
 }
 
@@ -57,7 +65,11 @@ async function requireLogin() {
 ========================= */
 async function loadUser() {
   const supabase = window._supabase;
-  if (!supabase) { currentUser = null; return; }
+  if (!supabase) {
+    currentUser = null;
+    return;
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
   currentUser = session?.user ? { id: session.user.id } : null;
 }
@@ -67,49 +79,85 @@ async function loadUser() {
 ========================= */
 async function loadWorks() {
   const supabase = window._supabase;
-  if (!supabase) { ALL_WORKS = []; return; }
+  if (!supabase) {
+    ALL_WORKS = [];
+    return;
+  }
 
   const { data: worksData, error: worksError } = await supabase
     .from("works")
-    .select(`work_id, work_title, work_path, work_link, user_id, tool_id, tool_cat, like_count, comment_count, updated_at`);
+    .select(`
+      work_id,
+      work_title,
+      work_path,
+      work_link,
+      user_id,
+      tool_id,
+      tool_cat,
+      like_count,
+      comment_count,
+      updated_at
+    `);
 
-  if (worksError) { console.error("works 불러오기 실패:", worksError); ALL_WORKS = []; return; }
+  if (worksError) {
+    console.error("works 불러오기 실패:", worksError);
+    ALL_WORKS = [];
+    return;
+  }
 
   const works   = Array.isArray(worksData) ? worksData : [];
   const userIds = [...new Set(works.map((w) => w.user_id).filter(Boolean))];
   const toolIds = [...new Set(works.map((w) => w.tool_id).filter(Boolean))];
 
-  let usersMap = {}, toolsMap = {}, ratingsMap = {};
+  let usersMap = {};
+  let toolsMap = {};
+  let ratingsMap = {};
 
   if (userIds.length) {
-    const { data: usersData } = await supabase.from("users").select("user_id, user_name, user_img").in("user_id", userIds);
+    const { data: usersData } = await supabase
+      .from("users")
+      .select("user_id, user_name, user_img")
+      .in("user_id", userIds);
+
     usersMap = Object.fromEntries((usersData || []).map((u) => [String(u.user_id), u]));
   }
 
   if (toolIds.length) {
-    // ✅ tool_subcat 추가
     const { data: toolsData } = await supabase
       .from("tools")
       .select("tool_ID, tool_name, tool_company, tool_cat, tool_subcat, icon")
       .in("tool_ID", toolIds);
+
     toolsMap = Object.fromEntries((toolsData || []).map((t) => [String(t.tool_ID), t]));
   }
 
   if (toolIds.length) {
-    const { data: reviewsData } = await supabase.from("tool_reviews").select("tool_id, rating").in("tool_id", toolIds);
+    const { data: reviewsData } = await supabase
+      .from("tool_reviews")
+      .select("tool_id, rating")
+      .in("tool_id", toolIds);
+
     const grouped = {};
+
     (reviewsData || []).forEach((row) => {
-      const key    = String(row.tool_id);
+      const key = String(row.tool_id);
       const rating = Number(row.rating);
+
       if (!grouped[key]) grouped[key] = { sum: 0, count: 0 };
-      if (!Number.isNaN(rating)) { grouped[key].sum += rating; grouped[key].count += 1; }
+      if (!Number.isNaN(rating)) {
+        grouped[key].sum += rating;
+        grouped[key].count += 1;
+      }
     });
+
     ratingsMap = Object.fromEntries(
-      Object.entries(grouped).map(([toolId, info]) => [toolId, info.count ? Number((info.sum / info.count).toFixed(1)) : 0])
+      Object.entries(grouped).map(([toolId, info]) => [
+        toolId,
+        info.count ? Number((info.sum / info.count).toFixed(1)) : 0,
+      ])
     );
   }
 
-  // ✅ 내가 좋아요한 work_id 목록 가져오기
   let likedSet = new Set();
   if (currentUser?.id) {
     const { data: userData } = await supabase
@@ -117,15 +165,17 @@ async function loadWorks() {
       .select("liked_works")
       .eq("user_id", currentUser.id)
       .single();
+
     (userData?.liked_works || []).forEach((id) => likedSet.add(String(id)));
   }
 
   ALL_WORKS = works.map((w) => {
-    const tool      = toolsMap[String(w.tool_id)] || null;
+    const tool = toolsMap[String(w.tool_id)] || null;
     const avgRating = ratingsMap[String(w.tool_id)] ?? 0;
+
     return {
       ...w,
-      is_liked: likedSet.has(String(w.work_id)), // ✅ 추가
+      is_liked: likedSet.has(String(w.work_id)),
       users: usersMap[String(w.user_id)] || null,
       tools: tool ? { ...tool, avg_rating: avgRating } : null,
     };
@@ -140,11 +190,10 @@ function updateSectionText(tabKey, keyword = "") {
   const sectionDesc  = document.querySelector(".artwork-section__desc");
   const searchArea   = document.getElementById("search-area");
 
-  // ✅ 검색 중이면 검색 결과 텍스트로
   if (keyword) {
     if (sectionTitle) sectionTitle.textContent = `🔍 "${keyword}" 검색 결과`;
-    if (sectionDesc)  sectionDesc.textContent  = `"${keyword}" 와 관련된 작업물들을 감상해보세요.`;
-    if (searchArea)   searchArea.style.display  = "";
+    if (sectionDesc) sectionDesc.textContent = `"${keyword}" 와 관련된 작업물들을 감상해보세요.`;
+    if (searchArea) searchArea.style.display = "";
     return;
   }
 
@@ -164,7 +213,9 @@ function updateSectionText(tabKey, keyword = "") {
       : `${tabKey} 관련 작업물들을 감상해보세요.`;
   }
 
-  if (searchArea) searchArea.style.display = tabKey === "내 라이브러리" ? "none" : "";
+  if (searchArea) {
+    searchArea.style.display = tabKey === "내 라이브러리" ? "none" : "";
+  }
 }
 
 /* =========================
@@ -179,18 +230,24 @@ function setTab(tabKey, options = {}) {
     return;
   }
 
-  currentTab     = tabKey;
+  currentTab = tabKey;
   currentKeyword = "";
 
-  // ✅ 탭 바꾸면 검색 필터 초기화
-  searchFilter = { cats: [], subcats: [], keywords: [], active: false };
+  searchFilter = {
+    cats: [],
+    subcats: [],
+    keywords: [],
+    active: false,
+  };
 
   updateSectionText(tabKey, "");
 
   if (updateUrl) {
     const url = new URL(window.location.href);
+
     if (tabKey === "좋아요 많은 작업물") url.searchParams.delete("tab");
     else url.searchParams.set("tab", tabKey);
+
     history.pushState({ tab: tabKey }, "", url.pathname + url.search);
   }
 
@@ -198,7 +255,105 @@ function setTab(tabKey, options = {}) {
 }
 
 /* =========================
-   7) 정렬 + 필터
+   7) 검색 점수 계산용 유틸
+========================= */
+function normalizeText(text) {
+  return String(text || "").toLowerCase().trim();
+}
+
+function tokenizeText(text) {
+  return normalizeText(text)
+    .split(/\s+/)
+    .map((t) => t.replace(/[^a-z0-9가-힣]/gi, ""))
+    .filter(Boolean);
+}
+
+function includesAnyToken(target, tokens) {
+  if (!target || !tokens.length) return false;
+  return tokens.some((token) => token && target.includes(token));
+}
+
+function calcWorkScore(work, filter, rawKeyword = "") {
+  let score = 0;
+
+  const toolCat    = normalizeText(work.tools?.tool_cat ?? work.tool_cat);
+  const toolSubcat = normalizeText(work.tools?.tool_subcat);
+  const toolName   = normalizeText(work.tools?.tool_name);
+  const title      = normalizeText(work.work_title);
+  const keyword    = normalizeText(rawKeyword);
+
+  const cats = Array.isArray(filter.cats)
+    ? filter.cats.map(normalizeText)
+    : [];
+
+  const subcats = Array.isArray(filter.subcats)
+    ? filter.subcats.map(normalizeText)
+    : [];
+
+  const keywords = Array.isArray(filter.keywords)
+    ? filter.keywords.map(normalizeText).filter(Boolean)
+    : [];
+
+  const keywordTokens = tokenizeText(keyword);
+  const titleTokens   = tokenizeText(title);
+  const toolNameTokens = tokenizeText(toolName);
+
+  // 1) 대분류 일치
+  if (cats.includes(toolCat)) score += 40;
+
+  // 2) 소분류 일치
+  if (subcats.includes(toolSubcat)) score += 30;
+
+  // 3) Groq 키워드가 제목에 포함
+  keywords.forEach((kw) => {
+    if (title.includes(kw)) score += 20;
+  });
+
+  // 4) Groq 키워드가 툴 이름에 포함
+  keywords.forEach((kw) => {
+    if (toolName.includes(kw)) score += 18;
+  });
+
+  // 5) 사용자가 친 검색어 전체가 제목/툴명에 직접 포함
+  if (keyword && title.includes(keyword)) score += 35;
+  if (keyword && toolName.includes(keyword)) score += 30;
+
+  // 6) 검색어 토큰이 제목에 여러 개 겹치면 추가 가산점
+  keywordTokens.forEach((token) => {
+    if (title.includes(token)) score += 12;
+  });
+
+  // 7) 검색어 토큰이 툴명에 겹치면 추가 가산점
+  keywordTokens.forEach((token) => {
+    if (toolName.includes(token)) score += 10;
+  });
+
+  // 8) 제목 단어와 검색 단어가 일부라도 겹치면 약한 가산점
+  if (titleTokens.length && keywordTokens.length) {
+    const overlap = keywordTokens.filter((token) => titleTokens.includes(token)).length;
+    score += overlap * 8;
+  }
+
+  // 9) 툴명 단어와 검색 단어 겹치면 약한 가산점
+  if (toolNameTokens.length && keywordTokens.length) {
+    const overlap = keywordTokens.filter((token) => toolNameTokens.includes(token)).length;
+    score += overlap * 6;
+  }
+
+  // 10) 검색어 토큰이 하나라도 제목/툴명에 있으면 최소 점수 보장
+  const looseMatch =
+    includesAnyToken(title, keywordTokens) ||
+    includesAnyToken(toolName, keywordTokens) ||
+    cats.includes(toolCat) ||
+    subcats.includes(toolSubcat);
+
+  if (looseMatch && score < 15) score = 15;
+
+  return score;
+}
+
+/* =========================
+   8) 정렬 + 필터
 ========================= */
 function getSortedWorks() {
   let filtered = [...ALL_WORKS];
@@ -212,24 +367,30 @@ function getSortedWorks() {
     }
   }
 
-  // ✅ Groq 검색 필터
+  // ✅ 검색 중일 때는 점수 계산 후 관련도순 정렬
   if (searchFilter.active) {
-    filtered = filtered.filter((w) => {
-      const toolCat    = w.tools?.tool_cat    ?? w.tool_cat ?? "";
-      const toolSubcat = w.tools?.tool_subcat ?? "";
-      const toolName   = (w.tools?.tool_name  ?? "").toLowerCase();
-      const title      = (w.work_title ?? "").toLowerCase();
+    filtered = filtered
+      .map((w) => ({
+        ...w,
+        _searchScore: calcWorkScore(w, searchFilter, currentKeyword),
+      }))
+      .filter((w) => w._searchScore > 0)
+      .sort((a, b) => {
+        if (b._searchScore !== a._searchScore) {
+          return b._searchScore - a._searchScore;
+        }
 
-      const catMatch    = searchFilter.cats.includes(toolCat);
-      const subcatMatch = searchFilter.subcats.includes(toolSubcat);
-      const keyMatch    = searchFilter.keywords.some((kw) => title.includes(kw.toLowerCase()));
-      const toolMatch   = searchFilter.keywords.some((kw) => toolName.includes(kw.toLowerCase()));
+        if (currentSort === "new") {
+          return new Date(b.updated_at ?? 0) - new Date(a.updated_at ?? 0);
+        }
 
-      return catMatch || subcatMatch || keyMatch || toolMatch;
-    });
+        return (b.like_count ?? 0) - (a.like_count ?? 0);
+      });
+
+    return filtered;
   }
 
-  // 정렬
+  // 일반 정렬
   if (currentSort === "like") {
     filtered.sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0));
   } else if (currentSort === "new") {
@@ -240,7 +401,7 @@ function getSortedWorks() {
 }
 
 /* =========================
-   8) 카드 렌더
+   9) 카드 렌더
 ========================= */
 function renderWorks() {
   const works = getSortedWorks();
@@ -249,7 +410,9 @@ function renderWorks() {
 
   if (!works.length) {
     grid.innerHTML = `<div class="empty-msg">${
-      searchFilter.active ? `"${currentKeyword}" 검색 결과가 없습니다.` : "표시할 작업물이 없습니다."
+      searchFilter.active
+        ? `"${currentKeyword}" 검색 결과가 없습니다.`
+        : "표시할 작업물이 없습니다."
     }</div>`;
     return;
   }
@@ -257,29 +420,33 @@ function renderWorks() {
   renderArtworkCards(
     "#artworkGrid",
     works.map((w) => ({
-      id:           w.work_id,
-      work_id:      w.work_id,
-      work_title:   w.work_title,
-      previewSrc:   w.work_link || null,
-      user_name:    w.users?.user_name    ?? "작성자",
-      user_img:     w.users?.user_img     ?? "/media/profil.png",
-      tool_name:    w.tools?.tool_name    ?? "툴 정보 없음",
-      tool_brand:   w.tools?.tool_company ?? "",
-      tool_stars:   w.tools?.avg_rating   ?? 0,
-      tool_id:      w.tool_id,
-      icon:         w.tools?.icon         ?? "/media/tool-default.png",
-      dateText:     w.updated_at
-        ? new Date(w.updated_at).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
+      id:            w.work_id,
+      work_id:       w.work_id,
+      work_title:    w.work_title,
+      previewSrc:    w.work_link || null,
+      user_name:     w.users?.user_name ?? "작성자",
+      user_img:      w.users?.user_img ?? "/media/profil.png",
+      tool_name:     w.tools?.tool_name ?? "툴 정보 없음",
+      tool_brand:    w.tools?.tool_company ?? "",
+      tool_stars:    w.tools?.avg_rating ?? 0,
+      tool_id:       w.tool_id,
+      icon:          w.tools?.icon ?? "/media/tool-default.png",
+      dateText:      w.updated_at
+        ? new Date(w.updated_at).toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })
         : "",
-      like_count:    w.like_count    ?? 0,
+      like_count:    w.like_count ?? 0,
       comment_count: w.comment_count ?? 0,
-      is_liked:      w.is_liked      ?? false, // ✅ 추가
+      is_liked:      w.is_liked ?? false,
     }))
   );
 }
 
 /* =========================
-   9) URL에서 탭 읽기
+   10) URL에서 탭 읽기
 ========================= */
 function initFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -288,17 +455,23 @@ function initFromUrl() {
 }
 
 /* =========================
-   10) 상단 배너 링크 클릭 처리
+   11) 상단 배너 링크 클릭 처리
 ========================= */
 function bindTopBannerArtworkLinks() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href*="/artwork/artwork.html"]');
     if (!link) return;
+
     const href = link.getAttribute("href");
     if (!href) return;
+
     const url = new URL(href, window.location.origin);
     const tab = url.searchParams.get("tab");
-    const isArtworkPage = window.location.pathname === "/artwork/artwork.html" || window.location.pathname.endsWith("/artwork/artwork.html");
+
+    const isArtworkPage =
+      window.location.pathname === "/artwork/artwork.html" ||
+      window.location.pathname.endsWith("/artwork/artwork.html");
+
     if (isArtworkPage) {
       e.preventDefault();
       setTab(tab || "좋아요 많은 작업물", { updateUrl: true });
@@ -307,14 +480,16 @@ function bindTopBannerArtworkLinks() {
 }
 
 /* =========================
-   11) 브라우저 뒤로가기/앞으로가기
+   12) 브라우저 뒤로가기/앞으로가기
 ========================= */
 function bindPopState() {
-  window.addEventListener("popstate", () => { initFromUrl(); });
+  window.addEventListener("popstate", () => {
+    initFromUrl();
+  });
 }
 
 /* =========================
-   12) 정렬 select
+   13) 정렬 select
 ========================= */
 function initSortSelect() {
   const selectRoot = document.getElementById("select-root");
@@ -324,7 +499,7 @@ function initSortSelect() {
     target: "#select-root",
     options: [
       { value: "like", label: "좋아요순" },
-      { value: "new",  label: "최신순"   },
+      { value: "new",  label: "최신순" },
     ],
     value: currentSort,
     onChange: (item) => {
@@ -335,7 +510,7 @@ function initSortSelect() {
 }
 
 /* =========================
-   13) 카테고리 select
+   14) 카테고리 select
 ========================= */
 function initCategorySelect() {
   const mountEl = document.getElementById("category-select");
@@ -353,7 +528,7 @@ function initCategorySelect() {
 }
 
 /* =========================
-   ✅ 14) 검색바 — Groq 자연어 처리
+   15) 검색바 — Groq 자연어 처리
 ========================= */
 function initSearchBar() {
   if (typeof loadSearchBar !== "function") {
@@ -367,10 +542,14 @@ function initSearchBar() {
     onSearch: async (value) => {
       const keyword = value?.trim() ?? "";
 
-      // 검색어 없으면 초기화
       if (!keyword) {
         currentKeyword = "";
-        searchFilter   = { cats: [], subcats: [], keywords: [], active: false };
+        searchFilter = {
+          cats: [],
+          subcats: [],
+          keywords: [],
+          active: false,
+        };
         updateSectionText(currentTab, "");
         renderWorks();
         return;
@@ -378,19 +557,20 @@ function initSearchBar() {
 
       currentKeyword = keyword;
 
-      // ✅ 로딩 표시
       const grid = document.querySelector("#artworkGrid");
-      if (grid) grid.innerHTML = `<div class="empty-msg">🤖 AI가 검색 결과를 분석 중입니다...</div>`;
+      if (grid) {
+        grid.innerHTML = `<div class="empty-msg">🤖 AI가 검색 결과를 분석 중입니다...</div>`;
+      }
+
       updateSectionText(currentTab, keyword);
 
-      // ✅ Groq 호출
       const groqResult = await searchCategories(keyword);
       console.log("[groq] 검색 결과:", groqResult);
 
       searchFilter = {
-        cats:     groqResult?.recommended_cats    ?? [],
+        cats:     groqResult?.recommended_cats ?? [],
         subcats:  groqResult?.recommended_subcats ?? [],
-        keywords: groqResult?.keywords            ?? [],
+        keywords: groqResult?.keywords ?? [],
         active:   true,
       };
 
@@ -400,7 +580,7 @@ function initSearchBar() {
 }
 
 /* =========================
-   15) 시작
+   16) 시작
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
   const ok = await requireLogin();
@@ -414,6 +594,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindPopState();
   initSortSelect();
   initCategorySelect();
-  initSearchBar(); // ✅ Groq 검색바
+  initSearchBar();
   initFromUrl();
 });

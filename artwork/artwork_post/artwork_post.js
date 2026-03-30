@@ -395,10 +395,23 @@ async function fetchToolInfo(toolId) {
 
   return { tool_name, tool_company, tool_icon, rating };
 }
+function getToolCatLabel(value) {
+  const map = {
+    media: "이미지·오디오·영상",
+    res: "리서치",
+    doc: "문서 생성·요약·편집",
+    dev: "개발·코딩",
+    edu: "학습·교육",
+    ast: "챗봇·어시스턴트",
+  };
+  return map[value] || "";
+}
 
 function fillBanner(data) {
   if (data.work_title) $("#bannerTitle").textContent = data.work_title;
-  if (data.tool_cat)   $("#bannerCategory").textContent = data.tool_cat;
+
+  if (data.tool_cat)   $("#bannerCategory").textContent = getToolCatLabel(data.tool_cat);
+  
   if (data.user_name)  $("#bannerUsername").textContent = data.user_name;
   if (data.updated_at) $("#bannerDate").textContent = `· ${formatDate(data.updated_at)}`;
 
