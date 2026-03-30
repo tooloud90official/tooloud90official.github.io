@@ -5,9 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TOOLOUD - AI 소음 속, 나만의 도구</title>
 
-  <!-- 배포용 base 태그 -->
-  <base href="https://tooloud90official.github.io/tooloud/">
+  <!--
+    ✅ 환경별 주석 해제:
 
+    [로컬 Live Server]
+      <base href="http://127.0.0.1:5500/">
+
+    [GitHub Pages 배포 시] ← 배포 전에 아래 줄로 교체
+      <base href="https://tooloud90official.github.io/tooloud/">
+  -->
+  <base href="http://127.0.0.1:5500/">
+  <!-- 배포 시 위 줄 대신 아래 줄 사용:
+  <base href="https://tooloud90official.github.io/tooloud/">
+  -->
+
+  <!-- CSS -->
   <link rel="stylesheet" href="_common/background.css">
   <link rel="stylesheet" href="_common/top-banner/top-banner.css">
   <link rel="stylesheet" href="_common/searchBar/searchBar.css">
@@ -16,6 +28,7 @@
   <link rel="stylesheet" href="_common/bottom-banner/bottom-banner.css">
   <link rel="stylesheet" href="main1/main1.css">
 
+  <!-- PDF.js -->
   <script type="module">
     import * as pdfjsLib from "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.mjs";
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
@@ -24,19 +37,23 @@
 </head>
 <body>
 
+  <!-- Top Banner -->
   <div id="top-banner"></div>
 
   <main class="main-container">
+    <!-- Hero Section -->
     <section class="hero-section">
       <h1 class="hero-title">AI 소음 속, 나만의 도구</h1>
       <div id="searchbar-container"></div>
     </section>
 
+    <!-- Recommendation Section -->
     <section class="recommend-section" id="recommendSection" style="display:none">
       <h2 class="section-title">나에게 꼭 맞는 AI 툴을 사용해보세요.</h2>
       <div class="recommend-grid" id="recommendGrid"></div>
     </section>
 
+    <!-- Work Card Section -->
     <section class="work-card-section">
       <div class="category-tabs" id="categoryTabs">
         <button class="category-tab is-active" data-category="media">이미지·오디오·영상</button>
@@ -69,16 +86,18 @@
       </div>
     </section>
 
+    <!-- Tools Section -->
     <section class="tools-section-wrap">
       <h2 class="section-title">대표 AI 툴을 빠르게 탐색해보세요.</h2>
       <div class="tools-section" id="toolsSection"></div>
     </section>
   </main>
 
+  <!-- Bottom Banner & Alert Root -->
   <div id="bottom-banner"></div>
   <div id="alert-root"></div>
 
-  <!-- JS 모듈, 상대경로로 배포용 수정 -->
+  <!-- JS -->
   <script type="module" src="_common/top-banner/include.js"></script>
   <script src="_common/searchBar/searchBar.js"></script>
   <script src="_common/icon/icon.js"></script>

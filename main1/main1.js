@@ -13,13 +13,11 @@ function renderMainWorkMedia(container, data) {
     const img = document.createElement("img");
     img.src = url;
     img.alt = "작업물";
-  
     container.style.display = "flex";
     container.style.alignItems = "center";
     container.style.justifyContent = "center";
     container.style.overflow = "hidden";
     container.style.background = "linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%)";
-  
     img.style.cssText = `
       max-width: 100%;
       max-height: 100%;
@@ -28,11 +26,7 @@ function renderMainWorkMedia(container, data) {
       object-fit: contain;
       display: block;
     `;
-  
-    img.onerror = () => {
-      container.style.background = "#e8eef5";
-    };
-  
+    img.onerror = () => { container.style.background = "#e8eef5"; };
     container.appendChild(img);
     return;
   }
@@ -303,7 +297,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (reviewsError) console.error('[tool_reviews] 에러:', reviewsError.message);
 
-      // ✅ 툴별 평균 평점 계산 (반올림 없이 실수값 유지 — 정렬 정확도를 위해)
       const ratingMap = {};
       (reviewsData || []).forEach(r => {
         if (!ratingMap[r.tool_id]) ratingMap[r.tool_id] = { sum: 0, count: 0 };
@@ -318,21 +311,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       const toolMap = {};
       (toolsForWorks || []).forEach(t => { toolMap[t.tool_ID] = t; });
 
-      // ✅ 카테고리별로 작업물을 모두 수집한 뒤 평점 높은 순으로 정렬해서 1위만 채택
-      const catCandidates = {}; // { cat: [ { work, tool, rating } ] }
-
+      const catCandidates = {};
       worksData.forEach(work => {
         const tool = toolMap[work.tool_id];
         if (!tool || !tool.tool_cat) return;
-
         const cat    = tool.tool_cat;
         const rating = avgRatingMap[tool.tool_ID] ?? 0;
-
         if (!catCandidates[cat]) catCandidates[cat] = [];
         catCandidates[cat].push({ work, tool, rating });
       });
 
-      // ✅ 카테고리별로 평점 내림차순 정렬 후 1위 작업물 선택
       Object.entries(catCandidates).forEach(([cat, candidates]) => {
         candidates.sort((a, b) => b.rating - a.rating);
         const best   = candidates[0];
@@ -374,7 +362,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const userNameMap = {};
         (workUsers || []).forEach(u => { userNameMap[u.user_id] = u.user_name; });
-
         Object.values(WORK_DATA).forEach(w => {
           w.userName = userNameMap[w.userId] ?? null;
         });
@@ -460,9 +447,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/groq-proxy`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'llama-3.1-8b-instant',
           messages: [{ role: 'user', content: prompt }],
@@ -561,12 +546,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!data) {
       if (container) {
-        container.innerHTML = `<div style="width:100%;height:100%;background:#e8eef5;"></div>`;
-        if (moreBtn) { moreBtn.style.display = "none"; container.appendChild(moreBtn); }
+        // 부모의 패딩이나 텍스트 정렬 설정을 무시하도록 스타일 강제 적용
+        container.innerHTML = '';
+        container.style.cssText = `
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          background: #ffffff !important;
+          height: 300px !important;
+          position: relative !important;
+          width: 100% !important;
+          text-align: center !important;
+        `;
+
+        const msg = document.createElement('p');
+        msg.style.cssText = `
+          color: #aaa;
+          font-size: 14px;
+          margin: 0;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+        `;
+        msg.textContent = '등록된 작업물이 없습니다.';
+        container.appendChild(msg);
+
+        if (moreBtn) moreBtn.style.display = 'none';
       }
       if (nameEl) nameEl.textContent = '님의 작업물';
-      if (toolEl) toolEl.innerHTML = '<p style="color:#aaa; font-size:13px; padding:16px;">등록된 작업물이 없습니다.</p>';
+      if (toolEl) toolEl.innerHTML = '';
       return;
+    }
+
+    // 데이터가 있을 때는 inline style 초기화
+    if (container) {
+      container.style.cssText = '';
     }
 
     if (nameEl) {

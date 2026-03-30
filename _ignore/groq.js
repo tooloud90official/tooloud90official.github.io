@@ -34,6 +34,152 @@ const categories = {
 };
 
 //////////////////////////////
+// ===== 시맨틱 키워드 확장 맵 =====
+// 토큰 → [연관 카테고리 키, 확장 키워드들]
+// 의미적으로 연결되지만 글자가 달라 Levenshtein으로 못 잡는 케이스 커버
+//////////////////////////////
+
+const SEMANTIC_MAP = {
+  // 언어/학습
+  '일본어':   { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '영어':     { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '중국어':   { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '스페인어': { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '프랑스어': { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '독일어':   { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '한국어':   { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '외국어':   { cats: ['edu_lan', 'edu'],  keywords: ['언어', '학습'] },
+  '번역':     { cats: ['edu_lan', 'edu'],  keywords: ['언어', '번역'] },
+  '회화':     { cats: ['edu_lan', 'edu'],  keywords: ['언어', '말하기'] },
+  '공부':     { cats: ['edu_supp', 'edu'], keywords: ['학습', '교육'] },
+  '학습':     { cats: ['edu_supp', 'edu'], keywords: ['교육', '공부'] },
+  '교육':     { cats: ['edu_supp', 'edu'], keywords: ['학습', '공부'] },
+  '수학':     { cats: ['edu_supp', 'edu'], keywords: ['학습', '교육'] },
+  '과학':     { cats: ['edu_supp', 'edu'], keywords: ['학습', '교육'] },
+
+  // 이미지
+  '그림':     { cats: ['img_gen', 'media'],  keywords: ['이미지', '생성', '그리기'] },
+  '그리기':   { cats: ['img_gen', 'media'],  keywords: ['이미지', '생성', '그림'] },
+  '사진':     { cats: ['img_gen', 'media'],  keywords: ['이미지', '편집'] },
+  '이미지':   { cats: ['img_gen', 'media'],  keywords: ['생성', '그림', '사진'] },
+  '삽화':     { cats: ['img_gen', 'media'],  keywords: ['이미지', '생성'] },
+  '디자인':   { cats: ['img_edit', 'media'], keywords: ['이미지', '편집'] },
+  '배경':     { cats: ['img_edit', 'media'], keywords: ['이미지', '편집'] },
+  '포토샵':   { cats: ['img_edit', 'media'], keywords: ['이미지', '편집'] },
+
+  // 영상
+  '영상':     { cats: ['vid_gen', 'media'],  keywords: ['비디오', '생성', '편집'] },
+  '비디오':   { cats: ['vid_gen', 'media'],  keywords: ['영상', '생성', '편집'] },
+  '유튜브':   { cats: ['vid_edit', 'media'], keywords: ['영상', '편집'] },
+  '쇼츠':     { cats: ['vid_edit', 'media'], keywords: ['영상', '편집', '짧은'] },
+  '애니':     { cats: ['vid_gen', 'media'],  keywords: ['영상', '생성'] },
+  '애니메이션':{ cats: ['vid_gen', 'media'], keywords: ['영상', '생성'] },
+
+  // 오디오
+  '음악':     { cats: ['aud_gen', 'media'],  keywords: ['오디오', '생성', '음성'] },
+  '노래':     { cats: ['aud_gen', 'media'],  keywords: ['오디오', '생성', '음성'] },
+  '목소리':   { cats: ['aud_gen', 'media'],  keywords: ['음성', '생성', 'TTS'] },
+  '음성':     { cats: ['aud_gen', 'media'],  keywords: ['오디오', '생성'] },
+  'tts':      { cats: ['aud_gen', 'media'],  keywords: ['음성', '생성'] },
+  '팟캐스트': { cats: ['aud_edit', 'media'], keywords: ['오디오', '편집'] },
+
+  // 문서
+  '글쓰기':   { cats: ['doc_gen', 'doc'],  keywords: ['문서', '생성', '작성'] },
+  '작성':     { cats: ['doc_gen', 'doc'],  keywords: ['문서', '생성'] },
+  '보고서':   { cats: ['doc_gen', 'doc'],  keywords: ['문서', '생성'] },
+  '요약':     { cats: ['doc_sum', 'doc'],  keywords: ['문서', '요약'] },
+  '정리':     { cats: ['doc_sum', 'doc'],  keywords: ['문서', '요약'] },
+  '편집':     { cats: ['doc_edit', 'doc'], keywords: ['문서', '편집'] },
+  '교정':     { cats: ['doc_edit', 'doc'], keywords: ['문서', '편집'] },
+  '블로그':   { cats: ['doc_gen', 'doc'],  keywords: ['문서', '글쓰기', '생성'] },
+  '이메일':   { cats: ['doc_gen', 'doc'],  keywords: ['문서', '작성'] },
+
+  // 개발
+  '코드':     { cats: ['dev_gen', 'dev'],  keywords: ['코딩', '개발', '프로그래밍'] },
+  '코딩':     { cats: ['dev_gen', 'dev'],  keywords: ['코드', '개발'] },
+  '프로그래밍':{ cats: ['dev_gen', 'dev'], keywords: ['코드', '개발'] },
+  '웹':       { cats: ['dev_bld', 'dev'],  keywords: ['개발', '빌더', '웹사이트'] },
+  '앱':       { cats: ['dev_bld', 'dev'],  keywords: ['개발', '모바일'] },
+  '자동화':   { cats: ['dev_gen', 'dev'],  keywords: ['코드', '스크립트'] },
+  '버그':     { cats: ['dev_gen', 'dev'],  keywords: ['코드', '디버깅'] },
+
+  // 리서치
+  '검색':     { cats: ['res_paper', 'res'], keywords: ['리서치', '조사'] },
+  '논문':     { cats: ['res_paper', 'res'], keywords: ['리서치', '학술'] },
+  '조사':     { cats: ['res_paper', 'res'], keywords: ['리서치', '검색'] },
+  '쇼핑':     { cats: ['res_shop', 'res'],  keywords: ['리서치', '상품'] },
+  '상품':     { cats: ['res_shop', 'res'],  keywords: ['쇼핑', '리서치'] },
+
+  // 챗봇/어시스턴트
+  '챗봇':     { cats: ['ast_gen', 'ast'],  keywords: ['AI', '어시스턴트'] },
+  '대화':     { cats: ['ast_gen', 'ast'],  keywords: ['챗봇', '어시스턴트'] },
+  '질문':     { cats: ['ast_gen', 'ast'],  keywords: ['챗봇', '어시스턴트'] },
+  '협업':     { cats: ['ast_work', 'ast'], keywords: ['팀', '공유', '협력'] },
+  '업무':     { cats: ['ast_work', 'ast'], keywords: ['협업', '자동화'] },
+};
+
+/**
+ * 토큰 배열을 시맨틱 맵으로 확장
+ * ["일본어", "학습"] → ["일본어", "학습", "언어", "교육", "공부"] + 매칭 카테고리 키 반환
+ */
+function expandTokensSemantically(tokens) {
+  const expandedTokens = [...tokens];
+  const matchedCats    = new Set();
+
+  for (const token of tokens) {
+    const entry = SEMANTIC_MAP[token];
+    if (entry) {
+      expandedTokens.push(...entry.keywords);
+      entry.cats.forEach(c => matchedCats.add(c));
+    }
+  }
+
+  return {
+    tokens: [...new Set(expandedTokens)],
+    cats:   matchedCats,
+  };
+}
+
+//////////////////////////////
+// ===== 한국어 ↔ 영어 툴명 매핑 =====
+//////////////////////////////
+
+const KO_EN_TOOL_MAP = {
+  '챗지피티': 'chatgpt',
+  '챗gpt':    'chatgpt',
+  '지피티':   'chatgpt',
+  '클로드':   'claude',
+  '미드저니': 'midjourney',
+  '미드조니': 'midjourney',
+  '달리':     'dall-e',
+  '달이':     'dall-e',
+  '스테이블디퓨전': 'stable diffusion',
+  '퍼플렉시티': 'perplexity',
+  '퍼플렉서티': 'perplexity',
+  '제미나이': 'gemini',
+  '제미니':   'gemini',
+  '코파일럿': 'copilot',
+  '노션':     'notion',
+  '런웨이':   'runway',
+  '런웨이ml': 'runway',
+  '일레븐랩스': 'elevenlabs',
+  '수노':     'suno',
+  '유디오':   'udio',
+  '감마':     'gamma',
+  '캔바':     'canva',
+};
+
+function applyKoEnMapping(text) {
+  const lower = text.toLowerCase().replace(/\s/g, '');
+  for (const [ko, en] of Object.entries(KO_EN_TOOL_MAP)) {
+    if (lower.includes(normalize(ko))) {
+      return en;
+    }
+  }
+  return text;
+}
+
+//////////////////////////////
 // ===== 문자열 정규화 =====
 //////////////////////////////
 
@@ -45,23 +191,44 @@ function normalize(str) {
 }
 
 //////////////////////////////
+// ===== 조사/어미 제거 =====
+//////////////////////////////
+
+const JOSA_ENDINGS = [
+  '에서는', '으로는', '이라고', '라고', '이라는', '라는',
+  '이지만', '지만', '이고', '이며', '이면', '이나',
+  '에게서', '로부터', '한테서', '에게', '한테',
+  '에서', '에도', '에는', '에만',
+  '으로', '로는',
+  '에', '의', '로', '을', '를', '이', '가', '은', '는', '도', '만', '과', '와', '나',
+];
+
+function stripJosa(word) {
+  for (const ending of JOSA_ENDINGS) {
+    if (word.endsWith(ending) && word.length - ending.length >= 2) {
+      return word.slice(0, word.length - ending.length);
+    }
+  }
+  return word;
+}
+
+//////////////////////////////
 // ===== 자연어 → 핵심 토큰 분해 =====
-// "고양이 사진을 그리는 AI 툴" → ["고양이", "사진", "그리는", "AI", "툴"]
-// 불필요한 조사/어미 제거 후 의미 있는 단어만 추출
 //////////////////////////////
 
 const STOP_WORDS = new Set([
   '을', '를', '이', '가', '은', '는', '의', '에', '서', '로', '으로',
   '와', '과', '도', '만', '에서', '한', '하는', '해주는', '위한',
   '수', '있는', '있어요', '줘', '주는', '하고', '싶은', '좋은',
+  '알려줘', '찾아줘', '추천해줘', '뭐가', '어떤', '되는', '도움',
   'ai', 'AI', '툴', '도구', '앱', '프로그램', '소프트웨어',
 ]);
 
 function tokenize(text) {
-  // 공백 기준으로 분리 후 정규화, 불용어 제거, 2자 미만 제거
   return text
     .split(/\s+/)
     .map(t => t.replace(/[^a-zA-Z0-9가-힣]/g, ''))
+    .map(t => stripJosa(t))
     .filter(t => t.length >= 2 && !STOP_WORDS.has(t));
 }
 
@@ -97,19 +264,16 @@ function similarity(a, b) {
 
   if (!normA || !normB) return 0;
 
-  if (normA.includes(normB) || normB.includes(normA)) {
-    return 0.95;
-  }
+  if (normA.includes(normB) || normB.includes(normA)) return 0.95;
 
   const distance = levenshtein(normA, normB);
-  const maxLen = Math.max(normA.length, normB.length);
+  const maxLen   = Math.max(normA.length, normB.length);
 
   return 1 - distance / maxLen;
 }
 
 //////////////////////////////
 // ===== 토큰 기반 최대 유사도 =====
-// 자연어 문장의 각 토큰과 대상 필드를 비교해 최고 점수 반환
 //////////////////////////////
 
 function tokenSimilarity(tokens, target) {
@@ -120,20 +284,25 @@ function tokenSimilarity(tokens, target) {
 
 //////////////////////////////
 // ===== 카테고리 매칭 =====
+// semanticCats: expandTokensSemantically에서 직접 매칭된 카테고리 키 Set
 //////////////////////////////
 
-function categoryScore(tokens, tool) {
+function categoryScore(tokens, tool, semanticCats = new Set()) {
   let score = 0;
 
-  const catLabel = categories.대분류[tool.tool_cat];
-  if (catLabel) {
-    score += tokenSimilarity(tokens, catLabel) * 0.2;
-  }
+  const catKey   = tool.tool_cat;
+  const subcatKey = tool.tool_subcat;
 
-  const subLabel = categories.소분류[tool.tool_subcat];
-  if (subLabel) {
-    score += tokenSimilarity(tokens, subLabel) * 0.3;
-  }
+  // 시맨틱 맵에서 직접 매칭된 카테고리면 보너스 점수
+  if (semanticCats.has(subcatKey)) score += 0.5;
+  else if (semanticCats.has(catKey)) score += 0.3;
+
+  // 기존 레이블 유사도
+  const catLabel = categories.대분류[catKey];
+  if (catLabel) score += tokenSimilarity(tokens, catLabel) * 0.2;
+
+  const subLabel = categories.소분류[subcatKey];
+  if (subLabel) score += tokenSimilarity(tokens, subLabel) * 0.3;
 
   return score;
 }
@@ -162,42 +331,73 @@ async function fetchAllTools() {
 }
 
 //////////////////////////////
-// ===== 통합 유사도 =====
-// 자연어 문장을 토큰 분해 후 각 컬럼과 비교
-// score도 함께 반환 (searchResult에서 정렬에 활용)
+// ===== tool_name 직접 매칭 =====
 //////////////////////////////
 
-async function findSimilarTools(keyword, topN = 10) {
-  const tools  = await fetchAllTools();
-  const tokens = tokenize(keyword); // 자연어 분해
+function directNameScore(keyword, toolName) {
+  if (!keyword || !toolName) return 0;
 
-  // 토큰이 없으면(단일 단어 등) 원본 키워드를 토큰으로 사용
-  const effectiveTokens = tokens.length > 0 ? tokens : [keyword];
+  const normKeyword = normalize(keyword);
+  const normTool    = normalize(toolName);
+
+  if (normKeyword === normTool) return 1.0;
+  if (normTool.includes(normKeyword) || normKeyword.includes(normTool)) return 0.95;
+
+  const mapped = normalize(applyKoEnMapping(keyword));
+  if (mapped !== normKeyword) {
+    if (normTool === mapped) return 1.0;
+    if (normTool.includes(mapped) || mapped.includes(normTool)) return 0.95;
+  }
+
+  return 0;
+}
+
+//////////////////////////////
+// ===== 통합 유사도 =====
+//////////////////////////////
+
+async function findSimilarTools(keyword, topN = 10, extraKeywords = []) {
+  const tools = await fetchAllTools();
+
+  const mappedKeyword = applyKoEnMapping(keyword);
+  const rawTokens     = tokenize(keyword);
+  const mappedTokens  = tokenize(mappedKeyword);
+  const extraTokens   = extraKeywords.flatMap(k => tokenize(k));
+
+  const baseTokens = [...new Set([...rawTokens, ...mappedTokens, ...extraTokens])];
+
+  // 시맨틱 확장: 토큰 → 연관 키워드 + 카테고리 키
+  const { tokens: expandedTokens, cats: semanticCats } = expandTokensSemantically(baseTokens);
+  const effectiveTokens = expandedTokens.length > 0 ? expandedTokens : [keyword];
 
   const scored = tools.map(tool => {
+    const directScore = Math.max(
+      directNameScore(keyword, tool.tool_name),
+      directNameScore(mappedKeyword, tool.tool_name)
+    );
 
-    // 각 컬럼에 대해 토큰별 최대 유사도 계산
+    if (directScore >= 0.95) {
+      return { name: tool.tool_name, score: directScore };
+    }
+
     const nameScore = tokenSimilarity(effectiveTokens, tool.tool_name);
     const descScore = tokenSimilarity(effectiveTokens, tool.tool_des);
     const keyScore  = tokenSimilarity(effectiveTokens, tool.tool_key);
-    const catScore  = categoryScore(effectiveTokens, tool);
+    const catScore  = categoryScore(effectiveTokens, tool, semanticCats); // semanticCats 전달
 
-    const finalScore =
+    const fuzzyScore =
       nameScore * 0.5 +
       descScore * 0.25 +
       keyScore  * 0.1 +
       catScore  * 0.15;
 
-    return {
-      name:  tool.tool_name,
-      score: finalScore,
-    };
+    return { name: tool.tool_name, score: Math.max(directScore, fuzzyScore) };
   });
 
   return scored
     .sort((a, b) => b.score - a.score)
     .slice(0, topN)
-    .filter(t => t.score > 0.2); // 자연어 대응을 위해 임계값 낮춤
+    .filter(t => t.score > 0.2);
 }
 
 //////////////////////////////
@@ -239,10 +439,6 @@ async function callGroq(prompt) {
 
 async function searchCategories(keyword) {
 
-  // similarTools: [{ name, score }, ...]
-  const similarTools = await findSimilarTools(keyword);
-
-  // 자연어 의도 해석 + 카테고리/키워드 추출을 Groq에 위임
   const prompt = `
 사용자가 다음 자연어로 AI 툴을 검색했습니다.
 검색어: "${keyword}"
@@ -252,7 +448,7 @@ async function searchCategories(keyword) {
 ${JSON.stringify(categories)}
 
 검색어에서 핵심 기능/목적 키워드도 추출해주세요.
-예) "고양이 사진을 그리는 AI 툴" → keywords: ["이미지", "생성", "그림", "사진"]
+예) "일본어 학습에 도움이 되는 툴 알려줘" → keywords: ["일본어", "언어", "학습", "교육"]
 
 JSON만 반환 (다른 텍스트 없이):
 {
@@ -263,35 +459,32 @@ JSON만 반환 (다른 텍스트 없이):
 }
 `;
 
+  let groqResult   = null;
+  let groqKeywords = [];
+
   try {
-    const result = await callGroq(prompt);
-
-    const groqNames    = result.tool_names || [];
-    const similarNames = similarTools.map(t => t.name);
-
-    result.tool_names = [...new Set([...similarNames, ...groqNames])];
-
-    result._similarityMap = Object.fromEntries(
-      similarTools.map(t => [t.name, t.score])
-    );
-
-    return result;
-
+    groqResult   = await callGroq(prompt);
+    groqKeywords = groqResult.keywords || [];
   } catch (e) {
-    return {
-      tool_names: similarTools.map(t => t.name),
-      recommended_cats: [],
-      recommended_subcats: [],
-      keywords: tokenize(keyword), // Groq 실패 시 토큰을 키워드로 활용
-      _similarityMap: Object.fromEntries(
-        similarTools.map(t => [t.name, t.score])
-      ),
-    };
+    groqResult = null;
   }
+
+  const similarTools = await findSimilarTools(keyword, 10, groqKeywords);
+
+  const groqNames    = groqResult?.tool_names  || [];
+  const similarNames = similarTools.map(t => t.name);
+
+  return {
+    tool_names:          [...new Set([...similarNames, ...groqNames])],
+    recommended_cats:    groqResult?.recommended_cats    || [],
+    recommended_subcats: groqResult?.recommended_subcats || [],
+    keywords:            groqKeywords.length > 0 ? groqKeywords : tokenize(keyword),
+    _similarityMap:      Object.fromEntries(similarTools.map(t => [t.name, t.score])),
+  };
 }
 
 //////////////////////////////
-// ===== 추천 (그대로 유지)
+// ===== 추천 =====
 //////////////////////////////
 
 async function matchCategories(userInput) {

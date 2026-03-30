@@ -141,7 +141,16 @@ body {
 .work-card__body {
   display: flex;
   gap: 24px;
-  align-items: center;
+  align-items: stretch;
+}
+
+/* [수정] .empty 클래스 정렬 방해 요소 제거 */
+.work-card__image.empty {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center;
+  width: 100%;
 }
 
 .work-card__tool {
@@ -350,6 +359,8 @@ body {
   cursor: pointer;
   z-index: 2;
 }
+
+/* [수정] 작업물 이미지 컨테이너 정렬 강화 */
 .work-card__image {
   flex: 1;
   position: relative;
@@ -359,9 +370,9 @@ body {
   border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(160deg, #a8b8cc 0%, #8fa3bc 50%, #7d95b0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .main-work-image {
@@ -571,7 +582,7 @@ body {
 }
 
 .work-card__more-btn {
-  position: absolute; /* ✅ absolute로 변경 */
+  position: absolute; 
   top: 10px;
   left: 10px;
   z-index: 10;
@@ -598,6 +609,6 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #fff; /* ✅ 이미지 위라 흰색으로 */
+  background: #fff; 
   display: block;
 }

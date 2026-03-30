@@ -110,6 +110,16 @@ passwordInput.addEventListener('input', () => {
   }
 });
 
+// ===== [추가] 엔터 키 감지 이벤트 리스너 =====
+[emailInput, passwordInput].forEach(input => {
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // 엔터 키의 기본 제출 동작 방지
+      handleLogin();
+    }
+  });
+});
+
 // ===== 로그인 처리 =====
 async function handleLogin() {
   const email    = emailInput.value.trim();
