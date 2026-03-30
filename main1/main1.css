@@ -126,10 +126,7 @@ body {
 }
 
 .profile {
-  width: 20px;
-  height: 20px;
-  border-radius: 30%;
-  object-fit: cover;
+font-size: 18px;
 }
 
 .badge-logo {
@@ -630,7 +627,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: inherit;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,255);
 }
 
 .work-card__empty-text {

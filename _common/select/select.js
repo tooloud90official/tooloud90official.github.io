@@ -2,7 +2,7 @@ export async function loadNativeSelect({
   target,
   options = [],
   value = "",
-  placeholder = "선택 해주세요",
+  placeholder = "선택",
   onChange = null,
   disabled = false,
 }) {

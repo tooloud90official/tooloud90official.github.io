@@ -374,8 +374,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const updateBtnUI = (isPinned) => {
         btn.innerHTML = `
-          <img src="${isPinned ? "/media/pin_fill.png" : "/media/pin.png"}"
-            style="width:1em;height:1em;object-fit:contain;vertical-align:middle;margin-right:6px;">
+          <img
+            src="/media/pin.png"
+            style="
+              width:1em;
+              height:1em;
+              object-fit:contain;
+              vertical-align:middle;
+              margin-right:6px;
+            filter: ${isPinned ? "none" : "grayscale(1) brightness(1.50)"};
+            opacity: ${isPinned ? "1" : "0.95"};
+            "
+          >
           ${isPinned ? "관심 목록에 추가됨" : "관심 목록에 추가"}
         `;
       };
@@ -555,15 +565,24 @@ function renderPlanCards(tool) {
         priceEl.className = "plan-card__price";
         topEl.appendChild(priceEl);
       }
+
       if (priceEl) {
-        const numPrice = Number(price);
-        if (numPrice === 0) {
+        const rawPrice = String(price).trim();
+        const numPrice = Number(rawPrice.replace(/[^\d.]/g, ""));
+      
+        if (/^무료$|^free$/i.test(rawPrice) || numPrice === 0) {
           priceEl.textContent = "무료";
+        } else if (Number.isNaN(numPrice)) {
+          priceEl.textContent = rawPrice;
+        } else if (/₩|원/.test(rawPrice)) {
+          priceEl.textContent = `₩${numPrice.toLocaleString()}/월`;
+        } else if (/\$/.test(rawPrice)) {
+          priceEl.textContent = `$${numPrice}/월`;
         } else {
-          const usd = (numPrice / 1300).toFixed(2);
-          priceEl.textContent = `$${usd} / mo`;
+          priceEl.textContent = `₩${numPrice.toLocaleString()}/월`;
         }
       }
+
     } else if (priceEl) {
       priceEl.remove();
     }
