@@ -558,36 +558,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     const nameEl    = document.getElementById('workCardUserName');
     const moreBtn   = document.getElementById('workCardMoreBtn');
     const data      = WORK_DATA[category];
-
+  
+    // 바깥 카드 루트
+    const cardRoot =
+      container?.closest('.work-card') ||
+      container?.closest('.main-work-card') ||
+      container?.parentElement;
+  
+    // 기존 empty overlay 제거
+    cardRoot?.querySelector('.work-card__empty-overlay')?.remove();
+  
     if (!data) {
-      if (container) {
-        container.innerHTML = `<div style="width:100%;height:100%;background:#e8eef5;"></div>`;
-        if (moreBtn) { moreBtn.style.display = "none"; container.appendChild(moreBtn); }
+      if (cardRoot) {
+        cardRoot.classList.add('is-empty');
+  
+        const overlay = document.createElement('div');
+        overlay.className = 'work-card__empty-overlay';
+        overlay.innerHTML = `
+          <div class="work-card__empty-text">❌ 등록된 작업물이 없습니다. ❌</div>
+        `;
+        cardRoot.appendChild(overlay);
       }
-      if (nameEl) nameEl.textContent = '님의 작업물';
-      if (toolEl) toolEl.innerHTML = '<p style="color:#aaa; font-size:13px; padding:16px;">등록된 작업물이 없습니다.</p>';
+  
       return;
     }
-
+  
+    // 데이터 있으면 empty 상태 해제
+    cardRoot?.classList.remove('is-empty');
+  
     if (nameEl) {
       nameEl.textContent = data.userName ? `${data.userName} 님의 작업물` : '님의 작업물';
     }
-
-    if (moreBtn && moreBtn.parentElement === container) {
-      container.removeChild(moreBtn);
-    }
-
+  
     renderMainWorkMedia(container, data);
-
+  
     if (moreBtn) {
-      container.appendChild(moreBtn);
-      moreBtn.style.display = "flex";
+      moreBtn.style.display = '';
       moreBtn.onclick = (e) => {
         e.stopPropagation();
+  
+        if (!isLoggedIn) {
+          window.location.href = "/login1/login1.html";
+          return;
+        }
+  
         window.location.href = `/artwork/artwork_post/artwork_post.html?work_id=${encodeURIComponent(data.workId)}`;
       };
     }
-
+  
     if (toolEl) {
       toolEl.innerHTML = `
         <div class="tool-icon-card">
@@ -599,6 +617,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="work-card__stars">${data.stars}</div>
         <button type="button" class="btn-more">툴 더 알아보기</button>
       `;
+  
       toolEl.querySelector('.btn-more').addEventListener('click', () => {
         window.location.href = `/detail_AI/detail_AI.html?tool_ID=${data.tool.id}`;
       });

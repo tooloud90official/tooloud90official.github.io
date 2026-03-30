@@ -8,44 +8,134 @@ const CATEGORY_MAP = {
   "챗봇·어시스턴트": "ast",
 };
 
-/** 슬라이더 가격 구간 */
-const SLIDER_LABELS = ["₩0", "₩1–29,999", "₩30,000–59,999", "₩60,000–89,999", "₩90,000+"];
+/** 환율 상수 (슬라이더 필터용 내부 기준) */
+const KRW_PER_USD = 1500;
+
+/** 슬라이더 가격 구간 (USD 기준) */
+const SLIDER_LABELS = ["$0", "$1–19.99", "$20–39.99", "$40–59.99", "$60+"];
 
 const PRICE_RANGES = [
   { min: 0, max: 0 },
-  { min: 1, max: 29999 },
-  { min: 30000, max: 59999 },
-  { min: 60000, max: 89999 },
-  { min: 90000, max: Infinity },
+  { min: 0.01, max: 19.99 },
+  { min: 20, max: 39.99 },
+  { min: 40, max: 59.99 },
+  { min: 60, max: Infinity },
 ];
 
 let ALL_TOOLS = [];
 let currentStep = 0;
 let currentCatKey = "";
 
-function toPrice(value) {
-  const num = parseInt(value, 10);
-  return Number.isNaN(num) ? null : num;
+/**
+ * 문자열 가격을 USD 숫자로 통일
+ * 예)
+ *  - "0" / "무료"           -> 0
+ *  - "$30"                  -> 30
+ *  - "₩15200" / "15200"     -> 10.13
+ *  - "-1" / "별도 문의"      -> null
+ */
+function toPriceUSD(value) {
+  if (value == null) return null;
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+
+  // 문의형 / 비정형 값 제외
+  const lowered = raw.toLowerCase();
+  if (
+    raw === "-1" ||
+    lowered.includes("별도 문의") ||
+    lowered.includes("contact") ||
+    lowered.includes("enterprise") ||
+    lowered.includes("custom")
+  ) {
+    return null;
+  }
+
+  // 무료 처리
+  if (raw === "0" || raw === "무료") return 0;
+
+  // 숫자 추출 (소수점 허용)
+  const normalized = raw.replace(/,/g, "");
+  const num = parseFloat(normalized.replace(/[^0-9.]/g, ""));
+  if (Number.isNaN(num)) return null;
+
+  // 달러 표기면 그대로 USD
+  if (normalized.includes("$") || lowered.includes("usd")) {
+    return Number(num.toFixed(2));
+  }
+
+  // 달러 아니면 무조건 KRW로 간주해서 환산
+  return Number((num / KRW_PER_USD).toFixed(2));
+}
+
+/**
+ * 화면 표시용 가격 포맷
+ * - 달러는 달러 그대로
+ * - 원화는 원화 그대로
+ * - 무료는 무료
+ * - 문의형은 별도 문의
+ */
+function formatDisplayPrice(rawValue) {
+  if (rawValue == null) return "";
+
+  const raw = String(rawValue).trim();
+  if (!raw) return "";
+
+  const lowered = raw.toLowerCase();
+
+  if (
+    raw === "-1" ||
+    lowered.includes("별도 문의") ||
+    lowered.includes("contact") ||
+    lowered.includes("enterprise") ||
+    lowered.includes("custom")
+  ) {
+    return "별도 문의";
+  }
+
+  if (raw === "0" || raw === "무료" || raw === "$0" || raw.toLowerCase() === "usd 0") {
+    return "무료";
+  }
+
+  const normalized = raw.replace(/,/g, "");
+  const num = parseFloat(normalized.replace(/[^0-9.]/g, ""));
+  if (Number.isNaN(num)) return raw;
+
+  // 달러 표기면 달러 그대로
+  if (normalized.includes("$") || lowered.includes("usd")) {
+    const hasDecimal = !Number.isInteger(num);
+    return `$${num.toLocaleString("en-US", {
+      minimumFractionDigits: hasDecimal ? 2 : 0,
+      maximumFractionDigits: 2,
+    })}/월`;
+  }
+
+  // 그 외는 원화 그대로
+  return `₩${Math.round(num).toLocaleString("ko-KR")}/월`;
 }
 
 function getToolPlans(tool) {
   return [
     {
       name: (tool.tool_plan1_name || "").trim(),
-      price: toPrice(tool.tool_plan1_price_krw),
+      rawPrice: tool.tool_plan1_price_krw,
+      price: toPriceUSD(tool.tool_plan1_price_krw),
       desc: (tool.tool_plan1_des || "").trim(),
     },
     {
       name: (tool.tool_plan2name || "").trim(),
-      price: toPrice(tool.tool_plan2_price_krw),
+      rawPrice: tool.tool_plan2_price_krw,
+      price: toPriceUSD(tool.tool_plan2_price_krw),
       desc: (tool.tool_plan2_des || "").trim(),
     },
     {
       name: (tool.tool_plan3_name || "").trim(),
-      price: toPrice(tool.tool_plan3_price_krw),
+      rawPrice: tool.tool_plan3_price_krw,
+      price: toPriceUSD(tool.tool_plan3_price_krw),
       desc: (tool.tool_plan3_des || "").trim(),
     },
-  ].filter(plan => {
+  ].filter((plan) => {
     if (!plan.name) return false;
     if (plan.price === null) return false;
     if (plan.price < 0) return false;
@@ -53,27 +143,27 @@ function getToolPlans(tool) {
   });
 }
 
-function formatPrice(price) {
-  if (price === 0) return "무료";
-  return `₩${price.toLocaleString()}/월`;
-}
-
 function getPlanCardsByStep(step) {
   const range = PRICE_RANGES[step];
 
   return ALL_TOOLS
-    .filter(tool => tool.tool_cat === currentCatKey)
-    .flatMap(tool => {
+    .filter((tool) => tool.tool_cat === currentCatKey)
+    .flatMap((tool) => {
       const plans = getToolPlans(tool);
+
       return plans
-        .filter(plan => plan.price >= range.min && plan.price <= range.max)
-        .map(plan => ({
+        .filter((plan) => {
+          if (step === 0) return plan.price === 0;
+          return plan.price >= range.min && plan.price <= range.max;
+        })
+        .map((plan) => ({
           tool_ID: tool.tool_ID,
           tool_name: tool.tool_name,
           icon: tool.icon,
           tool_link: tool.tool_link,
           plan_name: plan.name,
           plan_price: plan.price,
+          plan_raw_price: plan.rawPrice,
           plan_desc: plan.desc,
         }));
     });
@@ -89,7 +179,10 @@ function bindToolLink(iconWrap, toolLink, toolId) {
   const go = async () => {
     try {
       const supabase = window._supabase;
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (user && toolId) {
         const { data: userData } = await supabase
           .from("users")
@@ -98,7 +191,8 @@ function bindToolLink(iconWrap, toolLink, toolId) {
           .single();
 
         const current = userData?.recent_tools ?? [];
-        const updated = [toolId, ...current.filter(id => id !== toolId)].slice(0, 8);
+        const updated = [toolId, ...current.filter((id) => id !== toolId)].slice(0, 8);
+
         await supabase.from("users").update({ recent_tools: updated }).eq("user_id", user.id);
       }
     } catch (e) {
@@ -163,7 +257,7 @@ function renderToolCards(planCards) {
     const priceLine = document.createElement("div");
     priceLine.className = "tool-price-card__price-line";
     priceLine.innerHTML = `
-      <span class="tool-price-card__price-main">${formatPrice(item.plan_price)}</span>
+      <span class="tool-price-card__price-main">${formatDisplayPrice(item.plan_raw_price)}</span>
       <span class="tool-price-card__price-plan">${item.plan_name}</span>
     `;
 
@@ -184,7 +278,7 @@ function renderToolCards(planCards) {
       });
     }
 
-    bindToolLink(iconWrap, item.tool_link, item.tool_ID); // ✅ toolId 추가
+    bindToolLink(iconWrap, item.tool_link, item.tool_ID);
   });
 }
 
@@ -218,7 +312,7 @@ function initStepSlider() {
     labelsWrap.appendChild(el);
   });
 
-  sliderRoot.querySelectorAll(".price-filter__dot").forEach(d => d.remove());
+  sliderRoot.querySelectorAll(".price-filter__dot").forEach((d) => d.remove());
 
   const dotEls = SLIDER_LABELS.map((_, i) => {
     const el = document.createElement("div");
@@ -234,9 +328,10 @@ function initStepSlider() {
   function calcStepPositions() {
     const sliderRect = sliderRoot.getBoundingClientRect();
     const labelNodes = labelsWrap.querySelectorAll(".price-filter__step-label");
-    stepPositions = Array.from(labelNodes).map(el => {
+
+    stepPositions = Array.from(labelNodes).map((el) => {
       const r = el.getBoundingClientRect();
-      return (r.left + r.width / 2) - sliderRect.left;
+      return r.left + r.width / 2 - sliderRect.left;
     });
   }
 
@@ -247,9 +342,9 @@ function initStepSlider() {
     const first = stepPositions[0];
     const last = stepPositions[stepPositions.length - 1];
 
-    track.style.left = (first - extend) + "px";
-    track.style.width = (last - first + extend * 2) + "px";
-    fill.style.left = (first - extend) + "px";
+    track.style.left = first - extend + "px";
+    track.style.width = last - first + extend * 2 + "px";
+    fill.style.left = first - extend + "px";
 
     dotEls.forEach((d, i) => {
       d.style.left = stepPositions[i] + "px";

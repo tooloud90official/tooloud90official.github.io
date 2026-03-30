@@ -6,6 +6,7 @@ const TOOL_ID = decodeURIComponent(
 ).trim();
 
 let currentUser = null;
+let pricingLink = ""; // ✅ pricing 컬럼 값 저장
 
 function getWorkExt(path = "") {
   const idx = path.lastIndexOf(".");
@@ -90,7 +91,6 @@ async function renderWorkMedia(container, work) {
 
   container.innerHTML = "";
 
-  // ✅ 1. 이미지: 컨테이너를 꽉 채우되 비율 유지 (contain + 배경 처리)
   if (kind === "image") {
     container.style.display         = "flex";
     container.style.alignItems      = "center";
@@ -102,7 +102,6 @@ async function renderWorkMedia(container, work) {
     return;
   }
 
-  // ✅ 2. 비디오: 썸네일 정방형 제거, 배경처럼 처리
   if (kind === "video") {
     container.innerHTML = `
       <div class="work-video-wrap" style="position:relative;width:100%;height:100%;background:#000;overflow:hidden;">
@@ -146,7 +145,6 @@ async function renderWorkMedia(container, work) {
       return `${m}:${String(s).padStart(2, "0")}`;
     }
 
-    // 썸네일: canvas에 첫 프레임 배경으로
     video.addEventListener("loadeddata", () => { video.currentTime = 0.5; });
     video.addEventListener("seeked", () => {
       if (video.paused) {
@@ -206,7 +204,6 @@ async function renderWorkMedia(container, work) {
     return;
   }
 
-  // ✅ 2. 오디오: 비디오와 동일한 구조로
   if (kind === "audio") {
     const audioId = `workAudio_${Date.now()}`;
     container.innerHTML = `
@@ -315,7 +312,6 @@ async function loadCurrentUser() {
   currentUser = { id: user.id, name: displayName, avatar: displayAvatar };
 }
 
-// ✅ 9. 사이트 미리보기 아이콘 흰 배경 + 정사각형 처리
 function applyToolIcon(mountSelector, iconUrl) {
   if (!iconUrl) return;
   const iconEl = document.querySelector(`${mountSelector} .tool-icon-card__icon`);
@@ -332,7 +328,6 @@ async function saveRecentTool() {
   try {
     const { data } = await supabase.from("users").select("recent_tools").eq("user_id", currentUser.id).single();
     const current = data?.recent_tools ?? [];
-    // ✅ 8. 최대 8개 슬라이스 (중복 제거 후 추가, 최대 8개 유지)
     const updated = [TOOL_ID, ...current.filter(id => id !== TOOL_ID)].slice(0, 8);
     await supabase.from("users").update({ recent_tools: updated }).eq("user_id", currentUser.id);
   } catch (e) {
@@ -363,7 +358,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateAvgScore();
   updateCardStars(0);
 
-  // ✅ 3. 플랜/프로모션 사이트 바로가기 버튼 제거 — planBtn1~3, promoBtn loadButton 호출 삭제
   await Promise.all([
     window.loadButton({ target: "#visitSiteBtn", text: "사이트 바로가기", variant: "primary", onClick: () => {} }),
 
@@ -420,15 +414,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const toolUrl = toolRow?.tool_link ?? "#";
-  // ✅ 3. visitSiteBtn만 남기고 planBtn/promoBtn 제거
-  ["#visitSiteBtn"].forEach((sel) => {
-    document.querySelector(`${sel} .btn`)?.addEventListener("click", async () => {
-      if (toolUrl && toolUrl !== "#") {
-        await saveRecentTool();
-        window.open(toolUrl, "_blank");
-      }
+
+  // ✅ visitSiteBtn → tool_link로 이동
+  document.querySelector("#visitSiteBtn .btn")?.addEventListener("click", async () => {
+    if (toolUrl && toolUrl !== "#") {
+      await saveRecentTool();
+      window.open(toolUrl, "_blank");
+    }
+  });
+
+  // ✅ 플랜 카드 클릭 → pricing 컬럼 링크로 이동
+  document.querySelectorAll(".plan-card").forEach(card => {
+    card.style.cursor = "pointer";
+    card.addEventListener("click", () => {
+      if (pricingLink) window.open(pricingLink, "_blank");
     });
   });
+
+  // ✅ 프로모션 카드 클릭 → pricing 컬럼 링크로 이동
+  const promoSection = document.getElementById("promoSection");
+  if (promoSection) {
+    promoSection.style.cursor = "pointer";
+    promoSection.addEventListener("click", () => {
+      if (pricingLink) window.open(pricingLink, "_blank");
+    });
+  }
 
   const uploadLink = document.querySelector(".detail_AI__work-link");
   if (uploadLink) {
@@ -458,6 +468,9 @@ async function loadToolInfo() {
 
     const { data, error } = await supabase.from("tools").select("*").eq("tool_ID", TOOL_ID).single();
     if (error || !data) throw error ?? new Error("툴 없음");
+
+    // ✅ pricing 컬럼 저장
+    pricingLink = data.pricing ?? "";
 
     await window.loadToolIconCard("#toolIconMount", { toolName: data.tool_name ?? "", url: data.tool_link ?? "#" });
     applyToolIcon("#toolIconMount", data.icon);
@@ -489,7 +502,6 @@ async function loadToolInfo() {
 }
 
 function renderPlanCards(tool) {
-  // ✅ 10. 기본 이모지 ✅ → /media/checkbox.png 이미지로 교체
   function getEmoji(text) {
     if (/무제한|unlimited/i.test(text)) return "♾️";
     if (/무료|free/i.test(text))        return "🆓";
@@ -503,7 +515,6 @@ function renderPlanCards(tool) {
     if (/비디오|영상|video/i.test(text)) return "🎬";
     if (/클라우드|저장|storage/i.test(text)) return "☁️";
     if (/크레딧|credit/i.test(text))    return "💳";
-    // ✅ 기본값: 이미지 태그로 반환 (이모지 대신 checkbox.png)
     return `<img src="/media/checkbox.png" style="width:1em;height:1em;object-fit:contain;vertical-align:middle;" alt="✅">`;
   }
 
@@ -538,7 +549,6 @@ function renderPlanCards(tool) {
     const price = tool[priceKey];
     let priceEl = topEl?.querySelector(".plan-card__price");
 
-    // ✅ 6. 가격 표시: ₩ → $, 원화값을 달러로 표기 (표시만 변경)
     if (price !== undefined && price !== null && price !== "") {
       if (!priceEl && topEl) {
         priceEl = document.createElement("div");
@@ -550,7 +560,6 @@ function renderPlanCards(tool) {
         if (numPrice === 0) {
           priceEl.textContent = "무료";
         } else {
-          // KRW → USD 환산 (1300원 기준) 후 소수 둘째자리로 표시
           const usd = (numPrice / 1300).toFixed(2);
           priceEl.textContent = `$${usd} / mo`;
         }
@@ -567,8 +576,6 @@ function renderPlanCards(tool) {
   });
 }
 
-// ✅ 4. 프로모션 제목 크게 + 중앙 정렬
-// ✅ 7. 프로모션 방어: tool_prom이 없으면 섹션 완전히 숨김 (플랜 정보 혼입 방지)
 function renderPromo(toolName, toolProm) {
   const section    = document.getElementById("promoSection");
   const titleEl    = document.querySelector(".promo__title");
@@ -578,7 +585,6 @@ function renderPromo(toolName, toolProm) {
 
   if (titleEl) titleEl.textContent = toolName ? `${toolName} 에서 진행 중인 프로모션` : "";
 
-  // ✅ 방어: 빈 문자열, null, undefined, 공백만 있는 경우 모두 숨김
   const cleanProm = (toolProm ?? "").trim();
   if (!cleanProm) {
     if (section) section.style.display = "none";
@@ -600,7 +606,7 @@ function renderPromo(toolName, toolProm) {
     return "✨";
   }
 
-  // ✅ 4. 헤드라인: 크고 중앙 정렬
+  // 헤드라인: 크고 중앙 정렬
   if (headlineEl) {
     headlineEl.textContent = lines[0] ? `${getPromoEmoji(lines[0])} ${lines[0]}` : "";
     headlineEl.style.fontSize    = "1.4em";
@@ -609,14 +615,19 @@ function renderPromo(toolName, toolProm) {
     headlineEl.style.display     = "block";
   }
 
+  // ✅ 상세 정보: 콘텐츠 박스 안에서 좌측 정렬
   if (subEl) {
     if (lines.length > 1) {
-      subEl.style.display   = "";
-      subEl.style.textAlign = "center";
-      // ✅ <br> 대신 block span으로 공백 없이 붙여서 렌더
-      subEl.innerHTML = lines.slice(1).map(l =>
-        `<span style="display:block;line-height:1.6;">${getPromoEmoji(l)} ${l}</span>`
-      ).join("");
+      subEl.style.display = "";
+      // ✅ 인라인 블록으로 감싸서 박스 자체는 중앙, 텍스트는 좌측 정렬
+      subEl.style.textAlign = "center"; // 박스를 중앙에 위치시키기 위한 부모 정렬
+      subEl.innerHTML = `
+      <div class="promo-banner__sub-inner">
+        ${lines.slice(1).map(l =>
+          `<div class="promo-banner__sub-line">${getPromoEmoji(l)} ${l}</div>`
+        ).join("")}
+      </div>
+    `;
     } else {
       subEl.innerHTML      = "";
       subEl.style.display  = "none";
@@ -898,7 +909,6 @@ function renderMyReviewArea() {
           <div class="review-write__overlay-inner">
             <span class="review-write__lock-icon">🔒</span>
             <p class="review-write__lock-msg">로그인 후 리뷰를 남길 수 있어요</p>
-            <!-- ✅ 5. 로그인 페이지 경로 수정 -->
             <a class="review-write__login-btn" href="/login1/login1.html">로그인하기</a>
           </div>
         </div>
@@ -1128,7 +1138,6 @@ function initReviewSort() {
   });
 }
 
-// ✅ 9. 사이트 미리보기: 아이콘 정사각형 + 아이프레임 배경 흰색
 function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   const nameEl = document.getElementById("sitePreviewName");
   const urlEl  = document.getElementById("sitePreviewUrl");
@@ -1147,7 +1156,6 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
   if (iframeEnabled && url) {
     cardEl?.classList.add("has-iframe");
     mediaEl.classList.add("has-iframe");
-    // ✅ 아이프레임일 때만 배경 흰색 (iframe 뒤가 비어보이지 않게)
     mediaEl.style.background = "#fff";
 
     const iframe = document.createElement("iframe");
@@ -1159,7 +1167,6 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
     const logo = mediaEl.querySelector(".site-preview__fallback-logo, img");
     if (logo) logo.style.display = "none";
   } else {
-    // ✅ 비아이프레임: 원래 CSS 그라데이션 유지 (인라인 background 제거)
     mediaEl.style.background = "";
 
     const imgEl = mediaEl.querySelector("img");
@@ -1167,7 +1174,6 @@ function setSitePreview({ name, url, icon, iframeEnabled = false } = {}) {
       if (icon) {
         imgEl.src = icon;
         imgEl.style.display      = "block";
-        // ✅ 정사각형 + object-fit contain으로 아이콘 온전히 표시
         imgEl.style.width        = "72px";
         imgEl.style.height       = "72px";
         imgEl.style.objectFit    = "contain";

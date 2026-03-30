@@ -601,3 +601,41 @@ body {
   background: #fff; /* ✅ 이미지 위라 흰색으로 */
   display: block;
 }
+
+
+/* 카드 루트는 기준점 */
+.work-card,
+.main-work-card {
+  position: relative;
+}
+
+/* empty 상태일 때 기존 내용은 안 보이게만 */
+.work-card.is-empty #workCardImage,
+.work-card.is-empty #workCardTool,
+.work-card.is-empty #workCardUserName,
+.work-card.is-empty #workCardMoreBtn,
+.main-work-card.is-empty #workCardImage,
+.main-work-card.is-empty #workCardTool,
+.main-work-card.is-empty #workCardUserName,
+.main-work-card.is-empty #workCardMoreBtn {
+  visibility: hidden;
+}
+
+/* 카드 전체를 덮는 오버레이 */
+.work-card__empty-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: rgba(255,255,255,0.92);
+}
+
+.work-card__empty-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #8a94a6;
+  text-align: center;
+}
