@@ -134,15 +134,12 @@
 
   </main>
 
-  <!-- ───────────────────────────────────────────
-       툴 추가/수정 모달 (스텝 방식)
-  ─────────────────────────────────────────── -->
+  <!-- 툴 추가/수정 모달 -->
   <div class="modal-overlay" id="toolModal" style="display:none">
     <div class="modal modal--wide">
       <div class="modal-header">
         <div class="modal-header-left">
           <h3 class="modal-title" id="toolModalTitle">툴 추가</h3>
-          <!-- 스텝 표시 -->
           <div class="step-indicators">
             <span class="step-dot is-active" data-step="0"></span>
             <span class="step-dot" data-step="1"></span>
@@ -153,7 +150,6 @@
         <button class="modal-close" id="toolModalClose">✕</button>
       </div>
 
-      <!-- 스텝 라벨 -->
       <div class="step-labels">
         <span class="step-label is-active" data-step="0">기본 정보</span>
         <span class="step-label" data-step="1">소개 · 링크</span>
@@ -167,9 +163,16 @@
         <!-- STEP 0: 기본 정보 -->
         <div class="step-panel is-active" data-step="0">
           <div class="form-row">
-            <div class="form-group"><label>툴 이름 <span class="required">*</span></label><input type="text" id="f_tool_name" placeholder="예: ChatGPT"></div>
-            <div class="form-group"><label>회사명</label><input type="text" id="f_tool_company" placeholder="예: OpenAI"></div>
+            <div class="form-group">
+              <label>툴 이름 <span class="required">*</span></label>
+              <input type="text" id="f_tool_name" placeholder="예: ChatGPT">
+            </div>
+            <div class="form-group">
+              <label>회사명</label>
+              <input type="text" id="f_tool_company" placeholder="예: OpenAI">
+            </div>
           </div>
+
           <div class="form-row">
             <div class="form-group">
               <label>카테고리 <span class="required">*</span></label>
@@ -182,67 +185,146 @@
                 <option value="ast">챗봇·어시스턴트</option>
               </select>
             </div>
-            <div class="form-group"><label>서브카테고리</label><input type="text" id="f_tool_subcat" placeholder="예: 이미지 생성"></div>
+            <div class="form-group">
+              <label>서브카테고리</label>
+              <input type="text" id="f_tool_subcat" placeholder="예: 이미지 생성">
+            </div>
           </div>
+
           <div class="form-row">
-            <div class="form-group"><label>키워드 <span class="hint">(한두 단어, 대표 기능)</span></label><input type="text" id="f_tool_key" placeholder="예: 이미지 생성"></div>
-            <div class="form-group"><label>아이콘 URL</label><input type="url" id="f_icon" placeholder="https://..."></div>
+            <div class="form-group">
+              <label>키워드 <span class="hint">(한두 단어, 대표 기능)</span></label>
+              <input type="text" id="f_tool_key" placeholder="예: 이미지 생성">
+            </div>
           </div>
         </div>
 
         <!-- STEP 1: 소개 · 링크 -->
         <div class="step-panel" data-step="1">
-          <div class="form-group"><label>한 줄 소개</label><input type="text" id="f_tool_des" placeholder="예: AI 기반 이미지 생성 도구"></div>
-          <div class="form-row">
-            <div class="form-group"><label>툴 링크</label><input type="url" id="f_tool_link" placeholder="https://..."></div>
-            <div class="form-group"><label>가격 페이지 링크</label><input type="url" id="f_pricing" placeholder="https://..."></div>
+          <div class="form-group">
+            <label>한 줄 소개</label>
+            <input type="text" id="f_tool_des" placeholder="예: AI 기반 이미지 생성 도구">
           </div>
+
           <div class="form-row">
-            <div class="form-group"><label>iframe URL</label><input type="url" id="f_iframe" placeholder="https://..."></div>
-            <div class="form-group"><label>홍보 문구</label><input type="text" id="f_tool_prom" placeholder="예: 무료로 시작하세요"></div>
+            <div class="form-group">
+              <label>툴 링크</label>
+              <input type="url" id="f_tool_link" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label>아이콘 URL</label>
+              <input type="url" id="f_icon" placeholder="https://...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>iframe 사용 여부</label>
+              <select id="f_iframe">
+                <option value="">선택</option>
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <!-- STEP 2: 요금제 -->
         <div class="step-panel" data-step="2">
+          <div class="form-group">
+            <label>가격 페이지 링크</label>
+            <input type="url" id="f_pricing" placeholder="https://...">
+          </div>
+
           <p class="step-desc">최대 3개의 요금제를 입력하세요.</p>
 
           <div class="plan-grid">
-            <!-- 플랜 1 -->
             <div class="plan-card">
               <div class="plan-card__header">플랜 1</div>
-              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan1_name" placeholder="예: Free"></div>
-              <div class="form-group"><label>가격</label><input type="text" id="f_plan1_price" placeholder="예: $0/월"></div>
-              <div class="form-group"><label>설명</label><textarea id="f_plan1_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+              <div class="form-group">
+                <label>플랜명</label>
+                <input type="text" id="f_plan1_name" placeholder="예: Free">
+              </div>
+              <div class="form-group">
+                <label>가격</label>
+                <input type="text" id="f_plan1_price" placeholder="예: $0 / ₩0 / 무료">
+              </div>
+              <div class="form-group">
+                <label>설명</label>
+                <textarea id="f_plan1_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea>
+              </div>
             </div>
-            <!-- 플랜 2 -->
+
             <div class="plan-card">
               <div class="plan-card__header">플랜 2</div>
-              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan2_name" placeholder="예: Pro"></div>
-              <div class="form-group"><label>가격</label><input type="text" id="f_plan2_price" placeholder="예: $20/월"></div>
-              <div class="form-group"><label>설명</label><textarea id="f_plan2_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+              <div class="form-group">
+                <label>플랜명</label>
+                <input type="text" id="f_plan2_name" placeholder="예: Pro">
+              </div>
+              <div class="form-group">
+                <label>가격</label>
+                <input type="text" id="f_plan2_price" placeholder="예: $20 / ₩30000">
+              </div>
+              <div class="form-group">
+                <label>설명</label>
+                <textarea id="f_plan2_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea>
+              </div>
             </div>
-            <!-- 플랜 3 -->
+
             <div class="plan-card">
               <div class="plan-card__header">플랜 3</div>
-              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan3_name" placeholder="예: Enterprise"></div>
-              <div class="form-group"><label>가격</label><input type="text" id="f_plan3_price" placeholder="예: 문의"></div>
-              <div class="form-group"><label>설명</label><textarea id="f_plan3_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+              <div class="form-group">
+                <label>플랜명</label>
+                <input type="text" id="f_plan3_name" placeholder="예: Enterprise">
+              </div>
+              <div class="form-group">
+                <label>가격</label>
+                <input type="text" id="f_plan3_price" placeholder="예: $60+ / 문의">
+              </div>
+              <div class="form-group">
+                <label>설명</label>
+                <textarea id="f_plan3_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea>
+              </div>
             </div>
           </div>
-
-          <div class="form-group" style="margin-top:16px"><label>요금제 기타 안내</label><input type="text" id="f_tool_plan_etc" placeholder="예: 연간 결제 시 20% 할인"></div>
         </div>
 
         <!-- STEP 3: 가격대 · 기타 -->
         <div class="step-panel" data-step="3">
-          <p class="step-desc">해당하는 가격대를 모두 선택하세요.</p>
+          <p class="step-desc">플랜 가격을 입력하면 아래 가격대가 자동으로 체크됩니다.</p>
+
           <div class="checkbox-grid">
-            <label class="checkbox-item"><input type="checkbox" id="f_class1" value="무료"><span>무료</span></label>
-            <label class="checkbox-item"><input type="checkbox" id="f_class2" value="프리미엄"><span>프리미엄</span></label>
-            <label class="checkbox-item"><input type="checkbox" id="f_class3" value="구독형"><span>구독형</span></label>
-            <label class="checkbox-item"><input type="checkbox" id="f_class4" value="일회성 결제"><span>일회성 결제</span></label>
-            <label class="checkbox-item"><input type="checkbox" id="f_class5" value="문의"><span>문의</span></label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="f_class1" value="$0" disabled>
+              <span>$0</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="f_class2" value="$1–19.99" disabled>
+              <span>$1–19.99</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="f_class3" value="$20–39.99" disabled>
+              <span>$20–39.99</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="f_class4" value="$40–59.99" disabled>
+              <span>$40–59.99</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="f_class5" value="$60+" disabled>
+              <span>$60+</span>
+            </label>
+          </div>
+
+          <div class="form-row" style="margin-top:16px">
+            <div class="form-group">
+              <label>프로모션 내용</label>
+              <input type="text" id="f_tool_prom" placeholder="예: 무료로 시작하세요">
+            </div>
+            <div class="form-group">
+              <label>요금제 기타 안내</label>
+              <input type="text" id="f_tool_plan_etc" placeholder="예: 연간 결제 시 20% 할인">
+            </div>
           </div>
         </div>
       </div>
