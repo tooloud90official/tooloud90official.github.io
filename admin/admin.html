@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOOLOUD Admin</title>
+  <!--
+    ✅ 로컬: <base href="http://127.0.0.1:5500/">
+    ✅ 배포: <base href="https://username.github.io/tooloud/">
+  -->
+  <base href="http://127.0.0.1:5500/">
+  <link rel="stylesheet" href="admin/admin.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-dot"></span>
+        <span class="logo-text">TOOLOUD</span>
+        <span class="logo-badge">ADMIN</span>
+      </div>
+      <h1 class="login-title">관리자 로그인</h1>
+      <p class="login-sub">관리자 계정으로만 접근 가능합니다</p>
+
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input type="email" id="email" placeholder="admin@tooloud.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <button class="login-btn" id="loginBtn">
+        <span class="btn-text">로그인</span>
+        <span class="btn-loader" style="display:none">로그인 중...</span>
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="admin/admin.js"></script>
+</body>
+</html>

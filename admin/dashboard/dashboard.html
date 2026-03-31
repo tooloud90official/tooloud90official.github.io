@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOOLOUD Admin Dashboard</title>
+  <!--
+    ✅ 로컬: <base href="http://127.0.0.1:5500/">
+    ✅ 배포: <base href="https://username.github.io/tooloud/">
+  -->
+  <base href="http://127.0.0.1:5500/">
+  <link rel="stylesheet" href="admin/dashboard/dashboard.css">
+</head>
+<body>
+
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="sidebar__logo">
+      <span class="logo-dot"></span>
+      <span class="logo-text">TOOLOUD</span>
+      <span class="logo-badge">ADMIN</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="nav-item is-active" data-tab="stats">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        로그 / 통계
+      </button>
+      <button class="nav-item" data-tab="tools">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        툴 관리
+      </button>
+      <button class="nav-item" data-tab="users">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        사용자 관리
+      </button>
+      <button class="nav-item" data-tab="inquiries">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        문의 관리
+      </button>
+    </nav>
+    <button class="logout-btn" id="logoutBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      로그아웃
+    </button>
+  </aside>
+
+  <!-- 메인 -->
+  <main class="main">
+
+    <!-- 통계 탭 -->
+    <section class="tab-panel is-active" id="tab-stats">
+      <div class="panel-header">
+        <h2 class="panel-title">로그 / 통계</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">전체 사용자</div><div class="stat-value" id="statUsers">-</div></div>
+        <div class="stat-card"><div class="stat-label">등록된 툴</div><div class="stat-value" id="statTools">-</div></div>
+        <div class="stat-card"><div class="stat-label">전체 작업물</div><div class="stat-value" id="statWorks">-</div></div>
+        <div class="stat-card"><div class="stat-label">미답변 문의</div><div class="stat-value" id="statInquiries">-</div></div>
+      </div>
+      <div class="chart-wrap">
+        <h3 class="chart-title">월별 가입자 추이</h3>
+        <div class="chart-container" id="chartContainer"></div>
+      </div>
+    </section>
+
+    <!-- 툴 관리 탭 -->
+    <section class="tab-panel" id="tab-tools">
+      <div class="panel-header">
+        <h2 class="panel-title">툴 관리</h2>
+        <button class="btn-primary" id="addToolBtn">+ 툴 추가</button>
+      </div>
+      <div class="search-bar-wrap">
+        <input type="text" class="table-search" id="toolSearch" placeholder="툴 이름으로 검색...">
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>툴 이름</th>
+              <th>회사</th>
+              <th>카테고리</th>
+              <th>키워드</th>
+              <th>링크</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="toolsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 사용자 관리 탭 -->
+    <section class="tab-panel" id="tab-users">
+      <div class="panel-header">
+        <h2 class="panel-title">사용자 관리</h2>
+      </div>
+      <div class="search-bar-wrap">
+        <input type="text" class="table-search" id="userSearch" placeholder="이름으로 검색...">
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>이름</th><th>직군</th><th>국적</th><th>연령대</th><th>권한</th><th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 문의 관리 탭 -->
+    <section class="tab-panel" id="tab-inquiries">
+      <div class="panel-header">
+        <h2 class="panel-title">문의 관리</h2>
+        <div class="filter-wrap">
+          <button class="filter-btn is-active" data-status="all">전체</button>
+          <button class="filter-btn" data-status="pending">미답변</button>
+          <button class="filter-btn" data-status="answered">답변완료</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>문의 내용</th><th>상태</th><th>문의일</th><th>답변일</th><th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="inquiriesBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ───────────────────────────────────────────
+       툴 추가/수정 모달 (스텝 방식)
+  ─────────────────────────────────────────── -->
+  <div class="modal-overlay" id="toolModal" style="display:none">
+    <div class="modal modal--wide">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h3 class="modal-title" id="toolModalTitle">툴 추가</h3>
+          <!-- 스텝 표시 -->
+          <div class="step-indicators">
+            <span class="step-dot is-active" data-step="0"></span>
+            <span class="step-dot" data-step="1"></span>
+            <span class="step-dot" data-step="2"></span>
+            <span class="step-dot" data-step="3"></span>
+          </div>
+        </div>
+        <button class="modal-close" id="toolModalClose">✕</button>
+      </div>
+
+      <!-- 스텝 라벨 -->
+      <div class="step-labels">
+        <span class="step-label is-active" data-step="0">기본 정보</span>
+        <span class="step-label" data-step="1">소개 · 링크</span>
+        <span class="step-label" data-step="2">요금제</span>
+        <span class="step-label" data-step="3">가격대 · 기타</span>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="toolId">
+
+        <!-- STEP 0: 기본 정보 -->
+        <div class="step-panel is-active" data-step="0">
+          <div class="form-row">
+            <div class="form-group"><label>툴 이름 <span class="required">*</span></label><input type="text" id="f_tool_name" placeholder="예: ChatGPT"></div>
+            <div class="form-group"><label>회사명</label><input type="text" id="f_tool_company" placeholder="예: OpenAI"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>카테고리 <span class="required">*</span></label>
+              <select id="f_tool_cat">
+                <option value="media">이미지·오디오·영상</option>
+                <option value="res">리서치</option>
+                <option value="doc">문서 생성·요약·편집</option>
+                <option value="dev">개발·코딩</option>
+                <option value="edu">학습·교육</option>
+                <option value="ast">챗봇·어시스턴트</option>
+              </select>
+            </div>
+            <div class="form-group"><label>서브카테고리</label><input type="text" id="f_tool_subcat" placeholder="예: 이미지 생성"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>키워드 <span class="hint">(한두 단어, 대표 기능)</span></label><input type="text" id="f_tool_key" placeholder="예: 이미지 생성"></div>
+            <div class="form-group"><label>아이콘 URL</label><input type="url" id="f_icon" placeholder="https://..."></div>
+          </div>
+        </div>
+
+        <!-- STEP 1: 소개 · 링크 -->
+        <div class="step-panel" data-step="1">
+          <div class="form-group"><label>한 줄 소개</label><input type="text" id="f_tool_des" placeholder="예: AI 기반 이미지 생성 도구"></div>
+          <div class="form-row">
+            <div class="form-group"><label>툴 링크</label><input type="url" id="f_tool_link" placeholder="https://..."></div>
+            <div class="form-group"><label>가격 페이지 링크</label><input type="url" id="f_pricing" placeholder="https://..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>iframe URL</label><input type="url" id="f_iframe" placeholder="https://..."></div>
+            <div class="form-group"><label>홍보 문구</label><input type="text" id="f_tool_prom" placeholder="예: 무료로 시작하세요"></div>
+          </div>
+        </div>
+
+        <!-- STEP 2: 요금제 -->
+        <div class="step-panel" data-step="2">
+          <p class="step-desc">최대 3개의 요금제를 입력하세요.</p>
+
+          <div class="plan-grid">
+            <!-- 플랜 1 -->
+            <div class="plan-card">
+              <div class="plan-card__header">플랜 1</div>
+              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan1_name" placeholder="예: Free"></div>
+              <div class="form-group"><label>가격</label><input type="text" id="f_plan1_price" placeholder="예: $0/월"></div>
+              <div class="form-group"><label>설명</label><textarea id="f_plan1_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+            </div>
+            <!-- 플랜 2 -->
+            <div class="plan-card">
+              <div class="plan-card__header">플랜 2</div>
+              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan2_name" placeholder="예: Pro"></div>
+              <div class="form-group"><label>가격</label><input type="text" id="f_plan2_price" placeholder="예: $20/월"></div>
+              <div class="form-group"><label>설명</label><textarea id="f_plan2_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+            </div>
+            <!-- 플랜 3 -->
+            <div class="plan-card">
+              <div class="plan-card__header">플랜 3</div>
+              <div class="form-group"><label>플랜명</label><input type="text" id="f_plan3_name" placeholder="예: Enterprise"></div>
+              <div class="form-group"><label>가격</label><input type="text" id="f_plan3_price" placeholder="예: 문의"></div>
+              <div class="form-group"><label>설명</label><textarea id="f_plan3_des" rows="3" placeholder="주요 기능을 입력하세요"></textarea></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:16px"><label>요금제 기타 안내</label><input type="text" id="f_tool_plan_etc" placeholder="예: 연간 결제 시 20% 할인"></div>
+        </div>
+
+        <!-- STEP 3: 가격대 · 기타 -->
+        <div class="step-panel" data-step="3">
+          <p class="step-desc">해당하는 가격대를 모두 선택하세요.</p>
+          <div class="checkbox-grid">
+            <label class="checkbox-item"><input type="checkbox" id="f_class1" value="무료"><span>무료</span></label>
+            <label class="checkbox-item"><input type="checkbox" id="f_class2" value="프리미엄"><span>프리미엄</span></label>
+            <label class="checkbox-item"><input type="checkbox" id="f_class3" value="구독형"><span>구독형</span></label>
+            <label class="checkbox-item"><input type="checkbox" id="f_class4" value="일회성 결제"><span>일회성 결제</span></label>
+            <label class="checkbox-item"><input type="checkbox" id="f_class5" value="문의"><span>문의</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="toolStepPrev" style="display:none">← 이전</button>
+        <div style="flex:1"></div>
+        <button class="btn-secondary" id="toolModalCancel">취소</button>
+        <button class="btn-primary" id="toolStepNext">다음 →</button>
+        <button class="btn-primary" id="toolModalSave" style="display:none">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 문의 답변 모달 -->
+  <div class="modal-overlay" id="inquiryModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">문의 답변</h3>
+        <button class="modal-close" id="inquiryModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="inquiryId">
+        <input type="hidden" id="inquiryUserId">
+        <div class="form-group">
+          <label>문의 내용</label>
+          <textarea id="inquiryQuestion" rows="3" readonly style="resize:none;opacity:0.7;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>답변</label>
+          <textarea id="inquiryAnswer" rows="5" placeholder="답변을 입력하세요..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="inquiryModalCancel">취소</button>
+        <button class="btn-primary" id="inquiryModalSave">답변 저장 + 알림 발송</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="admin/dashboard/dashboard.js"></script>
+</body>
+</html>
