@@ -5,6 +5,99 @@ import { supabase } from '/_ignore/supabase.js';
 // ─────────────────────────────────────────────────────────
 let adminUserId = null;
 
+function createUUIDv4() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  // randomUUID fallback
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+async function ensureAdminUserId() {
+  if (adminUserId) return adminUserId;
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return null;
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('role, user_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (error || data?.role !== 'admin') return null;
+
+  adminUserId = data.user_id;
+  return adminUserId;
+}
+
+async function markAdminInquiryNotificationRead(inquiryId, currentAdminUserId) {
+  if (!inquiryId || !currentAdminUserId) return null;
+
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('reference_id', inquiryId)
+    .eq('user_id', currentAdminUserId)
+    .eq('type', 'inquiry');
+
+  return error;
+}
+
+async function sendInquiryAnswerNotification(userId, inquiryId, currentAdminUserId) {
+  if (!userId || !inquiryId) return null;
+
+  // 이미 같은 문의에 대한 유저 알림이 있으면 재사용
+  const { data: existing, error: findError } = await supabase
+    .from('notifications')
+    .select('notification_id, is_read')
+    .eq('user_id', userId)
+    .eq('reference_id', inquiryId)
+    .eq('type', 'inquiry')
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (findError) return findError;
+
+  const existingRow = existing?.[0];
+
+  if (existingRow?.notification_id) {
+    const { error: updateError } = await supabase
+      .from('notifications')
+      .update({
+        sender_id: currentAdminUserId,
+        is_read: false,
+        created_at: new Date().toISOString(),
+      })
+      .eq('notification_id', existingRow.notification_id);
+
+    return updateError;
+  }
+
+  const payload = {
+    notification_id: createUUIDv4(),
+    user_id: userId,
+    sender_id: currentAdminUserId,
+    type: 'inquiry',
+    reference_id: inquiryId,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  };
+
+  console.log('[답변 알림 insert payload]', payload);
+
+  const { error: insertError } = await supabase
+    .from('notifications')
+    .insert(payload);
+
+  return insertError;
+}
+
 (async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -680,6 +773,12 @@ document.getElementById('inquiryModalSave')?.addEventListener('click', async () 
     return;
   }
 
+  const currentAdminUserId = await ensureAdminUserId();
+  if (!currentAdminUserId) {
+    alert('관리자 정보를 확인할 수 없습니다. 다시 로그인해주세요.');
+    return;
+  }
+
   // 1. 문의 답변 저장
   const { error: answerError } = await supabase
     .from('inquiries')
@@ -695,42 +794,26 @@ document.getElementById('inquiryModalSave')?.addEventListener('click', async () 
     return;
   }
 
-  // 2. 관리자한테 온 문의 알림 읽음 처리 (알림창에서 자동 제거)
-  if (adminUserId) {
-    const { error: readError } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('reference_id', inquiryId)
-      .eq('user_id', adminUserId)
-      .eq('type', 'inquiry');
-
-    if (readError) {
-      console.warn('관리자 알림 읽음 처리 실패:', readError.message);
-    }
+  // 2. 관리자 알림 읽음 처리
+  const readError = await markAdminInquiryNotificationRead(inquiryId, currentAdminUserId);
+  if (readError) {
+    console.warn('관리자 알림 읽음 처리 실패:', readError.message);
   }
 
-  // 3. 유저한테 답변 완료 알림 발송 (is_read: false 로 새로 insert)
-  if (userId) {
-    const { error: notiError } = await supabase
-      .from('notifications')
-      .insert({
-        notification_id: crypto.randomUUID(),
-        user_id: userId,
-        sender_id: adminUserId,
-        type: 'inquiry',
-        reference_id: inquiryId,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      });
-
-    if (notiError) {
-      console.warn('유저 알림 발송 실패:', notiError.message);
-    }
+  // 3. 유저에게 답변 완료 알림 발송
+  const notiError = await sendInquiryAnswerNotification(userId, inquiryId, currentAdminUserId);
+  if (notiError) {
+    console.warn('유저 알림 발송 실패:', notiError.message);
+    alert('답변은 저장됐지만 유저 알림 발송은 실패했어요: ' + notiError.message);
+  } else {
+    alert('답변이 저장되고 유저에게 알림이 발송되었습니다.');
   }
 
   document.getElementById('inquiryModal').style.display = 'none';
   await loadInquiries();
-  alert('답변이 저장되고 유저에게 알림이 발송되었습니다.');
+
+  // 관리자 알림 UI를 따로 불러오는 함수가 있다면 여기서 다시 호출
+  // await loadNotifications();
 });
 
 // ─────────────────────────────────────────────────────────
