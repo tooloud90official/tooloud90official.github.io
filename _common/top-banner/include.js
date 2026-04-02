@@ -68,7 +68,7 @@ function renderLoggedIn(authArea) {
 }
 
 // ===== 알림 타입별 텍스트 + 링크 변환 =====
-function formatAlert(n, senderNameMap = {}, currentUserId = null) {
+function formatAlert(n, senderNameMap = {}, senderRoleMap = {}, currentUserId = null) {  // ✅ senderRoleMap 추가
   const sender      = senderNameMap[n.sender_id] || '누군가';
   const referenceId = n.reference_id || null;
 
@@ -101,17 +101,12 @@ function formatAlert(n, senderNameMap = {}, currentUserId = null) {
   }
 
   if (n.type === 'inquiry') {
-
-    // 🔥 관리자 판별 (현재는 이름 기준)
-    const isAdmin = sender.includes('툴라우드 오피셜');
+    const isAdmin = senderRoleMap[n.sender_id] === 'admin';  // ✅ role 기반 판별
 
     let desc;
-
     if (isAdmin) {
-      // ✅ 유저 입장 (관리자가 답변)
-      desc = '관리자님이 문의사항에 답변을 했어요.';
+      desc = '관리자가 문의사항에 답변했습니다.';
     } else {
-      // ✅ 관리자 입장 (유저가 문의 등록)
       desc = `${sender}님이 문의사항을 등록했어요.`;
     }
 
@@ -232,20 +227,22 @@ async function initLogout() {
 
       const senderIds = [...new Set((notiData || []).map(n => n.sender_id).filter(Boolean))];
       let senderNameMap = {};
+      let senderRoleMap = {};  // ✅ 추가
 
       if (senderIds.length > 0) {
         const { data: senderUsers } = await supabase
           .from('users')
-          .select('user_id, user_name')
+          .select('user_id, user_name, role')  // ✅ role 추가
           .in('user_id', senderIds);
 
         (senderUsers || []).forEach(u => {
           senderNameMap[u.user_id] = u.user_name;
+          senderRoleMap[u.user_id] = u.role;   // ✅ role 저장
         });
       }
 
       const alerts = (notiData || []).map(n =>
-        formatAlert(n, senderNameMap, session.user.id)
+        formatAlert(n, senderNameMap, senderRoleMap, session.user.id)  // ✅ senderRoleMap 전달
       );
 
       if (!document.getElementById('alert-root')) {
