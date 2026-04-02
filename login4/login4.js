@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         user_age       : age,
         user_job       : job,
         favorite_tools : selectedTools,
+        created_at     : new Date().toISOString(), // ✅ 여기
       });
 
       if (error) throw error;
